@@ -85,6 +85,15 @@ app.post('/api/simulate', (req, res) => {
     // Calculate drawdown scenarios with stop loss
     const drawdownScenarios = calculateDrawdownScenarios(accountSize, riskPercent, stopLoss || avgLoss, 15);
 
+    // New features
+    const riskOfRuin = calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss || avgLoss);
+    const targetProjections = calculateTargetProjections(accountSize, expectedDailyProfit, [2, 3, 5, 10]);
+    const timeBasedAnalysis = calculateTimeBasedAnalysis(projection, tradesPerDay);
+    const recoveryCalculations = calculateRecoveryScenarios(riskPercent, avgWin, [10, 20, 30, 40, 50]);
+    const sharpeRatio = calculateSharpeRatio(monteCarloResults, accountSize);
+    const winStreakProbabilities = calculateStreakProbabilities(1 - winRate, 15); // For losses, inverse for wins
+    const simulationMode = 'stopLoss'; // Will be toggled by frontend
+
     res.json({
       success: true,
       data: {
@@ -102,12 +111,19 @@ app.post('/api/simulate', (req, res) => {
           maxDailyLoss: Math.round(maxDailyLoss * 100) / 100,
           stopLoss: stopLoss || avgLoss,
           contractPrice: contractPrice || 1.0,
-          commission: commission || 0.65
+          commission: commission || 0.65,
+          sharpeRatio: sharpeRatio
         },
         projection,
         monteCarlo: monteCarloResults,
         streakProbabilities,
-        drawdownScenarios
+        drawdownScenarios,
+        riskOfRuin,
+        targetProjections,
+        timeBasedAnalysis,
+        recoveryCalculations,
+        winStreakProbabilities,
+        simulationMode
       }
     });
   } catch (error) {
@@ -272,6 +288,132 @@ function calculateDrawdownScenarios(accountSize, riskPercent, stopLoss, maxLosse
   return scenarios;
 }
 
+// 1. Calculate Risk of Ruin (probability of losing X% of account)
+function calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss) {
+  const ruinLevels = [25, 50, 75, 90]; // Percentage drawdown levels
+  const results = [];
+  
+  for (const level of ruinLevels) {
+    const targetBalance = accountSize * (1 - level / 100);
+    const lossesNeeded = Math.ceil(Math.log(targetBalance / accountSize) / Math.log(1 - riskPercent * stopLoss));
+    const lossRate = 1 - winRate;
+    
+    // Simplified gambler's ruin formula approximation
+    const q = lossRate;
+    const p = winRate;
+    const ratio = avgWin / stopLoss;
+    
+    let ruinProb;
+    if (p === q && ratio === 1) {
+      ruinProb = 1; // Fair game, ruin is certain
+    } else if (p > q) {
+      // Favorable game
+      const r = (q * ratio) / p;
+      ruinProb = r >= 1 ? 1 : Math.pow(r, Math.abs(lossesNeeded));
+    } else {
+      // Unfavorable game
+      ruinProb = 1;
+    }
+    
+    results.push({
+      drawdownLevel: level,
+      probability: Math.round(Math.min(ruinProb, 1) * 10000) / 100,
+      lossesRequired: Math.abs(lossesNeeded)
+    });
+  }
+  
+  return results;
+}
+
+// 2. Calculate target-based projections
+function calculateTargetProjections(accountSize, dailyProfit, targetMultiples) {
+  const results = [];
+  
+  for (const multiple of targetMultiples) {
+    const targetAmount = accountSize * multiple;
+    const profitNeeded = targetAmount - accountSize;
+    const daysNeeded = dailyProfit > 0 ? Math.ceil(profitNeeded / dailyProfit) : Infinity;
+    const weeksNeeded = Math.ceil(daysNeeded / 5);
+    const monthsNeeded = Math.ceil(daysNeeded / 21);
+    
+    results.push({
+      targetMultiple: multiple,
+      targetAmount: Math.round(targetAmount * 100) / 100,
+      profitNeeded: Math.round(profitNeeded * 100) / 100,
+      daysNeeded: daysNeeded === Infinity ? 'Never' : daysNeeded,
+      weeksNeeded: weeksNeeded === Infinity ? 'Never' : weeksNeeded,
+      monthsNeeded: monthsNeeded === Infinity ? 'Never' : monthsNeeded
+    });
+  }
+  
+  return results;
+}
+
+// 3. Calculate time-based analysis (daily, weekly, monthly, quarterly)
+function calculateTimeBasedAnalysis(projection, tradesPerDay) {
+  const analysis = {
+    daily: { trades: tradesPerDay },
+    weekly: { trades: tradesPerDay * 5 },
+    monthly: { trades: tradesPerDay * 21 },
+    quarterly: { trades: tradesPerDay * 63 }
+  };
+  
+  // Calculate expected balances at each time period
+  if (projection.length > 0) {
+    analysis.daily.balance = projection[Math.min(1, projection.length - 1)]?.balance || 0;
+    analysis.weekly.balance = projection[Math.min(5, projection.length - 1)]?.balance || 0;
+    analysis.monthly.balance = projection[Math.min(21, projection.length - 1)]?.balance || 0;
+    analysis.quarterly.balance = projection[Math.min(63, projection.length - 1)]?.balance || 0;
+    
+    const startBalance = projection[0]?.balance || 0;
+    analysis.daily.growth = ((analysis.daily.balance - startBalance) / startBalance) * 100;
+    analysis.weekly.growth = ((analysis.weekly.balance - startBalance) / startBalance) * 100;
+    analysis.monthly.growth = ((analysis.monthly.balance - startBalance) / startBalance) * 100;
+    analysis.quarterly.growth = ((analysis.quarterly.balance - startBalance) / startBalance) * 100;
+  }
+  
+  return analysis;
+}
+
+// 4. Calculate recovery scenarios after drawdowns
+function calculateRecoveryScenarios(riskPercent, avgWin, drawdownLevels) {
+  const results = [];
+  
+  for (const drawdown of drawdownLevels) {
+    const remainingCapital = 1 - (drawdown / 100);
+    const recoveryNeeded = (drawdown / 100) / remainingCapital; // % gain needed to recover
+    const winsNeeded = Math.ceil(recoveryNeeded / (riskPercent * avgWin));
+    
+    results.push({
+      drawdownPercent: drawdown,
+      recoveryNeeded: Math.round(recoveryNeeded * 10000) / 100,
+      winsRequired: winsNeeded,
+      remainingCapital: Math.round(remainingCapital * 10000) / 100
+    });
+  }
+  
+  return results;
+}
+
+// 5. Calculate Sharpe Ratio from Monte Carlo results
+function calculateSharpeRatio(monteCarloResults, accountSize) {
+  if (!monteCarloResults || !monteCarloResults.statistics) {
+    return 0;
+  }
+  
+  const returns = monteCarloResults.statistics.meanReturn / 100;
+  const stdDev = monteCarloResults.statistics.stdDev;
+  
+  // Assuming risk-free rate of 5% annually, ~0.02% daily
+  const riskFreeRate = 0.0002;
+  const avgReturn = returns;
+  
+  if (stdDev === 0) return 0;
+  
+  const sharpe = (avgReturn - riskFreeRate) / (stdDev / accountSize);
+  return Math.round(sharpe * 100) / 100;
+}
+
 // Export to CSV endpoint
 app.post('/api/export-csv', (req, res) => {
   const { data } = req.body;
@@ -305,5 +447,10 @@ module.exports = {
   runMonteCarloSimulation, 
   createHistogram, 
   calculateStreakProbabilities, 
-  calculateDrawdownScenarios 
+  calculateDrawdownScenarios,
+  calculateRiskOfRuin,
+  calculateTargetProjections,
+  calculateTimeBasedAnalysis,
+  calculateRecoveryScenarios,
+  calculateSharpeRatio
 };

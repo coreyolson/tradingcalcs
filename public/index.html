@@ -255,6 +255,10 @@
                                 <div class="metric-label">Ruin %</div>
                                 <div class="metric-value" id="ruinValue">--</div>
                             </div>
+                            <div class="metric-box" data-tooltip="Risk-adjusted return metric">
+                                <div class="metric-label">Sharpe</div>
+                                <div class="metric-value" id="sharpeValue">--</div>
+                            </div>
                         </div>
 
                         <!-- Charts Row -->
@@ -344,6 +348,133 @@
                                     <div class="card-body p-2">
                                         <div id="positionSizing">
                                             <!-- Populated by JS -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- New Features: Win Streaks -->
+                        <div class="row g-3 mt-2">
+                            <div class="col-lg-4">
+                                <div class="card compact-table">
+                                    <div class="card-header">
+                                        <i class="fas fa-trophy"></i> Win Streaks
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="table-no-scroll">
+                                            <table class="table table-sm mb-0" id="winStreakTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Streak</th>
+                                                        <th>Prob</th>
+                                                        <th>Freq</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Populated by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="card compact-table">
+                                    <div class="card-header">
+                                        <i class="fas fa-skull-crossbones"></i> Risk of Ruin
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="table-no-scroll">
+                                            <table class="table table-sm mb-0" id="riskOfRuinTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>DD%</th>
+                                                        <th>Prob</th>
+                                                        <th>Losses</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Populated by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="card compact-table">
+                                    <div class="card-header">
+                                        <i class="fas fa-bullseye"></i> Account Targets
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="table-no-scroll">
+                                            <table class="table table-sm mb-0" id="targetTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Target</th>
+                                                        <th>Amount</th>
+                                                        <th>Days</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Populated by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- New Features: Time-Based & Recovery -->
+                        <div class="row g-3 mt-2">
+                            <div class="col-lg-6">
+                                <div class="card compact-table">
+                                    <div class="card-header">
+                                        <i class="fas fa-calendar-alt"></i> Time-Based Projections
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="table-no-scroll">
+                                            <table class="table table-sm mb-0" id="timeBasedTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Period</th>
+                                                        <th>Trades</th>
+                                                        <th>Balance</th>
+                                                        <th>Growth</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Populated by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="card compact-table">
+                                    <div class="card-header">
+                                        <i class="fas fa-heartbeat"></i> Recovery Analysis
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div class="table-no-scroll">
+                                            <table class="table table-sm mb-0" id="recoveryTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>DD%</th>
+                                                        <th>Recovery</th>
+                                                        <th>Wins</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Populated by JS -->
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>

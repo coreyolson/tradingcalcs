@@ -1730,3 +1730,149 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
         });
     });
 });
+describe('New Feature Functions', () => {
+    let appModule;
+    
+    beforeAll(() => {
+        appModule = require('../public/app.js');
+    });
+    
+    test('populateWinStreakTable should populate win streak data', (done) => {
+        const mockTbody = {
+            style: {},
+            innerHTML: '',
+            insertRow: jest.fn(() => ({
+                style: {},
+                innerHTML: ''
+            }))
+        };
+
+        global.document.querySelector = jest.fn((selector) => {
+            if (selector === '#winStreakTable tbody') return mockTbody;
+            return null;
+        });
+
+        const streaks = [
+            { streak: 1, probability: 80, frequency: '1 in 1' },
+            { streak: 2, probability: 64, frequency: '1 in 2' }
+        ];
+
+        appModule.populateWinStreakTable(streaks);
+
+        setTimeout(() => {
+            expect(mockTbody.insertRow).toHaveBeenCalled();
+            done();
+        }, 200);
+    });
+
+    test('populateRiskOfRuinTable should populate risk data', (done) => {
+        const mockTbody = {
+            style: {},
+            innerHTML: '',
+            insertRow: jest.fn(() => ({
+                style: {},
+                innerHTML: ''
+            }))
+        };
+
+        global.document.querySelector = jest.fn((selector) => {
+            if (selector === '#riskOfRuinTable tbody') return mockTbody;
+            return null;
+        });
+
+        const risks = [
+            { drawdownLevel: 25, probability: 5.5, lossesRequired: 10 }
+        ];
+
+        appModule.populateRiskOfRuinTable(risks);
+
+        setTimeout(() => {
+            expect(mockTbody.insertRow).toHaveBeenCalled();
+            done();
+        }, 200);
+    });
+
+    test('populateTargetTable should populate target data', (done) => {
+        const mockTbody = {
+            style: {},
+            innerHTML: '',
+            insertRow: jest.fn(() => ({
+                style: {},
+                innerHTML: ''
+            }))
+        };
+
+        global.document.querySelector = jest.fn((selector) => {
+            if (selector === '#targetTable tbody') return mockTbody;
+            return null;
+        });
+
+        const targets = [
+            { targetMultiple: 2, targetAmount: 10000, daysNeeded: 50 }
+        ];
+
+        appModule.populateTargetTable(targets);
+
+        setTimeout(() => {
+            expect(mockTbody.insertRow).toHaveBeenCalled();
+            done();
+        }, 200);
+    });
+
+    test('populateTimeBasedTable should populate time-based analysis', (done) => {
+        const mockTbody = {
+            style: {},
+            innerHTML: '',
+            insertRow: jest.fn(() => ({
+                style: {},
+                innerHTML: ''
+            }))
+        };
+
+        global.document.querySelector = jest.fn((selector) => {
+            if (selector === '#timeBasedTable tbody') return mockTbody;
+            return null;
+        });
+
+        const analysis = {
+            daily: { trades: 2, balance: 5100, growth: 2 },
+            weekly: { trades: 10, balance: 5500, growth: 10 },
+            monthly: { trades: 42, balance: 6500, growth: 30 },
+            quarterly: { trades: 126, balance: 8500, growth: 70 }
+        };
+
+        appModule.populateTimeBasedTable(analysis);
+
+        setTimeout(() => {
+            expect(mockTbody.insertRow).toHaveBeenCalled();
+            done();
+        }, 200);
+    });
+
+    test('populateRecoveryTable should populate recovery data', (done) => {
+        const mockTbody = {
+            style: {},
+            innerHTML: '',
+            insertRow: jest.fn(() => ({
+                style: {},
+                innerHTML: ''
+            }))
+        };
+
+        global.document.querySelector = jest.fn((selector) => {
+            if (selector === '#recoveryTable tbody') return mockTbody;
+            return null;
+        });
+
+        const recoveries = [
+            { drawdownPercent: 10, recoveryNeeded: 11.11, winsRequired: 5 }
+        ];
+
+        appModule.populateRecoveryTable(recoveries);
+
+        setTimeout(() => {
+            expect(mockTbody.insertRow).toHaveBeenCalled();
+            done();
+        }, 200);
+    });
+});

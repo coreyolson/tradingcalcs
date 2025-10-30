@@ -316,6 +316,26 @@ function displayResults(data) {
     populateStreakTable(streakProbabilities);
     populateDrawdownTable(drawdownScenarios);
     
+    // Populate new feature tables
+    if (data.winStreakProbabilities) {
+        populateWinStreakTable(data.winStreakProbabilities);
+    }
+    if (data.riskOfRuin) {
+        populateRiskOfRuinTable(data.riskOfRuin);
+    }
+    if (data.targetProjections) {
+        populateTargetTable(data.targetProjections);
+    }
+    if (data.timeBasedAnalysis) {
+        populateTimeBasedTable(data.timeBasedAnalysis);
+    }
+    if (data.recoveryCalculations) {
+        populateRecoveryTable(data.recoveryCalculations);
+    }
+    if (metrics.sharpeRatio !== undefined) {
+        updateMetricWithColor('sharpeValue', metrics.sharpeRatio.toFixed(2), metrics.sharpeRatio, 1, 2);
+    }
+    
     // Generate position sizing guide
     generatePositionSizing(data);
 }
@@ -587,6 +607,161 @@ function populateDrawdownTable(scenarios) {
             }, index * 30);
         });
         
+        tbody.style.opacity = '1';
+    }, 150);
+}
+
+// Populate win streak table
+function populateWinStreakTable(streaks) {
+    const tbody = document.querySelector('#winStreakTable tbody');
+    tbody.style.opacity = '0.3';
+    
+    setTimeout(() => {
+        tbody.innerHTML = '';
+        streaks.slice(0, 8).forEach((streak, index) => {
+            const row = tbody.insertRow();
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-10px)';
+            
+            row.innerHTML = `
+                <td>${streak.streak}</td>
+                <td>${streak.probability}%</td>
+                <td><small>${streak.frequency}</small></td>
+            `;
+            
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateX(0)';
+            }, index * 30);
+        });
+        tbody.style.opacity = '1';
+    }, 150);
+}
+
+// Populate risk of ruin table
+function populateRiskOfRuinTable(risks) {
+    const tbody = document.querySelector('#riskOfRuinTable tbody');
+    tbody.style.opacity = '0.3';
+    
+    setTimeout(() => {
+        tbody.innerHTML = '';
+        risks.forEach((risk, index) => {
+            const row = tbody.insertRow();
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-10px)';
+            
+            row.innerHTML = `
+                <td>${risk.drawdownLevel}%</td>
+                <td>${risk.probability}%</td>
+                <td>${risk.lossesRequired}</td>
+            `;
+            
+            if (risk.probability > 10) {
+                row.style.backgroundColor = 'rgba(255, 51, 102, 0.1)';
+                row.style.borderLeft = '2px solid var(--danger-color)';
+            }
+            
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateX(0)';
+            }, index * 30);
+        });
+        tbody.style.opacity = '1';
+    }, 150);
+}
+
+// Populate target table
+function populateTargetTable(targets) {
+    const tbody = document.querySelector('#targetTable tbody');
+    tbody.style.opacity = '0.3';
+    
+    setTimeout(() => {
+        tbody.innerHTML = '';
+        targets.forEach((target, index) => {
+            const row = tbody.insertRow();
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-10px)';
+            
+            row.innerHTML = `
+                <td>${target.targetMultiple}x</td>
+                <td><small>$${target.targetAmount.toLocaleString()}</small></td>
+                <td>${target.daysNeeded}</td>
+            `;
+            
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateX(0)';
+            }, index * 30);
+        });
+        tbody.style.opacity = '1';
+    }, 150);
+}
+
+// Populate time-based table
+function populateTimeBasedTable(analysis) {
+    const tbody = document.querySelector('#timeBasedTable tbody');
+    tbody.style.opacity = '0.3';
+    
+    setTimeout(() => {
+        tbody.innerHTML = '';
+        const periods = ['daily', 'weekly', 'monthly', 'quarterly'];
+        const labels = ['Daily', 'Weekly', 'Monthly', 'Quarterly'];
+        
+        periods.forEach((period, index) => {
+            const data = analysis[period];
+            const row = tbody.insertRow();
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-10px)';
+            
+            const growthColor = data.growth >= 0 ? 'success' : 'danger';
+            row.innerHTML = `
+                <td>${labels[index]}</td>
+                <td>${data.trades}</td>
+                <td><small>$${data.balance.toLocaleString()}</small></td>
+                <td class="text-${growthColor}">${data.growth.toFixed(1)}%</td>
+            `;
+            
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateX(0)';
+            }, index * 30);
+        });
+        tbody.style.opacity = '1';
+    }, 150);
+}
+
+// Populate recovery table
+function populateRecoveryTable(recoveries) {
+    const tbody = document.querySelector('#recoveryTable tbody');
+    tbody.style.opacity = '0.3';
+    
+    setTimeout(() => {
+        tbody.innerHTML = '';
+        recoveries.forEach((recovery, index) => {
+            const row = tbody.insertRow();
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-10px)';
+            
+            row.innerHTML = `
+                <td>${recovery.drawdownPercent}%</td>
+                <td>${recovery.recoveryNeeded}%</td>
+                <td>${recovery.winsRequired}</td>
+            `;
+            
+            if (recovery.winsRequired > 20) {
+                row.style.backgroundColor = 'rgba(255, 51, 102, 0.1)';
+            }
+            
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateX(0)';
+            }, index * 30);
+        });
         tbody.style.opacity = '1';
     }, 150);
 }
@@ -872,6 +1047,11 @@ if (typeof module !== 'undefined' && module.exports) {
         formatProjectionTooltipTitle,
         formatProjectionTooltipLabel,
         formatYAxisTick,
-        formatMonteCarloTooltipLabel
+        formatMonteCarloTooltipLabel,
+        populateWinStreakTable,
+        populateRiskOfRuinTable,
+        populateTargetTable,
+        populateTimeBasedTable,
+        populateRecoveryTable
     };
 }

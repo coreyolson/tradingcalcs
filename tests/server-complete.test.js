@@ -4,7 +4,12 @@ const {
   runMonteCarloSimulation,
   createHistogram,
   calculateStreakProbabilities,
-  calculateDrawdownScenarios
+  calculateDrawdownScenarios,
+  calculateRiskOfRuin,
+  calculateTargetProjections,
+  calculateTimeBasedAnalysis,
+  calculateRecoveryScenarios,
+  calculateSharpeRatio
 } = require('../server');
 
 describe('Server.js - Complete Branch Coverage', () => {
@@ -624,6 +629,218 @@ describe('Server.js - Complete Branch Coverage', () => {
 
       // If Express catches it, we get 400
       expect([400, 500]).toContain(response.status);
+    });
+  });
+
+  describe('New Features', () => {
+    describe('calculateRiskOfRuin', () => {
+      test('should calculate risk of ruin for different drawdown levels', () => {
+        const results = calculateRiskOfRuin(10000, 0.02, 0.6, 1.5, 0.5);
+        
+        expect(results).toHaveLength(4);
+        expect(results[0].drawdownLevel).toBe(25);
+        expect(results[1].drawdownLevel).toBe(50);
+        expect(results[2].drawdownLevel).toBe(75);
+        expect(results[3].drawdownLevel).toBe(90);
+        
+        results.forEach(result => {
+          expect(result).toHaveProperty('probability');
+          expect(result).toHaveProperty('lossesRequired');
+          expect(result.probability).toBeGreaterThanOrEqual(0);
+          expect(result.probability).toBeLessThanOrEqual(100);
+        });
+      });
+
+      test('should show higher risk for unfavorable game', () => {
+        const favorable = calculateRiskOfRuin(10000, 0.05, 0.8, 1.5, 0.5);
+        const unfavorable = calculateRiskOfRuin(10000, 0.05, 0.3, 1.5, 0.5);
+        
+        // Unfavorable game should have higher ruin probability
+        expect(unfavorable[0].probability).toBeGreaterThanOrEqual(favorable[0].probability);
+      });
+
+      test('should handle fair game (p = q, ratio = 1)', () => {
+        // 50% win rate with equal win/loss ratio = fair game
+        const results = calculateRiskOfRuin(10000, 0.02, 0.5, 1.0, 1.0);
+        
+        // Fair game has certain ruin over long term
+        expect(results[0].probability).toBe(100);
+      });
+
+      test('should handle ratio >= 1 case in favorable game', () => {
+        // Create scenario where r >= 1
+        const results = calculateRiskOfRuin(10000, 0.02, 0.4, 0.5, 1.0);
+        
+        expect(results[0].probability).toBeGreaterThan(0);
+      });
+    });
+
+    describe('calculateTargetProjections', () => {
+      test('should calculate target projections', () => {
+        const results = calculateTargetProjections(5000, 100, [2, 3, 5, 10]);
+        
+        expect(results).toHaveLength(4);
+        expect(results[0].targetMultiple).toBe(2);
+        expect(results[0].targetAmount).toBe(10000);
+        expect(results[0].daysNeeded).toBe(50);
+        
+        expect(results[1].targetMultiple).toBe(3);
+        expect(results[1].targetAmount).toBe(15000);
+      });
+
+      test('should return Never for negative daily profit', () => {
+        const results = calculateTargetProjections(5000, -50, [2]);
+        
+        expect(results[0].daysNeeded).toBe('Never');
+        expect(results[0].weeksNeeded).toBe('Never');
+        expect(results[0].monthsNeeded).toBe('Never');
+      });
+
+      test('should return Never for zero daily profit', () => {
+        const results = calculateTargetProjections(5000, 0, [2]);
+        
+        expect(results[0].daysNeeded).toBe('Never');
+      });
+    });
+
+    describe('calculateTimeBasedAnalysis', () => {
+      test('should analyze different time periods', () => {
+        const projection = [];
+        for (let i = 0; i <= 100; i++) {
+          projection.push({ day: i, balance: 5000 + (i * 20) });
+        }
+        
+        const results = calculateTimeBasedAnalysis(projection, 2);
+        
+        expect(results.daily.trades).toBe(2);
+        expect(results.weekly.trades).toBe(10);
+        expect(results.monthly.trades).toBe(42);
+        expect(results.quarterly.trades).toBe(126);
+        
+        expect(results.daily.balance).toBe(5020); // Day 1
+        expect(results.weekly.balance).toBe(5100); // Day 5
+        expect(results.monthly.balance).toBe(5420); // Day 21
+        expect(results.quarterly.balance).toBe(6260); // Day 63
+        
+        expect(results.daily.growth).toBeGreaterThan(0);
+        expect(results.quarterly.growth).toBeGreaterThan(results.monthly.growth);
+      });
+
+      test('should handle short projection arrays', () => {
+        const projection = [{ day: 0, balance: 5000 }];
+        const results = calculateTimeBasedAnalysis(projection, 1);
+        
+        expect(results.daily.balance).toBe(5000); // Falls back to first element when day 1 doesn't exist
+      });
+
+      test('should handle empty projection', () => {
+        const results = calculateTimeBasedAnalysis([], 2);
+        
+        expect(results.daily.trades).toBe(2);
+        expect(results.daily.balance).toBeUndefined(); // No projection data
+      });
+    });
+
+    describe('calculateRecoveryScenarios', () => {
+      test('should calculate recovery requirements', () => {
+        const results = calculateRecoveryScenarios(0.05, 1.5, [10, 20, 30, 40, 50]);
+        
+        expect(results).toHaveLength(5);
+        
+        results.forEach((recovery, index) => {
+          expect(recovery.drawdownPercent).toBe([10, 20, 30, 40, 50][index]);
+          expect(recovery).toHaveProperty('recoveryNeeded');
+          expect(recovery).toHaveProperty('winsRequired');
+          expect(recovery).toHaveProperty('remainingCapital');
+          
+          expect(recovery.winsRequired).toBeGreaterThan(0);
+          expect(recovery.remainingCapital).toBeGreaterThan(0);
+          expect(recovery.remainingCapital).toBeLessThan(100);
+        });
+      });
+
+      test('should show larger drawdowns need more recovery', () => {
+        const results = calculateRecoveryScenarios(0.05, 1.0, [10, 50]);
+        
+        expect(results[1].recoveryNeeded).toBeGreaterThan(results[0].recoveryNeeded);
+        expect(results[1].winsRequired).toBeGreaterThan(results[0].winsRequired);
+      });
+
+      test('should handle 50% drawdown correctly', () => {
+        const results = calculateRecoveryScenarios(0.05, 1.0, [50]);
+        
+        // 50% drawdown needs 100% gain to recover
+        expect(results[0].recoveryNeeded).toBeCloseTo(100, 1);
+        expect(results[0].remainingCapital).toBeCloseTo(50, 1);
+      });
+    });
+
+    describe('calculateSharpeRatio', () => {
+      test('should calculate Sharpe ratio from Monte Carlo results', () => {
+        const monteCarloResults = {
+          statistics: {
+            mean: 15000,
+            median: 14500,
+            stdDev: 2000,
+            meanReturn: 50,
+            ruinProbability: 5
+          }
+        };
+        
+        const sharpe = calculateSharpeRatio(monteCarloResults, 10000);
+        
+        expect(typeof sharpe).toBe('number');
+        expect(sharpe).not.toBeNaN();
+      });
+
+      test('should return 0 for zero standard deviation', () => {
+        const monteCarloResults = {
+          statistics: {
+            mean: 10000,
+            stdDev: 0,
+            meanReturn: 0
+          }
+        };
+        
+        const sharpe = calculateSharpeRatio(monteCarloResults, 10000);
+        expect(sharpe).toBe(0);
+      });
+
+      test('should return 0 for missing data', () => {
+        const sharpe1 = calculateSharpeRatio(null, 10000);
+        expect(sharpe1).toBe(0);
+        
+        const sharpe2 = calculateSharpeRatio({}, 10000);
+        expect(sharpe2).toBe(0);
+      });
+    });
+
+    describe('API Integration - New Features', () => {
+      test('should return all new feature data in API response', async () => {
+        const response = await request(app)
+          .post('/api/simulate')
+          .send({
+            accountSize: 5000,
+            riskPercent: 0.05,
+            winRate: 0.6,
+            avgWin: 0.5,
+            avgLoss: 0.3,
+            stopLoss: 0.5,
+            contractPrice: 1.0,
+            commission: 0.65,
+            tradesPerDay: 2,
+            days: 30,
+            simulations: 100
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.data).toHaveProperty('riskOfRuin');
+        expect(response.body.data).toHaveProperty('targetProjections');
+        expect(response.body.data).toHaveProperty('timeBasedAnalysis');
+        expect(response.body.data).toHaveProperty('recoveryCalculations');
+        expect(response.body.data).toHaveProperty('winStreakProbabilities');
+        expect(response.body.data.metrics).toHaveProperty('sharpeRatio');
+      });
     });
   });
 });
