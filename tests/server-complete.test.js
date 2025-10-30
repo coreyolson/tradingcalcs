@@ -843,4 +843,50 @@ describe('Server.js - Complete Branch Coverage', () => {
       });
     });
   });
+
+  describe('CSV Export Endpoint', () => {
+    test('should export projection data to CSV', async () => {
+      const testData = {
+        projection: [
+          { day: 0, balance: 5000 },
+          { day: 1, balance: 5100 },
+          { day: 2, balance: 5200 }
+        ]
+      };
+
+      const response = await request(app)
+        .post('/api/export-csv')
+        .send({ data: testData });
+
+      expect(response.status).toBe(200);
+      expect(response.headers['content-type']).toContain('text/csv');
+      expect(response.headers['content-disposition']).toContain('attachment');
+      expect(response.text).toContain('Day,Balance');
+      expect(response.text).toContain('0,5000');
+      expect(response.text).toContain('1,5100');
+      expect(response.text).toContain('2,5200');
+    });
+
+    test('should handle empty projection data', async () => {
+      const testData = {
+        projection: []
+      };
+
+      const response = await request(app)
+        .post('/api/export-csv')
+        .send({ data: testData });
+
+      expect(response.status).toBe(200);
+      expect(response.text).toContain('Day,Balance');
+    });
+  });
+
+  describe('Main Page Endpoint', () => {
+    test('should serve index.html', async () => {
+      const response = await request(app).get('/');
+
+      expect(response.status).toBe(200);
+      expect(response.headers['content-type']).toContain('text/html');
+    });
+  });
 });

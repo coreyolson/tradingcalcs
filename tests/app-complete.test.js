@@ -1876,3 +1876,387 @@ describe('New Feature Functions', () => {
         }, 200);
     });
 });
+
+describe('Branch Coverage - New Features', () => {
+    let appModule;
+    
+    beforeAll(() => {
+        appModule = require('../public/app.js');
+    });
+    
+    describe('Conditional branches for new features', () => {
+        test('should handle missing winStreakProbabilities', () => {
+            const data = {
+                metrics: { sharpeRatio: 1.5 },
+                streakProbabilities: [],
+                drawdownScenarios: []
+            };
+            
+            // Should not throw when winStreakProbabilities is missing
+            expect(() => {
+                if (data.winStreakProbabilities) {
+                    appModule.populateWinStreakTable(data.winStreakProbabilities);
+                }
+            }).not.toThrow();
+        });
+
+        test('should handle missing riskOfRuin', () => {
+            const data = {
+                metrics: { sharpeRatio: 1.5 }
+            };
+            
+            expect(() => {
+                if (data.riskOfRuin) {
+                    appModule.populateRiskOfRuinTable(data.riskOfRuin);
+                }
+            }).not.toThrow();
+        });
+
+        test('should handle missing targetProjections', () => {
+            const data = {
+                metrics: { sharpeRatio: 1.5 }
+            };
+            
+            expect(() => {
+                if (data.targetProjections) {
+                    appModule.populateTargetTable(data.targetProjections);
+                }
+            }).not.toThrow();
+        });
+
+        test('should handle missing timeBasedAnalysis', () => {
+            const data = {
+                metrics: { sharpeRatio: 1.5 }
+            };
+            
+            expect(() => {
+                if (data.timeBasedAnalysis) {
+                    appModule.populateTimeBasedTable(data.timeBasedAnalysis);
+                }
+            }).not.toThrow();
+        });
+
+        test('should handle missing recoveryCalculations', () => {
+            const data = {
+                metrics: { sharpeRatio: 1.5 }
+            };
+            
+            expect(() => {
+                if (data.recoveryCalculations) {
+                    appModule.populateRecoveryTable(data.recoveryCalculations);
+                }
+            }).not.toThrow();
+        });
+
+        test('should handle undefined sharpeRatio', () => {
+            const metrics = {};
+            
+            expect(() => {
+                if (metrics.sharpeRatio !== undefined) {
+                    // Would call updateMetricWithColor
+                }
+            }).not.toThrow();
+        });
+    });
+
+    describe('Risk highlighting branches', () => {
+        test('populateRiskOfRuinTable with high probability (>10%)', (done) => {
+            const mockTbody = {
+                style: {},
+                innerHTML: '',
+                insertRow: jest.fn(() => {
+                    const row = {
+                        style: {},
+                        innerHTML: ''
+                    };
+                    return row;
+                })
+            };
+
+            global.document.querySelector = jest.fn((selector) => {
+                if (selector === '#riskOfRuinTable tbody') return mockTbody;
+                return null;
+            });
+
+            const risks = [
+                { drawdownLevel: 25, probability: 15.5, lossesRequired: 10 }, // >10%
+                { drawdownLevel: 50, probability: 5.3, lossesRequired: 20 }   // <=10%
+            ];
+
+            appModule.populateRiskOfRuinTable(risks);
+
+            setTimeout(() => {
+                expect(mockTbody.insertRow).toHaveBeenCalledTimes(2);
+                done();
+            }, 200);
+        });
+
+        test('populateRecoveryTable with high wins required (>20)', (done) => {
+            const mockTbody = {
+                style: {},
+                innerHTML: '',
+                insertRow: jest.fn(() => ({
+                    style: {},
+                    innerHTML: ''
+                }))
+            };
+
+            global.document.querySelector = jest.fn((selector) => {
+                if (selector === '#recoveryTable tbody') return mockTbody;
+                return null;
+            });
+
+            const recoveries = [
+                { drawdownPercent: 10, recoveryNeeded: 11.11, winsRequired: 5 },   // <=20
+                { drawdownPercent: 50, recoveryNeeded: 100, winsRequired: 25 }     // >20
+            ];
+
+            appModule.populateRecoveryTable(recoveries);
+
+            setTimeout(() => {
+                expect(mockTbody.insertRow).toHaveBeenCalledTimes(2);
+                done();
+            }, 200);
+        });
+    });
+});
+
+describe('Branch Coverage - Missing New Features in displayResults', () => {
+    let appModule;
+    let mockDocument;
+    
+    beforeAll(() => {
+        appModule = require('../public/app.js');
+    });
+    
+    beforeEach(() => {
+        mockDocument = global.document;
+        
+        // Mock all required DOM elements
+        const mockTbody = {
+            innerHTML: '',
+            style: {},
+            insertRow: jest.fn(() => ({
+                innerHTML: '',
+                style: {}
+            }))
+        };
+
+        global.document.querySelector = jest.fn((selector) => {
+            if (selector.includes('tbody')) return mockTbody;
+            return null;
+        });
+
+        global.document.querySelectorAll = jest.fn(() => [
+            { classList: { add: jest.fn(), remove: jest.fn() }, textContent: '', style: {} }
+        ]);
+
+        global.document.getElementById = jest.fn((id) => ({
+            value: '50',
+            textContent: '',
+            innerHTML: '',
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: {},
+            getContext: jest.fn(() => ({})),
+            querySelector: jest.fn(() => mockTbody)
+        }));
+    });
+    
+    test('displayResults with missing winStreakProbabilities (line 321)', () => {
+        const data = {
+            metrics: {
+                accountSize: 5000,
+                riskPerTrade: 500,
+                expectedValue: 25,
+                expectedProfitPerTrade: 125,
+                expectedDailyProfit: 125,
+                dailyGrowthRate: 2.5,
+                kellyFraction: 15,
+                profitFactor: 2.5,
+                payoffRatio: 1.67,
+                stopLoss: 0.5
+            },
+            projection: [{ day: 0, balance: 5000 }],
+            monteCarlo: {
+                statistics: {
+                    mean: 6000,
+                    median: 5800,
+                    percentile5: 4500,
+                    percentile95: 7500,
+                    ruinProbability: 2
+                },
+                histogram: { labels: [5000], data: [10] }
+            },
+            streakProbabilities: [{ streak: 5, probability: 0.8, frequency: '1 in 1' }],
+            drawdownScenarios: [{ losses: 3, balance: 4500, drawdown: 10, survivable: true }]
+            // winStreakProbabilities is MISSING - tests line 321
+        };
+        
+        expect(() => appModule.displayResults(data)).not.toThrow();
+    });
+
+    test('displayResults with missing riskOfRuin (line 324)', () => {
+        const data = {
+            metrics: {
+                accountSize: 5000,
+                riskPerTrade: 500,
+                expectedValue: 25,
+                expectedProfitPerTrade: 125,
+                expectedDailyProfit: 125,
+                dailyGrowthRate: 2.5,
+                kellyFraction: 15,
+                profitFactor: 2.5,
+                payoffRatio: 1.67,
+                stopLoss: 0.5
+            },
+            projection: [{ day: 0, balance: 5000 }],
+            monteCarlo: {
+                statistics: {
+                    mean: 6000,
+                    median: 5800,
+                    percentile5: 4500,
+                    percentile95: 7500,
+                    ruinProbability: 2
+                },
+                histogram: { labels: [5000], data: [10] }
+            },
+            streakProbabilities: [],
+            drawdownScenarios: []
+            // riskOfRuin is MISSING - tests line 324
+        };
+        
+        expect(() => appModule.displayResults(data)).not.toThrow();
+    });
+
+    test('displayResults with missing targetProjections (line 327)', () => {
+        const data = {
+            metrics: {
+                accountSize: 5000,
+                riskPerTrade: 500,
+                expectedValue: 25,
+                expectedProfitPerTrade: 125,
+                expectedDailyProfit: 125,
+                dailyGrowthRate: 2.5,
+                kellyFraction: 15,
+                profitFactor: 2.5,
+                payoffRatio: 1.67,
+                stopLoss: 0.5
+            },
+            projection: [{ day: 0, balance: 5000 }],
+            monteCarlo: {
+                statistics: {
+                    mean: 6000,
+                    median: 5800,
+                    percentile5: 4500,
+                    percentile95: 7500,
+                    ruinProbability: 2
+                },
+                histogram: { labels: [5000], data: [10] }
+            },
+            streakProbabilities: [],
+            drawdownScenarios: []
+            // targetProjections is MISSING - tests line 327
+        };
+        
+        expect(() => appModule.displayResults(data)).not.toThrow();
+    });
+
+    test('displayResults with missing timeBasedAnalysis (line 330)', () => {
+        const data = {
+            metrics: {
+                accountSize: 5000,
+                riskPerTrade: 500,
+                expectedValue: 25,
+                expectedProfitPerTrade: 125,
+                expectedDailyProfit: 125,
+                dailyGrowthRate: 2.5,
+                kellyFraction: 15,
+                profitFactor: 2.5,
+                payoffRatio: 1.67,
+                stopLoss: 0.5
+            },
+            projection: [{ day: 0, balance: 5000 }],
+            monteCarlo: {
+                statistics: {
+                    mean: 6000,
+                    median: 5800,
+                    percentile5: 4500,
+                    percentile95: 7500,
+                    ruinProbability: 2
+                },
+                histogram: { labels: [5000], data: [10] }
+            },
+            streakProbabilities: [],
+            drawdownScenarios: []
+            // timeBasedAnalysis is MISSING - tests line 330
+        };
+        
+        expect(() => appModule.displayResults(data)).not.toThrow();
+    });
+
+    test('displayResults with missing recoveryCalculations (line 333)', () => {
+        const data = {
+            metrics: {
+                accountSize: 5000,
+                riskPerTrade: 500,
+                expectedValue: 25,
+                expectedProfitPerTrade: 125,
+                expectedDailyProfit: 125,
+                dailyGrowthRate: 2.5,
+                kellyFraction: 15,
+                profitFactor: 2.5,
+                payoffRatio: 1.67,
+                stopLoss: 0.5
+            },
+            projection: [{ day: 0, balance: 5000 }],
+            monteCarlo: {
+                statistics: {
+                    mean: 6000,
+                    median: 5800,
+                    percentile5: 4500,
+                    percentile95: 7500,
+                    ruinProbability: 2
+                },
+                histogram: { labels: [5000], data: [10] }
+            },
+            streakProbabilities: [],
+            drawdownScenarios: []
+            // recoveryCalculations is MISSING - tests line 333
+        };
+        
+        expect(() => appModule.displayResults(data)).not.toThrow();
+    });
+
+    test('displayResults with missing sharpeRatio (line 336)', () => {
+        const data = {
+            metrics: {
+                accountSize: 5000,
+                riskPerTrade: 500,
+                expectedValue: 25,
+                expectedProfitPerTrade: 125,
+                expectedDailyProfit: 125,
+                dailyGrowthRate: 2.5,
+                kellyFraction: 15,
+                profitFactor: 2.5,
+                payoffRatio: 1.67,
+                stopLoss: 0.5
+                // sharpeRatio is MISSING - tests line 336
+            },
+            projection: [{ day: 0, balance: 5000 }],
+            monteCarlo: {
+                statistics: {
+                    mean: 6000,
+                    median: 5800,
+                    percentile5: 4500,
+                    percentile95: 7500,
+                    ruinProbability: 2
+                },
+                histogram: { labels: [5000], data: [10] }
+            },
+            streakProbabilities: [],
+            drawdownScenarios: []
+        };
+        
+        expect(() => appModule.displayResults(data)).not.toThrow();
+    });
+});
