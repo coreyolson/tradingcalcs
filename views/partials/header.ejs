@@ -25,7 +25,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/style.css">
     
-    <% if (pageStyle) { %>
+    <% if (typeof pageStyle !== 'undefined' && pageStyle) { %>
         <%- pageStyle %>
     <% } %>
     
