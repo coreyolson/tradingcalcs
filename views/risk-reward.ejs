@@ -1,4 +1,8 @@
-<%- include('partials/header') %>
+<%- include('partials/header', { 
+    title: 'Risk/Reward Analyzer',
+    description: 'Analyze trade setups with R-multiples and risk/reward ratios',
+    includeChartJs: false
+}) %>
 
         <!-- Page Header -->
         <div class="container-fluid px-4 mb-4">
@@ -20,28 +24,65 @@
                         <div class="card-body compact-form">
                             <form id="analyzerForm">
                                 <div class="input-row">
-                                    <label><i class="fas fa-dollar-sign"></i> Entry Price</label>
-                                    <input type="number" class="form-control form-control-sm" id="entryPrice" value="100.00" step="0.01" min="0.01" required>
+                                    <label>
+                                        <i class="fas fa-dollar-sign"></i> Entry Price ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Planned entry price for the trade"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="entryPrice" 
+                                           value="100.00" step="0.01" min="0.01" required>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-stop-circle text-danger"></i> Stop Loss</label>
-                                    <input type="number" class="form-control form-control-sm" id="stopLoss" value="95.00" step="0.01" min="0.01" required>
+                                    <label>
+                                        <i class="fas fa-stop-circle text-danger"></i> Stop Loss ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Maximum loss exit price"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="stopLoss" 
+                                           value="95.00" step="0.01" min="0.01" required>
+                                    <small class="text-danger" style="font-size: 0.7rem;">
+                                        Risk: <span id="riskAmount">$5.00</span> (<span id="riskPercent">5.0%</span>)
+                                    </small>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-bullseye text-success"></i> Target 1</label>
-                                    <input type="number" class="form-control form-control-sm" id="target1" value="110.00" step="0.01" min="0.01" required>
+                                    <label>
+                                        <i class="fas fa-bullseye text-success"></i> Target 1 ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="First profit target"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="target1" 
+                                           value="110.00" step="0.01" min="0.01" required>
+                                    <small class="text-success" style="font-size: 0.7rem;">
+                                        Reward: <span id="reward1Amount">$10.00</span> (R:<span id="r1Multiple">2.0</span>)
+                                    </small>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-flag text-success"></i> Target 2 (Optional)</label>
-                                    <input type="number" class="form-control form-control-sm" id="target2" value="" step="0.01" min="0.01">
+                                    <label>
+                                        <i class="fas fa-flag text-success"></i> Target 2 (Optional)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Second profit target (optional)"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="target2" 
+                                           value="" step="0.01" min="0.01" placeholder="115.00">
+                                    <small class="text-success" style="font-size: 0.7rem; display: none;" id="reward2Display">
+                                        Reward: <span id="reward2Amount">--</span> (R:<span id="r2Multiple">--</span>)
+                                    </small>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-flag-checkered text-success"></i> Target 3 (Optional)</label>
-                                    <input type="number" class="form-control form-control-sm" id="target3" value="" step="0.01" min="0.01">
+                                    <label>
+                                        <i class="fas fa-flag-checkered text-success"></i> Target 3 (Optional)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Third profit target (optional)"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="target3" 
+                                           value="" step="0.01" min="0.01" placeholder="120.00">
+                                    <small class="text-success" style="font-size: 0.7rem; display: none;" id="reward3Display">
+                                        Reward: <span id="reward3Amount">--</span> (R:<span id="r3Multiple">--</span>)
+                                    </small>
                                 </div>
 
                                 <div class="input-row">
@@ -272,12 +313,43 @@
         const riskDollar = riskPerShare * size;
         const riskPercent = (riskDollar / accountBalance) * 100;
         
-        // Update risk metrics
+        // Update inline risk display in form
+        document.getElementById('riskAmount').textContent = '$' + riskPerShare.toFixed(2);
+        document.getElementById('riskPercent').textContent = ((Math.abs(entry - stop) / entry) * 100).toFixed(1) + '%';
+        
+        // Update risk metrics cards
         document.getElementById('riskAmount').textContent = '$' + riskDollar.toFixed(2);
         document.getElementById('riskPercent').textContent = riskPercent.toFixed(2) + '% of account';
         document.getElementById('oneRValue').textContent = '$' + riskDollar.toFixed(2);
         
-        // Calculate reward for T1
+        // Calculate and display reward for T1
+        const reward1PerShare = Math.abs(target1 - entry);
+        const r1Multiple = reward1PerShare / riskPerShare;
+        document.getElementById('reward1Amount').textContent = '$' + reward1PerShare.toFixed(2);
+        document.getElementById('r1Multiple').textContent = r1Multiple.toFixed(1);
+        
+        // Handle Target 2
+        if (target2) {
+            const reward2PerShare = Math.abs(target2 - entry);
+            const r2Multiple = reward2PerShare / riskPerShare;
+            document.getElementById('reward2Amount').textContent = '$' + reward2PerShare.toFixed(2);
+            document.getElementById('r2Multiple').textContent = r2Multiple.toFixed(1);
+            document.getElementById('reward2Display').style.display = 'block';
+        } else {
+            document.getElementById('reward2Display').style.display = 'none';
+        }
+        
+        // Handle Target 3
+        if (target3) {
+            const reward3PerShare = Math.abs(target3 - entry);
+            const r3Multiple = reward3PerShare / riskPerShare;
+            document.getElementById('reward3Amount').textContent = '$' + reward3PerShare.toFixed(2);
+            document.getElementById('r3Multiple').textContent = r3Multiple.toFixed(1);
+            document.getElementById('reward3Display').style.display = 'block';
+        } else {
+            document.getElementById('reward3Display').style.display = 'none';
+        }
+        
         const rewardPerShare = Math.abs(target1 - entry);
         const rewardDollar = rewardPerShare * size;
         const rewardPercent = (rewardDollar / accountBalance) * 100;
