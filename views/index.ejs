@@ -1072,50 +1072,6 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Advanced Tools -->
-        <div class="mb-5">
-            <h3 class="h4 mb-4" style="color: var(--violet-glow); font-weight: 700;">
-                <i class="fas fa-brain me-2"></i>Advanced Analysis
-            </h3>
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="coming-soon-card">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                 style="width: 50px; height: 50px; background: rgba(214,139,69,0.15); border: 1px solid var(--copper);">
-                                <i class="fas fa-layer-group" style="font-size: 1.4rem; color: var(--copper);"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Option Chain Explorer</h5>
-                                <span class="eta-badge">Coming Soon</span>
-                            </div>
-                        </div>
-                        <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
-                            Visualize Greeks and spot mispriced opportunities in option chains
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="coming-soon-card">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                 style="width: 50px; height: 50px; background: rgba(214,139,69,0.15); border: 1px solid var(--copper);">
-                                <i class="fas fa-chart-area" style="font-size: 1.4rem; color: var(--copper);"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Edge Decay Visualizer</h5>
-                                <span class="eta-badge">Coming Soon</span>
-                            </div>
-                        </div>
-                        <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
-                            Track how your trading edge changes over time and market conditions
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Footer -->
                 <!-- Footer -->
@@ -1131,14 +1087,19 @@
             <div class="footer-content">
                 <div class="row g-5">
                     <!-- Brand Section -->
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="footer-logo mb-4">
                             <div class="footer-candle-icon">
-                                <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="35" y="40" width="30" height="50" fill="#2a2f3a" stroke="var(--copper)" stroke-width="1.5" rx="2"/>
-                                    <line x1="50" y1="10" x2="50" y2="40" stroke="var(--copper)" stroke-width="2"/>
-                                    <ellipse cx="50" cy="12" rx="8" ry="12" fill="var(--copper)" opacity="0.9"/>
-                                    <path d="M 10 75 L 25 65 L 40 70 L 55 55 L 70 60 L 85 50" fill="none" stroke="var(--blue-accent)" stroke-width="2" opacity="0.6"/>
+                                <svg width="40" height="56" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="copper-grad-footer-home" x1="0%" y1="0%" x2="0%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#ffb86c;stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:#d68b45;stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <rect x="35" y="50" width="30" height="80" rx="2" fill="url(#copper-grad-footer-home)"/>
+                                    <ellipse cx="50" cy="50" rx="15" ry="5" fill="#ffb86c"/>
+                                    <path d="M 50 30 Q 45 40 50 50 Q 55 40 50 30 Z" fill="#fca311" opacity="0.9"/>
                                 </svg>
                             </div>
                             <div>
@@ -1147,13 +1108,15 @@
                             </div>
                         </div>
                         <p class="footer-description">
-                            Professional trading calculators for serious traders. Monte Carlo simulations, risk analysis, and position sizing — all running privately in your browser.
+                            Professional trading calculators for serious traders. All calculations run privately in your browser.
                         </p>
                     </div>
 
-                    <!-- Tools Column -->
+                    <!-- Risk & Position Tools -->
                     <div class="col-lg-2 col-md-4 col-6">
-                        <h5 class="footer-heading">Risk & Position</h5>
+                        <h5 class="footer-heading">
+                            <i class="fas fa-shield-alt me-1"></i> Risk & Position
+                        </h5>
                         <ul class="footer-links">
                             <li><a href="/contract-calculator">Contract Calculator</a></li>
                             <li><a href="/position-sizer">Position Sizer</a></li>
@@ -1163,36 +1126,57 @@
                         </ul>
                     </div>
 
-                    <!-- Features Column -->
-                    <div class="col-lg-3 col-md-4 col-6">
-                        <h5 class="footer-heading">Performance</h5>
+                    <!-- Performance Tools -->
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <h5 class="footer-heading">
+                            <i class="fas fa-chart-bar me-1"></i> Performance
+                        </h5>
                         <ul class="footer-links">
                             <li><a href="/trade-expectancy">Trade Expectancy</a></li>
                             <li><a href="/breakeven-calculator">Breakeven Calc</a></li>
                             <li><a href="/win-rate-impact">Win Rate Impact</a></li>
                             <li><a href="/sharpe-ratio">Sharpe Ratio</a></li>
-                            <li><a href="/drawdown-recovery">Drawdown Recovery</a></li>
                         </ul>
                     </div>
 
-                    <!-- Privacy Column -->
+                    <!-- Growth Tools -->
                     <div class="col-lg-2 col-md-4 col-6">
-                        <h5 class="footer-heading">Growth & Goals</h5>
+                        <h5 class="footer-heading">
+                            <i class="fas fa-rocket me-1"></i> Growth
+                        </h5>
                         <ul class="footer-links">
                             <li><a href="/compound-growth">Compound Growth</a></li>
+                            <li><a href="/drawdown-recovery">Drawdown Recovery</a></li>
                             <li><a href="/time-to-goal">Time to Goal</a></li>
                         </ul>
                     </div>
                     
-                    <!-- Info Column -->
-                    <div class="col-lg-2 col-md-4">
-                        <h5 class="footer-heading">Info</h5>
+                    <!-- Info & Privacy -->
+                    <div class="col-lg-3 col-md-4">
+                        <h5 class="footer-heading">
+                            <i class="fas fa-info-circle me-1"></i> Info
+                        </h5>
                         <ul class="footer-links">
                             <li><a href="/about">About</a></li>
                             <li><a href="/methodology">Methodology</a></li>
-                            <li><i class="fas fa-check-circle me-2" style="color: var(--green-glow);"></i>No Tracking</li>
-                            <li><i class="fas fa-check-circle me-2" style="color: var(--green-glow);"></i>100% Private</li>
                         </ul>
+                        
+                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                            <h6 style="color: #00ff88; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;">
+                                <i class="fas fa-lock me-1"></i> Privacy First
+                            </h6>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.8rem;">
+                                <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
+                                    <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>No Registration
+                                </li>
+                                <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
+                                    <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>100% Client-Side
+                                </li>
+                                <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
+                                    <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>No Tracking
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
