@@ -1,0 +1,534 @@
+<%- include('partials/header', { 
+    title: 'Win Rate Impact Analyzer',
+    description: 'Visualize how win rate changes affect profitability',
+    includeChartJs: true
+}) %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-chart-pie"></i>
+                Win Rate Impact Analyzer
+            </h1>
+            <p class="page-subtitle">Visualize How Win Rate Changes Affect Profitability • Interactive Analysis</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Controls -->
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Trading Parameters
+                        </div>
+                        <div class="card-body">
+                            <form id="analyzerForm">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-arrow-up text-success"></i> Average Win ($)
+                                    </label>
+                                    <input type="number" class="form-control" id="avgWin" value="200" min="1" step="1" required>
+                                    <small class="text-muted">Expected profit per winning trade</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-arrow-down text-danger"></i> Average Loss ($)
+                                    </label>
+                                    <input type="number" class="form-control" id="avgLoss" value="100" min="1" step="1" required>
+                                    <small class="text-muted">Expected loss per losing trade</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-hashtag"></i> Total Trades
+                                    </label>
+                                    <input type="number" class="form-control" id="totalTrades" value="100" min="10" step="10" required>
+                                    <small class="text-muted">Sample size for analysis</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-percentage"></i> Win Rate</span>
+                                        <span class="badge bg-primary" id="winRateBadge">50%</span>
+                                    </label>
+                                    <input type="range" class="form-range" id="winRateSlider" min="10" max="90" value="50" step="1">
+                                    <div class="d-flex justify-content-between text-muted small mt-1">
+                                        <span>10%</span>
+                                        <span>30%</span>
+                                        <span>50%</span>
+                                        <span>70%</span>
+                                        <span>90%</span>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>Current Metrics</h6>
+                                    <div class="row g-2 text-center">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Win/Loss Ratio</small>
+                                            <strong id="currentWLRatio">2.00:1</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Breakeven Rate</small>
+                                            <strong id="breakevenRate">33.3%</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Profitability Zones -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <i class="fas fa-traffic-light"></i> Profitability Zones
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="profitability-zones">
+                                <div class="zone zone-danger">
+                                    <div class="zone-label">
+                                        <i class="fas fa-times-circle"></i> Loss Zone
+                                    </div>
+                                    <div class="zone-range" id="lossZone">10% - 33%</div>
+                                </div>
+                                <div class="zone zone-warning">
+                                    <div class="zone-label">
+                                        <i class="fas fa-equals"></i> Breakeven Zone
+                                    </div>
+                                    <div class="zone-range" id="breakevenZone">33% - 35%</div>
+                                </div>
+                                <div class="zone zone-success">
+                                    <div class="zone-label">
+                                        <i class="fas fa-check-circle"></i> Profit Zone
+                                    </div>
+                                    <div class="zone-range" id="profitZone">35% - 90%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Charts -->
+                <div class="col-xl-8 col-lg-7">
+                    <!-- Main Impact Chart -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line"></i> Win Rate Impact Analysis
+                        </div>
+                        <div class="card-body">
+                            <canvas id="impactChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Current Analysis Cards -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <div class="card metric-card border-primary">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Expected Value</div>
+                                    <div class="metric-value text-primary" id="currentEV">$0</div>
+                                    <small class="text-muted">Per trade</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-success">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Total Profit</div>
+                                    <div class="metric-value text-success" id="totalProfit">$0</div>
+                                    <small class="text-muted" id="totalTradesLabel">100 trades</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-info">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">ROI</div>
+                                    <div class="metric-value text-info" id="roi">0%</div>
+                                    <small class="text-muted">Return on risk</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-warning">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Edge Strength</div>
+                                    <div class="metric-value text-warning" id="edgeStrength">Weak</div>
+                                    <small class="text-muted">Advantage level</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sensitivity Analysis -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-table"></i> Win Rate Sensitivity Analysis
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-dark table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Win Rate</th>
+                                        <th class="text-end">Expected Value</th>
+                                        <th class="text-end">Total P&L</th>
+                                        <th class="text-end">ROI</th>
+                                        <th class="text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sensitivityTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Loading analysis...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<style>
+    .profitability-zones {
+        padding: 0;
+    }
+    
+    .zone {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+    
+    .zone:last-child {
+        border-bottom: none;
+    }
+    
+    .zone-danger {
+        background: rgba(255, 68, 68, 0.1);
+        border-left: 4px solid #ff4444;
+    }
+    
+    .zone-warning {
+        background: rgba(252, 163, 17, 0.1);
+        border-left: 4px solid #fca311;
+    }
+    
+    .zone-success {
+        background: rgba(0, 255, 136, 0.1);
+        border-left: 4px solid #00ff88;
+    }
+    
+    .zone-label {
+        font-weight: 600;
+        color: #fff;
+        flex: 1;
+    }
+    
+    .zone-range {
+        font-family: 'SF Mono', monospace;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+        border: 2px solid #fff;
+        box-shadow: 0 0 10px rgba(0,176,255,0.5);
+    }
+    
+    .form-range::-moz-range-thumb {
+        background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+        border: 2px solid #fff;
+        box-shadow: 0 0 10px rgba(0,176,255,0.5);
+    }
+</style>
+
+<script>
+    let impactChart = null;
+    
+    const form = document.getElementById('analyzerForm');
+    const winRateSlider = document.getElementById('winRateSlider');
+    const winRateBadge = document.getElementById('winRateBadge');
+    
+    // Real-time updates
+    winRateSlider.addEventListener('input', function() {
+        winRateBadge.textContent = this.value + '%';
+        updateAnalysis();
+    });
+    
+    ['avgWin', 'avgLoss', 'totalTrades'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateAnalysis);
+    });
+    
+    function updateAnalysis() {
+        const avgWin = parseFloat(document.getElementById('avgWin').value);
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value);
+        const totalTrades = parseInt(document.getElementById('totalTrades').value);
+        const currentWinRate = parseInt(winRateSlider.value);
+        
+        if (!avgWin || !avgLoss || !totalTrades) return;
+        
+        // Calculate metrics
+        const wlRatio = avgWin / avgLoss;
+        const breakevenWinRate = (avgLoss / (avgWin + avgLoss)) * 100;
+        
+        // Update current metrics
+        document.getElementById('currentWLRatio').textContent = wlRatio.toFixed(2) + ':1';
+        document.getElementById('breakevenRate').textContent = breakevenWinRate.toFixed(1) + '%';
+        
+        // Update zones
+        updateProfitabilityZones(breakevenWinRate);
+        
+        // Calculate current position
+        const currentEV = (currentWinRate / 100 * avgWin) - ((100 - currentWinRate) / 100 * avgLoss);
+        const currentTotalProfit = currentEV * totalTrades;
+        const currentROI = totalTrades > 0 ? (currentTotalProfit / (avgLoss * totalTrades)) * 100 : 0;
+        
+        // Update current metrics
+        document.getElementById('currentEV').textContent = '$' + currentEV.toFixed(2);
+        document.getElementById('totalProfit').textContent = (currentTotalProfit >= 0 ? '+' : '') + '$' + currentTotalProfit.toLocaleString();
+        document.getElementById('roi').textContent = (currentROI >= 0 ? '+' : '') + currentROI.toFixed(1) + '%';
+        document.getElementById('totalTradesLabel').textContent = totalTrades + ' trades';
+        
+        // Update edge strength
+        updateEdgeStrength(currentWinRate, breakevenWinRate, wlRatio);
+        
+        // Update chart
+        updateChart(avgWin, avgLoss, totalTrades, currentWinRate, breakevenWinRate);
+        
+        // Update table
+        updateSensitivityTable(avgWin, avgLoss, totalTrades, breakevenWinRate);
+    }
+    
+    function updateProfitabilityZones(breakevenRate) {
+        const buffer = 2; // 2% buffer around breakeven
+        
+        document.getElementById('lossZone').textContent = `10% - ${(breakevenRate - buffer).toFixed(0)}%`;
+        document.getElementById('breakevenZone').textContent = `${(breakevenRate - buffer).toFixed(0)}% - ${(breakevenRate + buffer).toFixed(0)}%`;
+        document.getElementById('profitZone').textContent = `${(breakevenRate + buffer).toFixed(0)}% - 90%`;
+    }
+    
+    function updateEdgeStrength(currentWinRate, breakevenRate, wlRatio) {
+        const edgeEl = document.getElementById('edgeStrength');
+        const margin = currentWinRate - breakevenRate;
+        
+        let strength, color;
+        if (margin < 0) {
+            strength = 'No Edge';
+            color = 'text-danger';
+        } else if (margin < 5) {
+            strength = 'Weak';
+            color = 'text-warning';
+        } else if (margin < 15) {
+            strength = 'Moderate';
+            color = 'text-info';
+        } else {
+            strength = 'Strong';
+            color = 'text-success';
+        }
+        
+        edgeEl.textContent = strength;
+        edgeEl.className = 'metric-value ' + color;
+    }
+    
+    function updateChart(avgWin, avgLoss, totalTrades, currentWinRate, breakevenRate) {
+        const canvas = document.getElementById('impactChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Generate data points
+        const dataPoints = [];
+        const profitPoints = [];
+        for (let winRate = 10; winRate <= 90; winRate += 2) {
+            const ev = (winRate / 100 * avgWin) - ((100 - winRate) / 100 * avgLoss);
+            const totalProfit = ev * totalTrades;
+            dataPoints.push({ x: winRate, y: ev });
+            profitPoints.push({ x: winRate, y: totalProfit });
+        }
+        
+        // Destroy existing chart
+        if (impactChart) {
+            impactChart.destroy();
+        }
+        
+        // Create new chart
+        impactChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'Expected Value per Trade',
+                        data: dataPoints,
+                        borderColor: '#00b0ff',
+                        backgroundColor: 'rgba(0, 176, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 8,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Breakeven Line',
+                        data: [
+                            { x: 10, y: 0 },
+                            { x: 90, y: 0 }
+                        ],
+                        borderColor: '#fca311',
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        pointRadius: 0,
+                        fill: false,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Current Win Rate',
+                        data: [
+                            { x: currentWinRate, y: Math.min(...dataPoints.map(p => p.y)) - 50 },
+                            { x: currentWinRate, y: Math.max(...dataPoints.map(p => p.y)) + 50 }
+                        ],
+                        borderColor: '#d68b45',
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Breakeven Win Rate',
+                        data: [
+                            { x: breakevenRate, y: Math.min(...dataPoints.map(p => p.y)) - 50 },
+                            { x: breakevenRate, y: Math.max(...dataPoints.map(p => p.y)) + 50 }
+                        ],
+                        borderColor: '#ff4444',
+                        borderWidth: 2,
+                        borderDash: [15, 5],
+                        pointRadius: 0,
+                        fill: false,
+                        yAxisID: 'y'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#9ba1a6',
+                            font: { size: 12 },
+                            filter: function(item) {
+                                return item.datasetIndex < 2; // Only show first 2 datasets in legend
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 25, 34, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#9ba1a6',
+                        borderColor: '#00b0ff',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return 'Expected Value: $' + context.parsed.y.toFixed(2);
+                                }
+                                return context.dataset.label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Win Rate (%)',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#9ba1a6',
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Expected Value ($)',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#9ba1a6',
+                            callback: function(value) {
+                                return '$' + value.toFixed(0);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateSensitivityTable(avgWin, avgLoss, totalTrades, breakevenRate) {
+        const tbody = document.getElementById('sensitivityTableBody');
+        const winRates = [20, 30, 40, 50, 60, 70, 80];
+        let rows = '';
+        
+        winRates.forEach(winRate => {
+            const ev = (winRate / 100 * avgWin) - ((100 - winRate) / 100 * avgLoss);
+            const totalPL = ev * totalTrades;
+            const roi = (totalPL / (avgLoss * totalTrades)) * 100;
+            
+            const isProfitable = winRate > breakevenRate;
+            const isBreakeven = Math.abs(winRate - breakevenRate) < 2;
+            
+            let statusBadge, rowClass = '';
+            if (isBreakeven) {
+                statusBadge = '<span class="badge bg-warning"><i class="fas fa-equals"></i> Breakeven</span>';
+                rowClass = 'table-warning';
+            } else if (isProfitable) {
+                statusBadge = '<span class="badge bg-success"><i class="fas fa-trending-up"></i> Profitable</span>';
+            } else {
+                statusBadge = '<span class="badge bg-danger"><i class="fas fa-trending-down"></i> Loss</span>';
+            }
+            
+            const evClass = ev >= 0 ? 'text-success' : 'text-danger';
+            const plClass = totalPL >= 0 ? 'text-success' : 'text-danger';
+            const roiClass = roi >= 0 ? 'text-success' : 'text-danger';
+            
+            rows += `
+                <tr ${rowClass ? 'class="' + rowClass + '"' : ''}>
+                    <td><strong>${winRate}%</strong></td>
+                    <td class="text-end ${evClass}"><strong>$${ev.toFixed(2)}</strong></td>
+                    <td class="text-end ${plClass}"><strong>${totalPL >= 0 ? '+' : ''}$${totalPL.toLocaleString()}</strong></td>
+                    <td class="text-end ${roiClass}"><strong>${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</strong></td>
+                    <td class="text-end">${statusBadge}</td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = rows;
+    }
+    
+    // Initial analysis
+    updateAnalysis();
+</script>

@@ -1,0 +1,761 @@
+<%- include('partials/header', { 
+    title: 'Sharpe Ratio Calculator',
+    description: 'Calculate risk-adjusted returns and performance metrics',
+    includeChartJs: true
+}) %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-chart-bar"></i>
+                Sharpe Ratio Calculator
+            </h1>
+            <p class="page-subtitle">Calculate Risk-Adjusted Returns • Performance Analysis • Benchmark Comparison</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input -->
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-database"></i> Returns Data Input
+                        </div>
+                        <div class="card-body">
+                            <form id="sharpeForm">
+                                <!-- Input Method Selection -->
+                                <div class="mb-3">
+                                    <label class="form-label">Input Method</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="inputMethod" id="manualInput" value="manual" checked>
+                                        <label class="btn btn-outline-primary" for="manualInput">
+                                            <i class="fas fa-edit"></i> Manual
+                                        </label>
+                                        
+                                        <input type="radio" class="btn-check" name="inputMethod" id="statsInput" value="stats">
+                                        <label class="btn btn-outline-primary" for="statsInput">
+                                            <i class="fas fa-calculator"></i> Stats
+                                        </label>
+                                        
+                                        <input type="radio" class="btn-check" name="inputMethod" id="csvInput" value="csv">
+                                        <label class="btn btn-outline-primary" for="csvInput">
+                                            <i class="fas fa-file-csv"></i> CSV
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Manual Input -->
+                                <div id="manualInputSection" class="input-section">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-percentage"></i> Returns (% per period)
+                                        </label>
+                                        <textarea class="form-control" id="returnsData" rows="6" 
+                                                  placeholder="Enter returns separated by commas or new lines&#10;Example: 5.2, -2.1, 8.3, 1.4, -0.5"></textarea>
+                                        <small class="text-muted">Enter percentage returns for each period</small>
+                                    </div>
+                                </div>
+
+                                <!-- Stats Input -->
+                                <div id="statsInputSection" class="input-section" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-chart-line"></i> Average Return (%)
+                                        </label>
+                                        <input type="number" class="form-control" id="avgReturn" step="0.01" placeholder="2.5">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-chart-area"></i> Standard Deviation (%)
+                                        </label>
+                                        <input type="number" class="form-control" id="stdDev" step="0.01" placeholder="8.2">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-hashtag"></i> Number of Periods
+                                        </label>
+                                        <input type="number" class="form-control" id="numPeriods" min="1" placeholder="252">
+                                    </div>
+                                </div>
+
+                                <!-- CSV Input -->
+                                <div id="csvInputSection" class="input-section" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-upload"></i> Upload CSV File
+                                        </label>
+                                        <input type="file" class="form-control" id="csvFile" accept=".csv">
+                                        <small class="text-muted">First column should contain returns data</small>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <!-- Risk-Free Rate -->
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-university"></i> Risk-Free Rate (%)
+                                    </label>
+                                    <input type="number" class="form-control" id="riskFreeRate" value="2.5" step="0.01" min="0">
+                                    <small class="text-muted">Annual risk-free rate (e.g., Treasury bills)</small>
+                                </div>
+
+                                <!-- Period Type -->
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar"></i> Return Period
+                                    </label>
+                                    <select class="form-select" id="periodType">
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly" selected>Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                        <option value="annual">Annual</option>
+                                    </select>
+                                </div>
+
+                                <!-- Benchmark Comparison -->
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-chart-pie"></i> Benchmark Returns (optional)
+                                    </label>
+                                    <textarea class="form-control" id="benchmarkData" rows="3" 
+                                              placeholder="Enter benchmark returns (e.g., S&P 500)"></textarea>
+                                    <small class="text-muted">For performance comparison</small>
+                                </div>
+
+                                <button type="button" class="btn btn-primary w-100" onclick="calculateSharpe()">
+                                    <i class="fas fa-calculator"></i> Calculate Sharpe Ratio
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-8 col-lg-7">
+                    <!-- Key Metrics Cards -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <div class="card metric-card border-primary">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Sharpe Ratio</div>
+                                    <div class="metric-value text-primary" id="sharpeRatio">-</div>
+                                    <small class="text-muted">Risk-adjusted return</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-success">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Annual Return</div>
+                                    <div class="metric-value text-success" id="annualReturn">-</div>
+                                    <small class="text-muted">Annualized</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-warning">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Volatility</div>
+                                    <div class="metric-value text-warning" id="volatility">-</div>
+                                    <small class="text-muted">Annual std dev</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-info">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Excess Return</div>
+                                    <div class="metric-value text-info" id="excessReturn">-</div>
+                                    <small class="text-muted">Above risk-free</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Chart -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line"></i> Cumulative Returns vs Benchmark
+                        </div>
+                        <div class="card-body">
+                            <canvas id="performanceChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Additional Metrics & Interpretation -->
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-info-circle"></i> Performance Analysis
+                                </div>
+                                <div class="card-body">
+                                    <div id="interpretationContent">
+                                        <div class="text-center text-muted py-4">
+                                            <i class="fas fa-calculator fa-2x mb-2"></i>
+                                            <p>Enter returns data to see analysis</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-table"></i> Additional Metrics
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-dark table-sm mb-0">
+                                        <tbody id="additionalMetrics">
+                                            <tr>
+                                                <td>Maximum Drawdown</td>
+                                                <td class="text-end">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sortino Ratio</td>
+                                                <td class="text-end">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Calmar Ratio</td>
+                                                <td class="text-end">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Win Rate</td>
+                                                <td class="text-end">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Best Period</td>
+                                                <td class="text-end">-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Worst Period</td>
+                                                <td class="text-end">-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<style>
+    .input-section {
+        transition: all 0.3s ease;
+    }
+    
+    .metric-interpretation {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .interpretation-excellent {
+        background: rgba(0, 255, 136, 0.1);
+        border-left: 4px solid #00ff88;
+    }
+    
+    .interpretation-good {
+        background: rgba(0, 176, 255, 0.1);
+        border-left: 4px solid #00b0ff;
+    }
+    
+    .interpretation-fair {
+        background: rgba(252, 163, 17, 0.1);
+        border-left: 4px solid #fca311;
+    }
+    
+    .interpretation-poor {
+        background: rgba(255, 68, 68, 0.1);
+        border-left: 4px solid #ff4444;
+    }
+    
+    .performance-comparison {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        border-radius: 0.25rem;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .performance-comparison .metric {
+        text-align: center;
+        flex: 1;
+    }
+    
+    .performance-comparison .metric-label {
+        font-size: 0.8rem;
+        color: #9ba1a6;
+        margin-bottom: 0.25rem;
+    }
+    
+    .performance-comparison .metric-value {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+</style>
+
+<script>
+    let performanceChart = null;
+    
+    // Input method switching
+    document.querySelectorAll('input[name="inputMethod"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.input-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            const selectedMethod = this.value;
+            document.getElementById(selectedMethod + 'InputSection').style.display = 'block';
+        });
+    });
+    
+    // CSV file handling
+    document.getElementById('csvFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lines = csv.split('\n');
+                const returns = [];
+                
+                lines.forEach((line, index) => {
+                    if (index === 0) return; // Skip header
+                    const value = parseFloat(line.split(',')[0]);
+                    if (!isNaN(value)) {
+                        returns.push(value);
+                    }
+                });
+                
+                document.getElementById('returnsData').value = returns.join(', ');
+            };
+            reader.readAsText(file);
+        }
+    });
+    
+    function calculateSharpe() {
+        const inputMethod = document.querySelector('input[name="inputMethod"]:checked').value;
+        let returns = [];
+        
+        // Get returns data based on input method
+        if (inputMethod === 'manual') {
+            const returnsText = document.getElementById('returnsData').value;
+            if (!returnsText.trim()) {
+                alert('Please enter returns data');
+                return;
+            }
+            
+            returns = returnsText.split(/[,\n]/)
+                .map(val => parseFloat(val.trim()))
+                .filter(val => !isNaN(val));
+                
+        } else if (inputMethod === 'stats') {
+            const avgReturn = parseFloat(document.getElementById('avgReturn').value);
+            const stdDev = parseFloat(document.getElementById('stdDev').value);
+            const numPeriods = parseInt(document.getElementById('numPeriods').value);
+            
+            if (!avgReturn || !stdDev || !numPeriods) {
+                alert('Please fill in all statistical inputs');
+                return;
+            }
+            
+            // Generate synthetic returns based on normal distribution
+            returns = generateNormalReturns(avgReturn, stdDev, numPeriods);
+        }
+        
+        if (returns.length < 2) {
+            alert('Please provide at least 2 data points');
+            return;
+        }
+        
+        const riskFreeRate = parseFloat(document.getElementById('riskFreeRate').value) || 0;
+        const periodType = document.getElementById('periodType').value;
+        const benchmarkText = document.getElementById('benchmarkData').value;
+        
+        // Parse benchmark data if provided
+        let benchmarkReturns = [];
+        if (benchmarkText.trim()) {
+            benchmarkReturns = benchmarkText.split(/[,\n]/)
+                .map(val => parseFloat(val.trim()))
+                .filter(val => !isNaN(val));
+        }
+        
+        // Calculate metrics
+        const metrics = calculatePerformanceMetrics(returns, riskFreeRate, periodType);
+        const benchmarkMetrics = benchmarkReturns.length > 0 ? 
+            calculatePerformanceMetrics(benchmarkReturns, riskFreeRate, periodType) : null;
+        
+        // Update display
+        updateMetricsDisplay(metrics);
+        updateInterpretation(metrics, benchmarkMetrics);
+        updateAdditionalMetrics(returns, metrics);
+        updateChart(returns, benchmarkReturns, metrics, benchmarkMetrics);
+    }
+    
+    function generateNormalReturns(mean, stdDev, count) {
+        const returns = [];
+        for (let i = 0; i < count; i++) {
+            // Box-Muller transformation for normal distribution
+            const u1 = Math.random();
+            const u2 = Math.random();
+            const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+            returns.push(mean + stdDev * z);
+        }
+        return returns;
+    }
+    
+    function calculatePerformanceMetrics(returns, riskFreeRate, periodType) {
+        const n = returns.length;
+        
+        // Annualization factors
+        const annualizationFactors = {
+            daily: 252,
+            weekly: 52,
+            monthly: 12,
+            quarterly: 4,
+            annual: 1
+        };
+        
+        const annualFactor = annualizationFactors[periodType];
+        
+        // Basic statistics
+        const meanReturn = returns.reduce((sum, r) => sum + r, 0) / n;
+        const variance = returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / (n - 1);
+        const stdDev = Math.sqrt(variance);
+        
+        // Annualized metrics
+        const annualReturn = meanReturn * annualFactor;
+        const annualVolatility = stdDev * Math.sqrt(annualFactor);
+        const annualRiskFreeRate = riskFreeRate;
+        
+        // Risk-adjusted metrics
+        const excessReturn = annualReturn - annualRiskFreeRate;
+        const sharpeRatio = annualVolatility !== 0 ? excessReturn / annualVolatility : 0;
+        
+        // Downside deviation for Sortino ratio
+        const downsideReturns = returns.filter(r => r < riskFreeRate / annualFactor);
+        const downsideVariance = downsideReturns.length > 0 ? 
+            downsideReturns.reduce((sum, r) => sum + Math.pow(r - riskFreeRate / annualFactor, 2), 0) / downsideReturns.length : 0;
+        const downsideDeviation = Math.sqrt(downsideVariance) * Math.sqrt(annualFactor);
+        const sortinoRatio = downsideDeviation !== 0 ? excessReturn / downsideDeviation : 0;
+        
+        return {
+            sharpeRatio,
+            annualReturn,
+            annualVolatility,
+            excessReturn,
+            sortinoRatio,
+            meanReturn,
+            stdDev,
+            n
+        };
+    }
+    
+    function updateMetricsDisplay(metrics) {
+        document.getElementById('sharpeRatio').textContent = metrics.sharpeRatio.toFixed(3);
+        document.getElementById('annualReturn').textContent = (metrics.annualReturn >= 0 ? '+' : '') + metrics.annualReturn.toFixed(2) + '%';
+        document.getElementById('volatility').textContent = metrics.annualVolatility.toFixed(2) + '%';
+        document.getElementById('excessReturn').textContent = (metrics.excessReturn >= 0 ? '+' : '') + metrics.excessReturn.toFixed(2) + '%';
+        
+        // Color coding for Sharpe ratio
+        const sharpeEl = document.getElementById('sharpeRatio');
+        if (metrics.sharpeRatio > 2) {
+            sharpeEl.className = 'metric-value text-success';
+        } else if (metrics.sharpeRatio > 1) {
+            sharpeEl.className = 'metric-value text-info';
+        } else if (metrics.sharpeRatio > 0) {
+            sharpeEl.className = 'metric-value text-warning';
+        } else {
+            sharpeEl.className = 'metric-value text-danger';
+        }
+    }
+    
+    function updateInterpretation(metrics, benchmarkMetrics) {
+        let interpretation = '';
+        let interpretationClass = '';
+        
+        // Sharpe ratio interpretation
+        if (metrics.sharpeRatio > 3) {
+            interpretation = 'Excellent';
+            interpretationClass = 'interpretation-excellent';
+        } else if (metrics.sharpeRatio > 2) {
+            interpretation = 'Very Good';
+            interpretationClass = 'interpretation-good';
+        } else if (metrics.sharpeRatio > 1) {
+            interpretation = 'Good';
+            interpretationClass = 'interpretation-good';
+        } else if (metrics.sharpeRatio > 0) {
+            interpretation = 'Fair';
+            interpretationClass = 'interpretation-fair';
+        } else {
+            interpretation = 'Poor';
+            interpretationClass = 'interpretation-poor';
+        }
+        
+        let content = `
+            <div class="metric-interpretation ${interpretationClass}">
+                <h6><i class="fas fa-chart-line me-2"></i>${interpretation} Risk-Adjusted Performance</h6>
+                <p class="mb-2">A Sharpe ratio of <strong>${metrics.sharpeRatio.toFixed(3)}</strong> indicates ${interpretation.toLowerCase()} risk-adjusted returns.</p>
+                <small class="text-muted">
+                    ${getSharpeInterpretationText(metrics.sharpeRatio)}
+                </small>
+            </div>
+        `;
+        
+        // Performance summary
+        content += `
+            <div class="performance-comparison">
+                <div class="metric">
+                    <div class="metric-label">Return</div>
+                    <div class="metric-value ${metrics.annualReturn >= 0 ? 'text-success' : 'text-danger'}">
+                        ${(metrics.annualReturn >= 0 ? '+' : '') + metrics.annualReturn.toFixed(1)}%
+                    </div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Volatility</div>
+                    <div class="metric-value text-warning">${metrics.annualVolatility.toFixed(1)}%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Sharpe</div>
+                    <div class="metric-value text-primary">${metrics.sharpeRatio.toFixed(2)}</div>
+                </div>
+            </div>
+        `;
+        
+        // Benchmark comparison if available
+        if (benchmarkMetrics) {
+            const outperformance = metrics.annualReturn - benchmarkMetrics.annualReturn;
+            const outperformanceClass = outperformance >= 0 ? 'text-success' : 'text-danger';
+            
+            content += `
+                <hr>
+                <h6><i class="fas fa-chart-pie me-2"></i>Benchmark Comparison</h6>
+                <div class="performance-comparison">
+                    <div class="metric">
+                        <div class="metric-label">Outperformance</div>
+                        <div class="metric-value ${outperformanceClass}">
+                            ${(outperformance >= 0 ? '+' : '') + outperformance.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Your Sharpe</div>
+                        <div class="metric-value text-primary">${metrics.sharpeRatio.toFixed(2)}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Benchmark Sharpe</div>
+                        <div class="metric-value text-info">${benchmarkMetrics.sharpeRatio.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        document.getElementById('interpretationContent').innerHTML = content;
+    }
+    
+    function getSharpeInterpretationText(sharpe) {
+        if (sharpe > 3) return 'Exceptional performance with very high risk-adjusted returns.';
+        if (sharpe > 2) return 'Strong performance with good risk management.';
+        if (sharpe > 1) return 'Solid performance, beating risk-free rate with reasonable risk.';
+        if (sharpe > 0) return 'Positive risk-adjusted returns, but room for improvement.';
+        return 'Negative risk-adjusted returns. Consider reviewing strategy.';
+    }
+    
+    function updateAdditionalMetrics(returns, metrics) {
+        // Calculate additional metrics
+        const cumulativeReturns = calculateCumulativeReturns(returns);
+        const maxDrawdown = calculateMaxDrawdown(cumulativeReturns);
+        const calmarRatio = metrics.annualReturn / Math.abs(maxDrawdown);
+        const winRate = (returns.filter(r => r > 0).length / returns.length) * 100;
+        const bestPeriod = Math.max(...returns);
+        const worstPeriod = Math.min(...returns);
+        
+        // Update table
+        const tbody = document.getElementById('additionalMetrics');
+        tbody.innerHTML = `
+            <tr>
+                <td>Maximum Drawdown</td>
+                <td class="text-end text-danger">${maxDrawdown.toFixed(2)}%</td>
+            </tr>
+            <tr>
+                <td>Sortino Ratio</td>
+                <td class="text-end text-info">${metrics.sortinoRatio.toFixed(3)}</td>
+            </tr>
+            <tr>
+                <td>Calmar Ratio</td>
+                <td class="text-end text-warning">${calmarRatio.toFixed(3)}</td>
+            </tr>
+            <tr>
+                <td>Win Rate</td>
+                <td class="text-end text-primary">${winRate.toFixed(1)}%</td>
+            </tr>
+            <tr>
+                <td>Best Period</td>
+                <td class="text-end text-success">+${bestPeriod.toFixed(2)}%</td>
+            </tr>
+            <tr>
+                <td>Worst Period</td>
+                <td class="text-end text-danger">${worstPeriod.toFixed(2)}%</td>
+            </tr>
+        `;
+    }
+    
+    function calculateCumulativeReturns(returns) {
+        const cumulative = [100];
+        for (let i = 0; i < returns.length; i++) {
+            const newValue = cumulative[cumulative.length - 1] * (1 + returns[i] / 100);
+            cumulative.push(newValue);
+        }
+        return cumulative;
+    }
+    
+    function calculateMaxDrawdown(cumulativeReturns) {
+        let maxDrawdown = 0;
+        let peak = cumulativeReturns[0];
+        
+        for (let i = 1; i < cumulativeReturns.length; i++) {
+            if (cumulativeReturns[i] > peak) {
+                peak = cumulativeReturns[i];
+            }
+            const drawdown = ((peak - cumulativeReturns[i]) / peak) * 100;
+            if (drawdown > maxDrawdown) {
+                maxDrawdown = drawdown;
+            }
+        }
+        
+        return maxDrawdown;
+    }
+    
+    function updateChart(returns, benchmarkReturns, metrics, benchmarkMetrics) {
+        const canvas = document.getElementById('performanceChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Calculate cumulative returns
+        const cumulativeReturns = calculateCumulativeReturns(returns);
+        const labels = Array.from({length: cumulativeReturns.length}, (_, i) => i);
+        
+        // Prepare datasets
+        const datasets = [
+            {
+                label: 'Portfolio',
+                data: cumulativeReturns.map((value, index) => ({x: index, y: value})),
+                borderColor: '#00b0ff',
+                backgroundColor: 'rgba(0, 176, 255, 0.1)',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.2
+            }
+        ];
+        
+        // Add benchmark if available
+        if (benchmarkReturns.length > 0) {
+            const benchmarkCumulative = calculateCumulativeReturns(benchmarkReturns);
+            datasets.push({
+                label: 'Benchmark',
+                data: benchmarkCumulative.map((value, index) => ({x: index, y: value})),
+                borderColor: '#d68b45',
+                backgroundColor: 'rgba(214, 139, 69, 0.1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.2,
+                borderDash: [5, 5]
+            });
+        }
+        
+        // Destroy existing chart
+        if (performanceChart) {
+            performanceChart.destroy();
+        }
+        
+        // Create new chart
+        performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: { datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#9ba1a6',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 25, 34, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#9ba1a6',
+                        borderColor: '#00b0ff',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Period',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#9ba1a6' }
+                    },
+                    y: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Portfolio Value ($)',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#9ba1a6',
+                            callback: function(value) {
+                                return '$' + value.toFixed(0);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Sample data for demo
+    function loadSampleData() {
+        const sampleReturns = [
+            2.5, -1.2, 4.8, 1.1, -0.8, 3.2, 2.1, -2.5, 5.4, 0.9,
+            1.8, -1.5, 3.7, 2.3, -0.4, 4.1, 1.7, -1.1, 2.9, 3.4,
+            -2.1, 1.6, 4.2, 0.8, -1.9, 2.7, 3.1, -0.7, 1.4, 4.6
+        ];
+        
+        document.getElementById('returnsData').value = sampleReturns.join(', ');
+    }
+    
+    // Load sample data on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadSampleData();
+    });
+</script>

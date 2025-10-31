@@ -75,6 +75,24 @@ app.get('/trade-expectancy', (req, res) => {
     });
 });
 
+// Route for Win Rate Impact Analyzer
+app.get('/win-rate-impact', (req, res) => {
+    res.render('win-rate-impact', { 
+        title: 'Win Rate Impact Analyzer - Copper Candle Calculators',
+        description: 'Visualize how win rate changes affect profitability with interactive analysis',
+        includeChartJs: true
+    });
+});
+
+// Route for Sharpe Ratio Calculator
+app.get('/sharpe-ratio', (req, res) => {
+    res.render('sharpe-ratio', { 
+        title: 'Sharpe Ratio Calculator - Copper Candle Calculators',
+        description: 'Calculate risk-adjusted returns and performance metrics with benchmark comparison',
+        includeChartJs: true
+    });
+});
+
 // Route for Breakeven Calculator
 app.get('/breakeven-calculator', (req, res) => {
     res.render('breakeven-calculator', { 
