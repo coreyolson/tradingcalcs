@@ -55,8 +55,7 @@ header {
     border-bottom: 1px solid var(--border-accent);
     backdrop-filter: blur(20px);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 1000;
     width: 100%;
 }
@@ -120,9 +119,7 @@ header h1 i {
 
 /* Input Card */
 .input-card {
-    position: sticky;
-    top: 80px;
-    z-index: 100;
+    position: relative;
     margin-bottom: 0.5rem;
 }
 

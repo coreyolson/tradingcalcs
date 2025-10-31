@@ -1,0 +1,318 @@
+# Copper Candle Enhancement Plan
+**Date:** October 31, 2025  
+**Status:** Active Development
+
+---
+
+## 🚨 CRITICAL FIXES (Do Now)
+
+### 1. **Fix Scrolling Issues on All Calculators**
+- **Problem:** Header with `position: sticky` causing visual glitches on scroll
+- **Solution:** 
+  - Remove `position: sticky` from header in style.css (line 58)
+  - Keep header static but ensure it stays at top
+  - Test all 12 calculators for smooth scrolling
+  - Check modal overlays don't get stuck behind elements
+- **Files to modify:**
+  - `public/style.css` (header styles)
+  - Test each calculator page for z-index conflicts
+- **Priority:** 🔴 URGENT
+
+### 2. **Make Leverage Calculator Real-Time**
+- **Problem:** Still has submit button (inconsistent with other calculators)
+- **Solution:**
+  - Remove submit button
+  - Add `addEventListener('input', calculateLeverage)` to all inputs
+  - Add `addEventListener('change', calculateLeverage)` to all selects
+  - Match UX of Position Sizer, Portfolio Heat
+- **Files to modify:**
+  - `views/leverage-calculator.ejs`
+- **Priority:** 🟠 HIGH
+
+### 3. **Add Prominent Sample Size Warnings**
+- **Problem:** Sample size warnings not visible enough in calculators
+- **Solution:**
+  - Add warning banner at top of results when totalTrades < 30
+  - Use Bootstrap alert with warning icon
+  - Make it dismissible but re-appears on page load
+  - Show on: Trade Expectancy, Breakeven, Win Rate Impact, Sharpe Ratio
+- **Files to modify:**
+  - `views/trade-expectancy.ejs`
+  - `views/win-rate-impact.ejs`
+  - `views/sharpe-ratio.ejs`
+  - `views/breakeven-calculator.ejs`
+- **Priority:** 🟠 HIGH
+
+---
+
+## 🎯 PROFILE ENHANCEMENTS (High Value)
+
+### 4. **Show Recommendations IN Calculators**
+- **Problem:** Recommendations hidden in dropdown, users miss critical warnings
+- **Solution:**
+  - Add recommendation banner at top of each calculator page
+  - Show only CRITICAL and HIGH priority recommendations
+  - Make it collapsible with localStorage to remember state
+  - Example: "⚠️ Negative Edge Detected - Your strategy has negative expectancy"
+- **Implementation:**
+  - Create `showCalculatorRecommendations()` function
+  - Call on page load in each calculator
+  - Filter recommendations relevant to that calculator
+- **Files to modify:**
+  - All 12 calculator .ejs files
+  - Add to `public/personalization.js`
+- **Priority:** 🟡 MEDIUM-HIGH
+
+### 5. **Enhanced Profile Loaded Notification**
+- **Problem:** Toast notification is subtle, users might not notice auto-fill happened
+- **Solution:**
+  - Add subtle green border pulse to auto-filled fields
+  - Increase toast size and duration
+  - Add sound notification (optional, user preference)
+  - Show "Loaded from profile" icon next to field labels
+- **Files to modify:**
+  - Position Sizer, Portfolio Heat, Trade Expectancy (already have notifications)
+  - Add to remaining calculators with auto-fill
+- **Priority:** 🟡 MEDIUM
+
+### 6. **Profile Import from CSV/JSON**
+- **Problem:** Users can export but not import
+- **Solution:**
+  - Add "Import Profile" button in profile modal
+  - File input accepts .json and .csv
+  - Parse and validate data
+  - Show preview before importing
+  - Support common trading journal formats (TradeZella, Edgewonk)
+- **Files to modify:**
+  - `views/partials/profile-modal.ejs`
+  - `public/personalization.js` (add importProfile validation)
+- **Priority:** 🟡 MEDIUM
+
+### 7. **Profile Backup Reminder**
+- **Problem:** Users might lose profile if browser data cleared
+- **Solution:**
+  - Track `lastBackupDate` in profile metadata
+  - Show banner if not backed up in 30 days
+  - Add "Backup Now" button
+  - Store reminder dismissal in localStorage
+- **Files to modify:**
+  - `public/personalization.js`
+  - `views/partials/header.ejs` (banner location)
+- **Priority:** 🟢 LOW-MEDIUM
+
+---
+
+## 📊 CALCULATOR IMPROVEMENTS
+
+### 8. **Sticky Table Headers in Long Tables**
+- **Problem:** Scrolling through large result tables loses context
+- **Solution:**
+  - Add `position: sticky; top: 0;` to table headers in scrollable containers
+  - Ensure z-index is correct
+  - Test in: Compound Growth, Time to Goal, Win Rate Impact
+- **Files to modify:**
+  - Calculator pages with long tables
+  - Add proper `overflow-y: auto` containers
+- **Priority:** 🟡 MEDIUM
+
+### 9. **Most Used Calculators Widget**
+- **Problem:** Usage tracking exists but not displayed
+- **Solution:**
+  - Add "Quick Access" widget on homepage
+  - Show 3 most-used calculators from PersonalizationEngine
+  - One-click access
+  - Show usage count badge
+- **Files to modify:**
+  - `views/index.ejs` (homepage dashboard)
+  - Use `PersonalizationEngine.getMostUsedCalculators()`
+- **Priority:** 🟢 LOW-MEDIUM
+
+### 10. **Real Discord Invite Link**
+- **Problem:** Discord links are placeholder "#"
+- **Solution:**
+  - Create Discord server for Copper Candle community
+  - Generate permanent invite link
+  - Replace all "#" Discord links
+  - Add Discord widget to homepage
+- **Files to modify:**
+  - `views/index.ejs`
+  - `views/about.ejs`
+  - `views/partials/footer.ejs`
+- **Priority:** 🟢 LOW (when Discord ready)
+
+---
+
+## 🛠️ TECHNICAL IMPROVEMENTS
+
+### 11. **404 Error Page**
+- **Problem:** No custom 404 page
+- **Solution:**
+  - Create `views/404.ejs` with branded design
+  - Add route handler in `server.js`
+  - Show links to all calculators
+  - Track 404s to find broken links
+- **Files to create:**
+  - `views/404.ejs`
+- **Files to modify:**
+  - `server.js` (add 404 handler)
+- **Priority:** 🟢 LOW
+
+### 12. **Performance Optimization**
+- **Problem:** Large JavaScript files loaded on every page
+- **Solution:**
+  - Lazy load Chart.js only when needed
+  - Minify `personalization.js` and `calculations.js`
+  - Add service worker for offline functionality
+  - Cache static assets
+- **Files to modify:**
+  - Add build process (optional)
+  - Update script loading in header
+- **Priority:** 🟢 LOW
+
+### 13. **Mobile Optimization**
+- **Problem:** Some calculators might not be fully responsive
+- **Solution:**
+  - Test all 12 calculators on mobile devices
+  - Adjust input card widths for small screens
+  - Ensure charts are touch-friendly
+  - Test profile modal on mobile
+- **Files to modify:**
+  - Add responsive CSS media queries
+  - Test and adjust each calculator
+- **Priority:** 🟡 MEDIUM
+
+---
+
+## 🎨 UX POLISH
+
+### 14. **Loading States**
+- **Problem:** No feedback when calculations are running
+- **Solution:**
+  - Add spinner for Monte Carlo simulations
+  - Disable inputs during calculation
+  - Show "Calculating..." state
+  - Add progress bar for long operations
+- **Files to modify:**
+  - Contract Calculator (Monte Carlo)
+  - Any heavy computation calculators
+- **Priority:** 🟢 LOW
+
+### 15. **Keyboard Shortcuts**
+- **Problem:** Power users can't navigate quickly
+- **Solution:**
+  - Add hotkeys: `Ctrl+P` = Profile, `Ctrl+K` = Calculator search
+  - Show shortcut hints on hover
+  - Add "?" key for help overlay
+- **Implementation:**
+  - Add global keyboard listener
+  - Create modal for shortcut reference
+- **Priority:** 🟢 LOW
+
+### 16. **Dark/Light Mode Toggle**
+- **Problem:** Only dark mode available
+- **Solution:**
+  - Add theme toggle in header
+  - Store preference in localStorage
+  - Create light theme CSS
+  - Default to system preference
+- **Files to modify:**
+  - `public/style.css` (add light theme)
+  - `views/partials/header.ejs` (add toggle)
+- **Priority:** 🟢 LOW (dark mode is on-brand)
+
+---
+
+## 📈 ANALYTICS & INSIGHTS
+
+### 17. **Anonymous Usage Analytics**
+- **Problem:** No visibility into which features are popular
+- **Solution:**
+  - Add privacy-respecting analytics (no personal data)
+  - Track: calculator usage, time spent, errors
+  - Use localStorage counters
+  - Export to admin dashboard
+  - **Important:** Keep 100% local, no external tracking
+- **Implementation:**
+  - Extend PersonalizationEngine with analytics
+  - Create admin view to see aggregated data
+- **Priority:** 🟢 LOW
+
+---
+
+## 🚀 FUTURE FEATURES
+
+### 18. **Option Chain Explorer** (Coming Soon on Homepage)
+- Greek calculations
+- IV surface visualization
+- Strategy builder
+
+### 19. **Edge Decay Visualizer** (Coming Soon on Homepage)
+- Historical edge tracking
+- Market condition correlation
+- Strategy degradation alerts
+
+### 20. **Trading Journal Integration**
+- Import trades from CSV
+- Auto-calculate metrics
+- Performance dashboard
+- Sync with profile
+
+---
+
+## 📋 IMPLEMENTATION ORDER
+
+### Sprint 1 (This Week) - Critical Fixes
+1. ✅ Fix scrolling issues (remove sticky header)
+2. ✅ Make Leverage Calculator real-time
+3. ✅ Add sample size warnings to calculators
+
+### Sprint 2 (Next Week) - Profile Polish
+4. Show recommendations in calculators
+5. Enhanced profile notifications
+6. Profile import from JSON/CSV
+7. Profile backup reminder
+
+### Sprint 3 (Week 3) - Calculator UX
+8. Sticky table headers
+9. Most used calculators widget
+10. Real Discord link
+11. Mobile optimization testing
+
+### Sprint 4 (Week 4) - Technical Debt
+12. 404 page
+13. Performance optimization
+14. Loading states
+15. Keyboard shortcuts
+
+### Backlog - Nice to Have
+16. Dark/Light mode toggle
+17. Anonymous usage analytics
+18. Trading journal integration
+19. Advanced features (Option Chain, Edge Decay)
+
+---
+
+## 🎯 SUCCESS METRICS
+
+- **No visual glitches** when scrolling on any calculator
+- **100% calculator consistency** (all real-time or all with submit)
+- **Sample size warnings** shown on <30 trades
+- **Profile completion rate** >50% of visitors
+- **Calculator usage** tracked and displayed
+- **Mobile responsive** on all devices
+- **Zero console errors** on any page
+
+---
+
+## 📝 NOTES
+
+- Keep 100% privacy focus (no external tracking)
+- Maintain localStorage-only approach
+- Test every change on all 12 calculators
+- Document new features in methodology page
+- Keep commit messages descriptive with emojis
+
+---
+
+**Last Updated:** October 31, 2025  
+**Next Review:** After Sprint 1 completion
