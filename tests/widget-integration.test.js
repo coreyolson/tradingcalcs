@@ -34,7 +34,7 @@ describe('Widget Integration Tests', () => {
         test('should return risk of ruin data', () => {
             expect(testData.riskOfRuin).toBeDefined();
             expect(Array.isArray(testData.riskOfRuin)).toBe(true);
-            expect(testData.riskOfRuin.length).toBe(4);
+            expect(testData.riskOfRuin.length).toBe(8);
 
             testData.riskOfRuin.forEach(risk => {
                 expect(risk).toHaveProperty('drawdownLevel');
@@ -46,10 +46,14 @@ describe('Widget Integration Tests', () => {
         });
 
         test('should show increasing drawdown levels', () => {
-            expect(testData.riskOfRuin[0].drawdownLevel).toBe(25);
-            expect(testData.riskOfRuin[1].drawdownLevel).toBe(50);
-            expect(testData.riskOfRuin[2].drawdownLevel).toBe(75);
-            expect(testData.riskOfRuin[3].drawdownLevel).toBe(90);
+            expect(testData.riskOfRuin[0].drawdownLevel).toBe(10);
+            expect(testData.riskOfRuin[1].drawdownLevel).toBe(20);
+            expect(testData.riskOfRuin[2].drawdownLevel).toBe(30);
+            expect(testData.riskOfRuin[3].drawdownLevel).toBe(40);
+            expect(testData.riskOfRuin[4].drawdownLevel).toBe(50);
+            expect(testData.riskOfRuin[5].drawdownLevel).toBe(60);
+            expect(testData.riskOfRuin[6].drawdownLevel).toBe(75);
+            expect(testData.riskOfRuin[7].drawdownLevel).toBe(90);
         });
     });
 
@@ -57,7 +61,7 @@ describe('Widget Integration Tests', () => {
         test('should return target projection data', () => {
             expect(testData.targetProjections).toBeDefined();
             expect(Array.isArray(testData.targetProjections)).toBe(true);
-            expect(testData.targetProjections.length).toBe(4);
+            expect(testData.targetProjections.length).toBe(8);
 
             testData.targetProjections.forEach(target => {
                 expect(target).toHaveProperty('targetMultiple');
@@ -71,8 +75,12 @@ describe('Widget Integration Tests', () => {
         test('should show increasing target multiples', () => {
             expect(testData.targetProjections[0].targetMultiple).toBe(2);
             expect(testData.targetProjections[1].targetMultiple).toBe(3);
-            expect(testData.targetProjections[2].targetMultiple).toBe(5);
-            expect(testData.targetProjections[3].targetMultiple).toBe(10);
+            expect(testData.targetProjections[2].targetMultiple).toBe(4);
+            expect(testData.targetProjections[3].targetMultiple).toBe(5);
+            expect(testData.targetProjections[4].targetMultiple).toBe(10);
+            expect(testData.targetProjections[5].targetMultiple).toBe(20);
+            expect(testData.targetProjections[6].targetMultiple).toBe(50);
+            expect(testData.targetProjections[7].targetMultiple).toBe(100);
         });
 
         test('should calculate correct target amounts', () => {

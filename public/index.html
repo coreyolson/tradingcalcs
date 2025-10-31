@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Risk Calculator | Business Model Analysis</title>
+    <title>Contract Trading Calculator | Risk Analysis & Monte Carlo Simulation</title>
     
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -26,7 +26,7 @@
                     <div class="col-12">
                         <h1 class="mb-0">
                             <i class="fas fa-chart-line"></i>
-                            TRADING RISK CALCULATOR
+                            CONTRACT TRADING CALCULATOR
                         </h1>
                         <small class="text-muted">Risk Analysis & Monte Carlo Simulation</small>
                     </div>
@@ -45,13 +45,25 @@
                         <div class="card-body compact-form">
                             <form id="calculatorForm">
                                 <div class="input-row">
+                                    <label>Asset Type</label>
+                                    <select class="form-control form-control-sm" id="assetType">
+                                        <option value="futures">Futures</option>
+                                        <option value="options">Options</option>
+                                        <option value="stocks">Stocks</option>
+                                    </select>
+                                </div>
+
+                                <div class="input-row">
                                     <label>Account ($)</label>
                                     <input type="number" class="form-control form-control-sm" id="accountSize" value="3125" min="100" step="100">
                                 </div>
 
                                 <div class="input-row">
                                     <label>Risk (%)</label>
-                                    <input type="number" class="form-control form-control-sm" id="riskPercent" value="8" min="0.1" max="100" step="0.1">
+                                    <input type="number" class="form-control form-control-sm" id="riskPercent" value="8" min="1" max="95" step="1">
+                                    <small class="text-warning" style="font-size: 0.7rem; display: none;" id="riskWarning">
+                                        <i class="fas fa-exclamation-triangle"></i> Risk capped at 95%
+                                    </small>
                                 </div>
 
                                 <div class="input-row">
@@ -75,7 +87,7 @@
                                 </div>
 
                                 <div class="input-row">
-                                    <label>Contract Price ($)</label>
+                                    <label id="contractPriceLabel">Contract Price ($)</label>
                                     <input type="number" class="form-control form-control-sm" id="contractPrice" value="1.00" min="0.01" max="100" step="0.01">
                                 </div>
 
@@ -223,6 +235,14 @@
                                 <div class="metric-label">EV</div>
                                 <div class="metric-value text-success" id="evValue">--</div>
                             </div>
+                            <div class="metric-box" data-tooltip="Your win rate percentage">
+                                <div class="metric-label">Win Rate</div>
+                                <div class="metric-value text-info" id="winRateMetric">--</div>
+                            </div>
+                            <div class="metric-box" data-tooltip="Average win / average loss">
+                                <div class="metric-label">Payoff</div>
+                                <div class="metric-value" id="payoffValue">--</div>
+                            </div>
                             <div class="metric-box" data-tooltip="Capital risked per trade">
                                 <div class="metric-label">Risk/Trade</div>
                                 <div class="metric-value text-info" id="riskValue">--</div>
@@ -230,6 +250,10 @@
                             <div class="metric-box" data-tooltip="Expected daily account growth">
                                 <div class="metric-label">Daily Growth</div>
                                 <div class="metric-value text-warning" id="dailyGrowthValue">--</div>
+                            </div>
+                            <div class="metric-box" data-tooltip="Ratio of wins to losses">
+                                <div class="metric-label">Profit Factor</div>
+                                <div class="metric-value text-danger" id="profitFactorValue">--</div>
                             </div>
                             <div class="metric-box" data-tooltip="Expected profit per trade">
                                 <div class="metric-label">$/Trade</div>
@@ -239,17 +263,13 @@
                                 <div class="metric-label">$/Day</div>
                                 <div class="metric-value text-success" id="dailyProfitValue">--</div>
                             </div>
-                            <div class="metric-box" data-tooltip="Ratio of wins to losses">
-                                <div class="metric-label">Profit Factor</div>
-                                <div class="metric-value text-danger" id="profitFactorValue">--</div>
-                            </div>
                             <div class="metric-box" data-tooltip="Optimal bet size (Kelly Criterion)">
                                 <div class="metric-label">Kelly %</div>
                                 <div class="metric-value" id="kellyValue">--</div>
                             </div>
-                            <div class="metric-box" data-tooltip="Average win / average loss">
-                                <div class="metric-label">Payoff</div>
-                                <div class="metric-value" id="payoffValue">--</div>
+                            <div class="metric-box" data-tooltip="Expected maximum consecutive losses in this period">
+                                <div class="metric-label">Max Loss Streak</div>
+                                <div class="metric-value text-warning" id="maxWinStreakValue">--</div>
                             </div>
                             <div class="metric-box" data-tooltip="Probability of losing all capital">
                                 <div class="metric-label">Ruin %</div>

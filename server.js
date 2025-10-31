@@ -12,27 +12,16 @@ app.use(express.static('public'));
 
 // API endpoint for simulation
 app.post('/api/simulate', (req, res) => {
-  const {
-    accountSize,
-    riskPercent,
-    winRate,
-    avgWin,
-    avgLoss,
-    stopLoss,
-    contractPrice,
-    commission,
-    tradesPerDay,
-    days,
-    simulations
-  } = req.body;
-
-  try {
+    const {
+        accountSize, riskPercent, winRate, avgWin, avgLoss,
+        contractPrice, commission, tradesPerDay, days, stopLoss, simulations, assetType
+    } = req.body;  try {
     // Validate required parameters
     if (!accountSize || accountSize <= 0) {
       throw new Error('Invalid account size');
     }
     if (riskPercent === undefined || riskPercent < 0 || riskPercent > 1) {
-      throw new Error('Invalid risk percent');
+      throw new Error('Invalid risk percent (must be between 0 and 100%)');
     }
     if (winRate === undefined || winRate < 0 || winRate > 1) {
       throw new Error('Invalid win rate');
@@ -87,11 +76,18 @@ app.post('/api/simulate', (req, res) => {
 
     // New features
     const riskOfRuin = calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss || avgLoss);
-    const targetProjections = calculateTargetProjections(accountSize, expectedDailyProfit, [2, 3, 5, 10]);
+    const targetProjections = calculateTargetProjections(accountSize, expectedDailyProfit, [2, 3, 4, 5, 10, 20, 50, 100]);
     const timeBasedAnalysis = calculateTimeBasedAnalysis(projection, tradesPerDay);
     const recoveryCalculations = calculateRecoveryScenarios(riskPercent, avgWin, [10, 20, 30, 40, 50]);
-    const sharpeRatio = calculateSharpeRatio(monteCarloResults, accountSize);
-    const winStreakProbabilities = calculateStreakProbabilities(1 - winRate, 15); // For losses, inverse for wins
+    const sharpeRatio = calculateSharpeRatio(monteCarloResults, accountSize, tradesPerDay * days);
+    
+    // Calculate expected max loss streak in the given number of trades
+    const totalTrades = tradesPerDay * days;
+    const expectedMaxLossStreak = calculateExpectedMaxLossStreak(1 - winRate, totalTrades);
+    
+    // Calculate win streak probabilities (for wins, not losses)
+    const winStreakProbabilities = calculateStreakProbabilities(1 - winRate, 15);
+    
     const simulationMode = 'stopLoss'; // Will be toggled by frontend
 
     res.json({
@@ -123,6 +119,7 @@ app.post('/api/simulate', (req, res) => {
         timeBasedAnalysis,
         recoveryCalculations,
         winStreakProbabilities,
+        expectedMaxLossStreak,
         simulationMode
       }
     });
@@ -236,9 +233,20 @@ function createHistogram(data, bins) {
     histogram[binIndex]++;
   });
   
+  // Filter out bins with 0 values
+  const filteredLabels = [];
+  const filteredData = [];
+  
+  for (let i = 0; i < bins; i++) {
+    if (histogram[i] > 0) {
+      filteredLabels.push(binLabels[i]);
+      filteredData.push(histogram[i]);
+    }
+  }
+  
   return {
-    labels: binLabels,
-    data: histogram
+    labels: filteredLabels,
+    data: filteredData
   };
 }
 
@@ -247,6 +255,20 @@ function calculateStreakProbabilities(winRate, maxStreak) {
   const lossRate = 1 - winRate;
   const streaks = [];
   
+  // Helper function to format large numbers with K, M, B abbreviations
+  const formatFrequency = (num) => {
+    if (num >= 1000000000) {
+      return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    }
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    if (num >= 10000) {
+      return (num / 1000).toFixed(0) + 'K';
+    }
+    return num.toLocaleString();
+  };
+  
   for (let streak = 1; streak <= maxStreak; streak++) {
     const probability = Math.pow(lossRate, streak);
     const frequency = probability > 0 ? Math.round(1 / probability) : Infinity;
@@ -254,7 +276,7 @@ function calculateStreakProbabilities(winRate, maxStreak) {
     streaks.push({
       streak,
       probability: Math.round(probability * 1000000) / 10000,
-      frequency: frequency === Infinity ? 'Never' : `1 in ${frequency.toLocaleString()}`
+      frequency: frequency === Infinity ? 'Never' : `1 in ${formatFrequency(frequency)}`
     });
   }
   
@@ -290,7 +312,7 @@ function calculateDrawdownScenarios(accountSize, riskPercent, stopLoss, maxLosse
 
 // 1. Calculate Risk of Ruin (probability of losing X% of account)
 function calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss) {
-  const ruinLevels = [25, 50, 75, 90]; // Percentage drawdown levels
+  const ruinLevels = [10, 20, 30, 40, 50, 60, 75, 90]; // More even progression
   const results = [];
   
   for (const level of ruinLevels) {
@@ -355,7 +377,8 @@ function calculateTimeBasedAnalysis(projection, tradesPerDay) {
     daily: { trades: tradesPerDay },
     weekly: { trades: tradesPerDay * 5 },
     monthly: { trades: tradesPerDay * 21 },
-    quarterly: { trades: tradesPerDay * 63 }
+    quarterly: { trades: tradesPerDay * 63 },
+    yearly: { trades: tradesPerDay * 252 }
   };
   
   // Calculate expected balances at each time period
@@ -364,12 +387,14 @@ function calculateTimeBasedAnalysis(projection, tradesPerDay) {
     analysis.weekly.balance = projection[Math.min(5, projection.length - 1)]?.balance || 0;
     analysis.monthly.balance = projection[Math.min(21, projection.length - 1)]?.balance || 0;
     analysis.quarterly.balance = projection[Math.min(63, projection.length - 1)]?.balance || 0;
+    analysis.yearly.balance = projection[Math.min(252, projection.length - 1)]?.balance || 0;
     
     const startBalance = projection[0]?.balance || 0;
     analysis.daily.growth = ((analysis.daily.balance - startBalance) / startBalance) * 100;
     analysis.weekly.growth = ((analysis.weekly.balance - startBalance) / startBalance) * 100;
     analysis.monthly.growth = ((analysis.monthly.balance - startBalance) / startBalance) * 100;
     analysis.quarterly.growth = ((analysis.quarterly.balance - startBalance) / startBalance) * 100;
+    analysis.yearly.growth = ((analysis.yearly.balance - startBalance) / startBalance) * 100;
   }
   
   return analysis;
@@ -396,22 +421,32 @@ function calculateRecoveryScenarios(riskPercent, avgWin, drawdownLevels) {
 }
 
 // 5. Calculate Sharpe Ratio from Monte Carlo results
-function calculateSharpeRatio(monteCarloResults, accountSize) {
+function calculateSharpeRatio(monteCarloResults, accountSize, totalTrades) {
   if (!monteCarloResults || !monteCarloResults.statistics) {
     return 0;
   }
   
-  const returns = monteCarloResults.statistics.meanReturn / 100;
-  const stdDev = monteCarloResults.statistics.stdDev;
+  const totalReturn = monteCarloResults.statistics.meanReturn / 100;
+  const stdDev = monteCarloResults.statistics.stdDev / accountSize; // Normalize by account size
   
-  // Assuming risk-free rate of 5% annually, ~0.02% daily
-  const riskFreeRate = 0.0002;
-  const avgReturn = returns;
+  // Assume 5% annual risk-free rate, scale to period
+  // Estimate period in years: totalTrades / (252 trading days * 2 trades/day)
+  const yearsInPeriod = totalTrades / (252 * 2);
+  const riskFreeRate = 0.05 * yearsInPeriod;
   
   if (stdDev === 0) return 0;
   
-  const sharpe = (avgReturn - riskFreeRate) / (stdDev / accountSize);
+  const sharpe = (totalReturn - riskFreeRate) / stdDev;
   return Math.round(sharpe * 100) / 100;
+}
+
+// Calculate expected maximum loss streak for given number of trades
+function calculateExpectedMaxLossStreak(lossRate, totalTrades) {
+  // Using the approximation: E[max streak] ≈ log(totalTrades) / log(1/lossRate)
+  if (lossRate === 0 || lossRate >= 1) return 0;
+  
+  const expected = Math.log(totalTrades) / Math.log(1 / lossRate);
+  return Math.round(expected);
 }
 
 // Export to CSV endpoint
@@ -435,6 +470,7 @@ app.get('/', (req, res) => {
 });
 
 // Export for testing
+/* istanbul ignore if */
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 Trading Risk Calculator running on http://localhost:${PORT}`);
@@ -452,5 +488,6 @@ module.exports = {
   calculateTargetProjections,
   calculateTimeBasedAnalysis,
   calculateRecoveryScenarios,
-  calculateSharpeRatio
+  calculateSharpeRatio,
+  calculateExpectedMaxLossStreak
 };

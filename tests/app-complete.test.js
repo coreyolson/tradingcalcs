@@ -382,7 +382,7 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
         it('should load moderate preset', () => {
             app.loadPreset('moderate');
             
-            expect(document.getElementById('accountSize').value).toBe('3125');
+            expect(document.getElementById('accountSize').value).toBe('5000');
             expect(document.getElementById('riskPercent').value).toBe('8');
             expect(document.getElementById('winRate').value).toBe('80');
         });
@@ -390,7 +390,7 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
         it('should load aggressive preset', () => {
             app.loadPreset('aggressive');
             
-            expect(document.getElementById('accountSize').value).toBe('3125');
+            expect(document.getElementById('accountSize').value).toBe('5000');
             expect(document.getElementById('riskPercent').value).toBe('12');
             expect(document.getElementById('winRate').value).toBe('75');
         });
@@ -415,7 +415,11 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
             app.loadCustomPresets();
             app.loadPreset('mypreset');
             
-            expect(mockDocument.getElementById('accountSize').value).toBe('10000');
+            // Account size should be preserved (not changed by preset)
+            expect(mockDocument.getElementById('accountSize').value).toBe('5000');
+            // But other values should update
+            expect(mockDocument.getElementById('riskPercent').value).toBe('15');
+            expect(mockDocument.getElementById('winRate').value).toBe('90');
         });
         
         it('should return early if preset does not exist', () => {
@@ -568,8 +572,8 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
             
             app.resetForm();
             
-            // Should load moderate preset values
-            expect(document.getElementById('accountSize').value).toBe('3125');
+            // Should load moderate preset values (but preserve account size)
+            expect(document.getElementById('accountSize').value).toBe('10000');
             expect(document.getElementById('riskPercent').value).toBe('8');
         });
     });
@@ -1303,7 +1307,7 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
             expect(row10.innerHTML).toContain('10L');
         });
         
-        it('should only show first 8 streaks', () => {
+        it('should only show first 9 streaks', () => {
             const streaks = Array.from({ length: 15 }, (_, i) => ({
                 streak: i + 1,
                 probability: 50 / (i + 1),
@@ -1314,7 +1318,7 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
             
             jest.advanceTimersByTime(200);
             
-            expect(mockTableBody.insertRow).toHaveBeenCalledTimes(8);
+            expect(mockTableBody.insertRow).toHaveBeenCalledTimes(9);
         });
     });
     
@@ -1386,7 +1390,7 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
             expect(nonSurvivableRow2.style.borderLeft).toBe('2px solid var(--danger-color)');
         });
         
-        it('should only show first 8 scenarios', () => {
+        it('should only show first 9 scenarios', () => {
             const scenarios = Array.from({ length: 15 }, (_, i) => ({
                 consecutiveLosses: i + 1,
                 remainingBalance: 5000 - (i * 300),
@@ -1398,7 +1402,7 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
             
             jest.advanceTimersByTime(200);
             
-            expect(mockTableBody.insertRow).toHaveBeenCalledTimes(8);
+            expect(mockTableBody.insertRow).toHaveBeenCalledTimes(9);
         });
         
         it('should handle missing remainingBalance using balance fallback (line 573)', () => {
@@ -1838,7 +1842,8 @@ describe('New Feature Functions', () => {
             daily: { trades: 2, balance: 5100, growth: 2 },
             weekly: { trades: 10, balance: 5500, growth: 10 },
             monthly: { trades: 42, balance: 6500, growth: 30 },
-            quarterly: { trades: 126, balance: 8500, growth: 70 }
+            quarterly: { trades: 126, balance: 8500, growth: 70 },
+            yearly: { trades: 504, balance: 15000, growth: 200 }
         };
 
         appModule.populateTimeBasedTable(analysis);
@@ -2074,7 +2079,8 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 kellyFraction: 15,
                 profitFactor: 2.5,
                 payoffRatio: 1.67,
-                stopLoss: 0.5
+                stopLoss: 0.5,
+                sharpeRatio: 1.5
             },
             projection: [{ day: 0, balance: 5000 }],
             monteCarlo: {
@@ -2088,11 +2094,18 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 histogram: { labels: [5000], data: [10] }
             },
             streakProbabilities: [{ streak: 5, probability: 0.8, frequency: '1 in 1' }],
-            drawdownScenarios: [{ losses: 3, balance: 4500, drawdown: 10, survivable: true }]
-            // winStreakProbabilities is MISSING - tests line 321
+            drawdownScenarios: [{ losses: 3, balance: 4500, drawdown: 10, survivable: true }],
+            // winStreakProbabilities is MISSING - tests line 320 FALSE branch
+            riskOfRuin: [{ riskPercent: 1, ruinProbability: 5 }],
+            targetProjections: [{ target: 10000, days: 30, probability: 80 }],
+            timeBasedAnalysis: { daily: { ev: 2.5 } },
+            recoveryCalculations: [{ drawdown: 10, recovery: 11.1 }]
         };
         
-        expect(() => appModule.displayResults(data)).not.toThrow();
+        // Actually call displayResults to execute the code path
+        appModule.displayResults(data);
+        // If we get here without throwing, the test passes
+        expect(true).toBe(true);
     });
 
     test('displayResults with missing riskOfRuin (line 324)', () => {
@@ -2107,7 +2120,8 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 kellyFraction: 15,
                 profitFactor: 2.5,
                 payoffRatio: 1.67,
-                stopLoss: 0.5
+                stopLoss: 0.5,
+                sharpeRatio: 1.5
             },
             projection: [{ day: 0, balance: 5000 }],
             monteCarlo: {
@@ -2120,12 +2134,17 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 },
                 histogram: { labels: [5000], data: [10] }
             },
-            streakProbabilities: [],
-            drawdownScenarios: []
-            // riskOfRuin is MISSING - tests line 324
+            streakProbabilities: [{ streak: 5, probability: 0.8, frequency: '1 in 1' }],
+            drawdownScenarios: [{ losses: 3, balance: 4500, drawdown: 10, survivable: true }],
+            winStreakProbabilities: [{ streak: 3, probability: 0.5, frequency: '1 in 2' }],
+            // riskOfRuin is MISSING - tests line 323 FALSE branch
+            targetProjections: [{ target: 10000, days: 30, probability: 80 }],
+            timeBasedAnalysis: { daily: { ev: 2.5 } },
+            recoveryCalculations: [{ drawdown: 10, recovery: 11.1 }]
         };
         
-        expect(() => appModule.displayResults(data)).not.toThrow();
+        appModule.displayResults(data);
+        expect(true).toBe(true);
     });
 
     test('displayResults with missing targetProjections (line 327)', () => {
@@ -2140,7 +2159,8 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 kellyFraction: 15,
                 profitFactor: 2.5,
                 payoffRatio: 1.67,
-                stopLoss: 0.5
+                stopLoss: 0.5,
+                sharpeRatio: 1.5
             },
             projection: [{ day: 0, balance: 5000 }],
             monteCarlo: {
@@ -2153,12 +2173,17 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 },
                 histogram: { labels: [5000], data: [10] }
             },
-            streakProbabilities: [],
-            drawdownScenarios: []
-            // targetProjections is MISSING - tests line 327
+            streakProbabilities: [{ streak: 5, probability: 0.8, frequency: '1 in 1' }],
+            drawdownScenarios: [{ losses: 3, balance: 4500, drawdown: 10, survivable: true }],
+            winStreakProbabilities: [{ streak: 3, probability: 0.5, frequency: '1 in 2' }],
+            riskOfRuin: [{ riskPercent: 1, ruinProbability: 5 }],
+            // targetProjections is MISSING - tests line 326 FALSE branch
+            timeBasedAnalysis: { daily: { ev: 2.5 } },
+            recoveryCalculations: [{ drawdown: 10, recovery: 11.1 }]
         };
         
-        expect(() => appModule.displayResults(data)).not.toThrow();
+        appModule.displayResults(data);
+        expect(true).toBe(true);
     });
 
     test('displayResults with missing timeBasedAnalysis (line 330)', () => {
@@ -2173,7 +2198,8 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 kellyFraction: 15,
                 profitFactor: 2.5,
                 payoffRatio: 1.67,
-                stopLoss: 0.5
+                stopLoss: 0.5,
+                sharpeRatio: 1.5
             },
             projection: [{ day: 0, balance: 5000 }],
             monteCarlo: {
@@ -2186,12 +2212,17 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 },
                 histogram: { labels: [5000], data: [10] }
             },
-            streakProbabilities: [],
-            drawdownScenarios: []
-            // timeBasedAnalysis is MISSING - tests line 330
+            streakProbabilities: [{ streak: 5, probability: 0.8, frequency: '1 in 1' }],
+            drawdownScenarios: [{ losses: 3, balance: 4500, drawdown: 10, survivable: true }],
+            winStreakProbabilities: [{ streak: 3, probability: 0.5, frequency: '1 in 2' }],
+            riskOfRuin: [{ riskPercent: 1, ruinProbability: 5 }],
+            targetProjections: [{ target: 10000, days: 30, probability: 80 }],
+            // timeBasedAnalysis is MISSING - tests line 329 FALSE branch
+            recoveryCalculations: [{ drawdown: 10, recovery: 11.1 }]
         };
         
-        expect(() => appModule.displayResults(data)).not.toThrow();
+        appModule.displayResults(data);
+        expect(true).toBe(true);
     });
 
     test('displayResults with missing recoveryCalculations (line 333)', () => {
@@ -2206,7 +2237,8 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 kellyFraction: 15,
                 profitFactor: 2.5,
                 payoffRatio: 1.67,
-                stopLoss: 0.5
+                stopLoss: 0.5,
+                sharpeRatio: 1.5
             },
             projection: [{ day: 0, balance: 5000 }],
             monteCarlo: {
@@ -2219,12 +2251,17 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 },
                 histogram: { labels: [5000], data: [10] }
             },
-            streakProbabilities: [],
-            drawdownScenarios: []
-            // recoveryCalculations is MISSING - tests line 333
+            streakProbabilities: [{ streak: 5, probability: 0.8, frequency: '1 in 1' }],
+            drawdownScenarios: [{ losses: 3, balance: 4500, drawdown: 10, survivable: true }],
+            winStreakProbabilities: [{ streak: 3, probability: 0.5, frequency: '1 in 2' }],
+            riskOfRuin: [{ riskPercent: 1, ruinProbability: 5 }],
+            targetProjections: [{ target: 10000, days: 30, probability: 80 }],
+            timeBasedAnalysis: { daily: { ev: 2.5 } }
+            // recoveryCalculations is MISSING - tests line 332 FALSE branch
         };
         
-        expect(() => appModule.displayResults(data)).not.toThrow();
+        appModule.displayResults(data);
+        expect(true).toBe(true);
     });
 
     test('displayResults with missing sharpeRatio (line 336)', () => {
@@ -2240,7 +2277,7 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 profitFactor: 2.5,
                 payoffRatio: 1.67,
                 stopLoss: 0.5
-                // sharpeRatio is MISSING - tests line 336
+                // sharpeRatio is MISSING - tests line 335 FALSE branch
             },
             projection: [{ day: 0, balance: 5000 }],
             monteCarlo: {
@@ -2253,10 +2290,16 @@ describe('Branch Coverage - Missing New Features in displayResults', () => {
                 },
                 histogram: { labels: [5000], data: [10] }
             },
-            streakProbabilities: [],
-            drawdownScenarios: []
+            streakProbabilities: [{ streak: 5, probability: 0.8, frequency: '1 in 1' }],
+            drawdownScenarios: [{ losses: 3, balance: 4500, drawdown: 10, survivable: true }],
+            winStreakProbabilities: [{ streak: 3, probability: 0.5, frequency: '1 in 2' }],
+            riskOfRuin: [{ riskPercent: 1, ruinProbability: 5 }],
+            targetProjections: [{ target: 10000, days: 30, probability: 80 }],
+            timeBasedAnalysis: { daily: { ev: 2.5 } },
+            recoveryCalculations: [{ drawdown: 10, recovery: 11.1 }]
         };
         
-        expect(() => appModule.displayResults(data)).not.toThrow();
+        appModule.displayResults(data);
+        expect(true).toBe(true);
     });
 });

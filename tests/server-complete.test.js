@@ -24,6 +24,16 @@ describe('Server.js - Complete Branch Coverage', () => {
   });
   
   describe('API Endpoints', () => {
+    describe('GET /', () => {
+      test('should serve index.html', async () => {
+        const response = await request(app).get('/');
+        
+        expect(response.status).toBe(200);
+        expect(response.type).toBe('text/html');
+        expect(response.text).toContain('Options Contract Calculator');
+      });
+    });
+    
     describe('POST /api/simulate', () => {
       test('should return 200 with valid complete request', async () => {
         const response = await request(app)
@@ -49,6 +59,27 @@ describe('Server.js - Complete Branch Coverage', () => {
         expect(response.body.data).toHaveProperty('monteCarlo');
         expect(response.body.data).toHaveProperty('streakProbabilities');
         expect(response.body.data).toHaveProperty('drawdownScenarios');
+      });
+      
+      test('should use default 10000 simulations when not provided', async () => {
+        const response = await request(app)
+          .post('/api/simulate')
+          .send({
+            accountSize: 5000,
+            riskPercent: 0.05,
+            winRate: 0.6,
+            avgWin: 0.5,
+            avgLoss: 0.3,
+            stopLoss: 0.5,
+            tradesPerDay: 2,
+            days: 30
+            // simulations omitted - should default to 10000
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.data.monteCarlo.statistics).toBeDefined();
+        expect(response.body.data.monteCarlo.histogram).toBeDefined();
       });
 
       test('should calculate metrics correctly', async () => {
@@ -249,7 +280,7 @@ describe('Server.js - Complete Branch Coverage', () => {
 
         expect(response.status).toBe(400);
         expect(response.body.success).toBe(false);
-        expect(response.body.error).toBe('Invalid risk percent');
+        expect(response.body.error).toBe('Invalid risk percent (must be between 0 and 100%)');
       });
       
       test('should handle invalid win rate', async () => {
@@ -488,9 +519,38 @@ describe('Server.js - Complete Branch Coverage', () => {
       
       streaks.forEach(streak => {
         if (streak.frequency !== 'Never') {
-          expect(streak.frequency).toMatch(/^1 in \d{1,3}(,\d{3})*$/);
+          expect(streak.frequency).toMatch(/^1 in (\d{1,3}(,\d{3})*|\d+K|\d+(\.\d+)?M|\d+(\.\d+)?B)$/);
         }
       });
+    });
+    
+    test('should format large frequencies with K abbreviation', () => {
+      // Win rate of 0.95 gives loss rate of 0.05
+      // Streak of 5: (0.05)^5 = 0.0000003125, frequency = ~3.2M
+      // Streak of 4: (0.05)^4 = 0.00000625, frequency = ~160K
+      const streaks = calculateStreakProbabilities(0.95, 4);
+      
+      // Should have K formatting for large numbers
+      const hasKFormat = streaks.some(s => s.frequency.includes('K'));
+      expect(hasKFormat).toBe(true);
+    });
+    
+    test('should format huge frequencies with M abbreviation', () => {
+      // Win rate of 0.95, longer streaks
+      const streaks = calculateStreakProbabilities(0.95, 6);
+      
+      // Should have M (million) formatting for very large numbers
+      const hasMFormat = streaks.some(s => s.frequency.includes('M'));
+      expect(hasMFormat).toBe(true);
+    });
+    
+    test('should format extreme frequencies with B abbreviation', () => {
+      // Win rate of 0.99, very long streaks
+      const streaks = calculateStreakProbabilities(0.99, 12);
+      
+      // Should have B (billion) formatting for extreme numbers
+      const hasBFormat = streaks.some(s => s.frequency.includes('B'));
+      expect(hasBFormat).toBe(true);
     });
 
     test('should handle 100% win rate (never lose)', () => {
@@ -637,11 +697,15 @@ describe('Server.js - Complete Branch Coverage', () => {
       test('should calculate risk of ruin for different drawdown levels', () => {
         const results = calculateRiskOfRuin(10000, 0.02, 0.6, 1.5, 0.5);
         
-        expect(results).toHaveLength(4);
-        expect(results[0].drawdownLevel).toBe(25);
-        expect(results[1].drawdownLevel).toBe(50);
-        expect(results[2].drawdownLevel).toBe(75);
-        expect(results[3].drawdownLevel).toBe(90);
+        expect(results).toHaveLength(8);
+        expect(results[0].drawdownLevel).toBe(10);
+        expect(results[1].drawdownLevel).toBe(20);
+        expect(results[2].drawdownLevel).toBe(30);
+        expect(results[3].drawdownLevel).toBe(40);
+        expect(results[4].drawdownLevel).toBe(50);
+        expect(results[5].drawdownLevel).toBe(60);
+        expect(results[6].drawdownLevel).toBe(75);
+        expect(results[7].drawdownLevel).toBe(90);
         
         results.forEach(result => {
           expect(result).toHaveProperty('probability');

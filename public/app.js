@@ -61,6 +61,23 @@ function initialize() {
     savePresetBtn.addEventListener('click', () => savePresetModal.show());
     confirmSavePresetBtn.addEventListener('click', saveCustomPreset);
     
+    // Asset type change listener
+    const assetTypeSelect = document.getElementById('assetType');
+    const contractPriceLabel = document.getElementById('contractPriceLabel');
+    if (assetTypeSelect && contractPriceLabel) {
+        assetTypeSelect.addEventListener('change', (e) => {
+            const assetType = e.target.value;
+            if (assetType === 'stocks') {
+                contractPriceLabel.textContent = 'Share Price ($)';
+            } else if (assetType === 'options') {
+                contractPriceLabel.textContent = 'Option Price ($)';
+            } else {
+                contractPriceLabel.textContent = 'Contract Price ($)';
+            }
+            runCalculation();
+        });
+    }
+    
     // Load custom presets from localStorage
     loadCustomPresets();
     
@@ -76,6 +93,20 @@ function initialize() {
     const inputs = form.querySelectorAll('input');
     inputs.forEach(input => {
         input.addEventListener('input', debounce(() => {
+            // Validate risk percent
+            if (input.id === 'riskPercent') {
+                const riskValue = parseFloat(input.value);
+                const riskWarning = document.getElementById('riskWarning');
+                if (riskValue > 95) {
+                    input.value = 95;
+                    if (riskWarning) {
+                        riskWarning.style.display = 'block';
+                        setTimeout(() => {
+                            riskWarning.style.display = 'none';
+                        }, 3000);
+                    }
+                }
+            }
             runCalculation();
         }, 300));
         
@@ -190,18 +221,58 @@ async function runCalculation() {
 
 // Get form values
 function getFormValues() {
+    const accountSize = parseFloat(document.getElementById('accountSize').value);
+    const riskPercent = parseFloat(document.getElementById('riskPercent').value) / 100;
+    const contractPrice = parseFloat(document.getElementById('contractPrice').value);
+    const commission = parseFloat(document.getElementById('commission').value);
+    const stopLoss = parseFloat(document.getElementById('stopLoss').value) / 100;
+    const contractStep = parseFloat(document.getElementById('contractStep').value) || 1;
+    const assetType = document.getElementById('assetType').value;
+    
+    // Determine multiplier based on asset type
+    // Futures/Options: $100 per point, Stocks: 1 (price per share)
+    const multiplier = assetType === 'stocks' ? 1 : 100;
+    
+    // Calculate actual contract size based on risk and contract step
+    const riskAmount = accountSize * riskPercent;
+    const maxLossPerContract = contractPrice * multiplier * stopLoss;
+    const roundTripCommission = commission * 2;
+    const totalLossPerContract = maxLossPerContract + roundTripCommission;
+    
+    // Ideal contract size to match risk
+    const idealContracts = Math.floor(riskAmount / totalLossPerContract);
+    
+    // Round to nearest contract step
+    const roundedContracts = Math.max(contractStep, Math.round(idealContracts / contractStep) * contractStep);
+    
+    // Calculate potential costs for the rounded contracts
+    const potentialStopLossCost = (roundedContracts * maxLossPerContract) + (roundedContracts * roundTripCommission);
+    
+    // Ensure stop loss cost doesn't exceed account size limits
+    let actualContracts = roundedContracts;
+    if (potentialStopLossCost > accountSize * 0.95) {
+        const maxSafeRisk = accountSize * 0.95;
+        const maxSafeContracts = Math.floor(maxSafeRisk / (maxLossPerContract + roundTripCommission));
+        actualContracts = Math.max(1, Math.floor(maxSafeContracts / contractStep) * contractStep);
+    }
+    
+    // Calculate the ACTUAL risk percentage based on final contract count
+    const actualStopLossCost = (actualContracts * maxLossPerContract) + (actualContracts * roundTripCommission);
+    const actualRiskPercent = actualStopLossCost / accountSize;
+    
     return {
-        accountSize: parseFloat(document.getElementById('accountSize').value),
-        riskPercent: parseFloat(document.getElementById('riskPercent').value) / 100,
+        accountSize,
+        riskPercent: Math.round(actualRiskPercent * 10000) / 10000, // Round to 4 decimal places
         winRate: parseFloat(document.getElementById('winRate').value) / 100,
         avgWin: parseFloat(document.getElementById('avgWin').value) / 100,
         avgLoss: parseFloat(document.getElementById('avgLoss').value) / 100,
-        stopLoss: parseFloat(document.getElementById('stopLoss').value) / 100,
-        contractPrice: parseFloat(document.getElementById('contractPrice').value),
-        commission: parseFloat(document.getElementById('commission').value),
+        stopLoss,
+        contractPrice,
+        commission,
         tradesPerDay: parseInt(document.getElementById('tradesPerDay').value),
         days: parseInt(document.getElementById('days').value),
-        simulations: 10000
+        simulations: 10000,
+        assetType
     };
 }
 
@@ -215,9 +286,13 @@ function displayResults(data) {
     const riskAmount = metrics.riskPerTrade;
     const stopLossPercent = metrics.stopLoss;
     const contractStep = parseFloat(document.getElementById('contractStep').value) || 1;
+    const assetType = document.getElementById('assetType').value;
+    
+    // Determine multiplier based on asset type
+    const multiplier = assetType === 'stocks' ? 1 : 100;
     
     // Calculate how many contracts based on risk and stop loss
-    const maxLossPerContract = contractPrice * 100 * stopLossPercent; // $100 per point per contract
+    const maxLossPerContract = contractPrice * multiplier * stopLossPercent;
     const roundTripCommission = commission * 2; // Entry + Exit
     const totalLossPerContract = maxLossPerContract + roundTripCommission;
     
@@ -226,28 +301,43 @@ function displayResults(data) {
     
     // Round to nearest contract step (e.g., nearest 1, 3, 5, 10)
     const roundedContracts = Math.max(contractStep, Math.round(idealContracts / contractStep) * contractStep);
-    const actualContracts = roundedContracts; // Use rounded value
     
-    // Calculate actual costs
-    const entryCost = (actualContracts * contractPrice * 100) + (actualContracts * commission);
+    // Calculate potential costs for the rounded contracts
+    const potentialStopLossCost = (roundedContracts * maxLossPerContract) + (roundedContracts * roundTripCommission);
+    
+    // Ensure stop loss cost doesn't exceed risk amount (validate against account)
+    let actualContracts = roundedContracts;
+    if (potentialStopLossCost > metrics.accountSize * 0.95) {
+        // Recalculate to fit within safe limits
+        const maxSafeRisk = metrics.accountSize * 0.95;
+        const maxSafeContracts = Math.floor(maxSafeRisk / (maxLossPerContract + roundTripCommission));
+        actualContracts = Math.max(1, Math.floor(maxSafeContracts / contractStep) * contractStep);
+    }
+    
+    // Calculate actual costs with validated contract size
+    const entryCost = (actualContracts * contractPrice * multiplier) + (actualContracts * commission);
     const stopLossCost = (actualContracts * maxLossPerContract) + (actualContracts * roundTripCommission);
     
     // Win target should be based on Avg Win %, not expected value
     const avgWinPercent = parseFloat(document.getElementById('avgWin').value) / 100;
-    const winTargetProfit = (actualContracts * contractPrice * 100 * avgWinPercent) - (actualContracts * roundTripCommission);
+    const winTargetProfit = (actualContracts * contractPrice * multiplier * avgWinPercent) - (actualContracts * roundTripCommission);
     
     const tradesPerDay = parseFloat(document.getElementById('tradesPerDay').value);
     const dailyFees = roundTripCommission * actualContracts * tradesPerDay;
     
     // Calculate break-even win rate with fees
     const feesPerTrade = actualContracts * roundTripCommission;
-    const avgWinAmount = actualContracts * contractPrice * 100 * (parseFloat(document.getElementById('avgWin').value) / 100);
-    const avgLossAmount = actualContracts * contractPrice * 100 * (parseFloat(document.getElementById('avgLoss').value) / 100);
+    const avgWinAmount = actualContracts * contractPrice * multiplier * (parseFloat(document.getElementById('avgWin').value) / 100);
+    const avgLossAmount = actualContracts * contractPrice * multiplier * (parseFloat(document.getElementById('avgLoss').value) / 100);
     const breakEvenWR = ((avgLossAmount + feesPerTrade) / (avgWinAmount + avgLossAmount)) * 100;
     
+    // Dynamic labels based on asset type
+    const unitLabel = assetType === 'stocks' ? 'shares' : 'contracts';
+    const sizeLabel = assetType === 'stocks' ? `${actualContracts}` : `${actualContracts}-lot`;
+    
     // Update trade summary
-    document.getElementById('contractSize').textContent = `${actualContracts}-lot`;
-    document.getElementById('contractDesc').textContent = `${actualContracts} contract${actualContracts > 1 ? 's' : ''} @ $${contractPrice.toFixed(2)}`;
+    document.getElementById('contractSize').textContent = sizeLabel;
+    document.getElementById('contractDesc').textContent = `${actualContracts} ${unitLabel} @ $${contractPrice.toFixed(2)}`;
     document.getElementById('entryCost').textContent = `$${entryCost.toFixed(2)}`;
     document.getElementById('stopLossCost').textContent = `-$${stopLossCost.toFixed(2)}`;
     document.getElementById('winTarget').textContent = `+$${Math.max(0, winTargetProfit).toFixed(2)}`;
@@ -277,6 +367,11 @@ function displayResults(data) {
     
     // Update metric cards with color coding
     updateMetricWithColor('evValue', `${metrics.expectedValue}%`, metrics.expectedValue, 30, 40);
+    
+    // Add Win Rate metric
+    const winRatePercent = parseFloat(document.getElementById('winRate').value);
+    updateMetricWithColor('winRateMetric', `${winRatePercent}%`, winRatePercent, 50, 70);
+    
     updateMetricWithColor('riskValue', `$${metrics.riskPerTrade.toLocaleString()}`, metrics.riskPerTrade, 200, 400, true);
     updateMetricWithColor('dailyGrowthValue', `${metrics.dailyGrowthRate}%`, metrics.dailyGrowthRate, 3, 6);
     document.getElementById('profitPerTradeValue').textContent = `$${metrics.expectedProfitPerTrade.toLocaleString()}`;
@@ -286,6 +381,14 @@ function displayResults(data) {
     // Update advanced metrics
     updateMetricWithColor('kellyValue', `${metrics.kellyFraction}%`, metrics.kellyFraction, 10, 20);
     document.getElementById('payoffValue').textContent = metrics.payoffRatio;
+    
+    // Display expected maximum loss streak
+    if (data.expectedMaxLossStreak !== undefined) {
+        document.getElementById('maxWinStreakValue').textContent = data.expectedMaxLossStreak;
+    } else {
+        document.getElementById('maxWinStreakValue').textContent = '--';
+    }
+    
     updateMetricWithColor('ruinValue', `${monteCarlo.statistics.ruinProbability}%`, monteCarlo.statistics.ruinProbability, 5, 1, true);
     
     // Update Monte Carlo statistics with animation
@@ -392,8 +495,14 @@ function createProjectionChart(projection) {
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4,
-                pointRadius: 0,
-                pointHoverRadius: 4
+                pointRadius: 3,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#00d4ff',
+                pointBorderColor: '#0a1628',
+                pointBorderWidth: 2,
+                pointHoverBackgroundColor: '#00d4ff',
+                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderWidth: 2
             }]
         },
         options: {
@@ -402,6 +511,11 @@ function createProjectionChart(projection) {
             animation: {
                 duration: 750,
                 easing: 'easeInOutQuart'
+            },
+            interaction: {
+                mode: 'nearest',
+                intersect: false,
+                axis: 'x'
             },
             plugins: {
                 legend: {
@@ -474,7 +588,9 @@ function createMonteCarloChart(histogram) {
                 data: histogram.data,
                 backgroundColor: 'rgba(0, 212, 255, 0.5)',
                 borderColor: '#00d4ff',
-                borderWidth: 1
+                borderWidth: 1,
+                barPercentage: 1.0,
+                categoryPercentage: 1.0
             }]
         },
         options: {
@@ -509,11 +625,11 @@ function createMonteCarloChart(histogram) {
                     },
                     ticks: {
                         color: '#8b92b0',
-                        maxTicksLimit: 8,
-                        maxRotation: 45,
-                        minRotation: 45,
+                        maxRotation: 0,
+                        minRotation: 0,
+                        autoSkip: true,
                         font: {
-                            size: 9
+                            size: 10
                         }
                     }
                 },
@@ -544,8 +660,8 @@ function populateStreakTable(streaks) {
     setTimeout(() => {
         tbody.innerHTML = '';
         
-        // Show first 8 streaks
-        streaks.slice(0, 8).forEach((streak, index) => {
+        // Show first 9 streaks
+        streaks.slice(0, 9).forEach((streak, index) => {
             const row = tbody.insertRow();
             row.style.opacity = '0';
             row.style.transform = 'translateX(-10px)';
@@ -557,7 +673,7 @@ function populateStreakTable(streaks) {
             `;
             
             // Highlight critical streaks
-            if (streak.streak >= 8) {
+            if (streak.streak >= 9) {
                 row.style.backgroundColor = 'rgba(255, 51, 102, 0.1)';
                 row.style.borderLeft = '2px solid var(--danger-color)';
             }
@@ -584,8 +700,8 @@ function populateDrawdownTable(scenarios) {
     setTimeout(() => {
         tbody.innerHTML = '';
         
-    // Show first 8 scenarios
-    scenarios.slice(0, 8).forEach((scenario, index) => {
+    // Show first 9 scenarios
+    scenarios.slice(0, 9).forEach((scenario, index) => {
         const row = tbody.insertRow();
         row.style.opacity = '0';
         row.style.transform = 'translateX(-10px)';
@@ -707,8 +823,8 @@ function populateTimeBasedTable(analysis) {
     
     setTimeout(() => {
         tbody.innerHTML = '';
-        const periods = ['daily', 'weekly', 'monthly', 'quarterly'];
-        const labels = ['Daily', 'Weekly', 'Monthly', 'Quarterly'];
+        const periods = ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'];
+        const labels = ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'];
         
         periods.forEach((period, index) => {
             const data = analysis[period];
@@ -802,7 +918,7 @@ function generatePositionSizing(data) {
         
         html += '<table class="table table-sm mb-0"><thead><tr>';
         html += '<th>Strategy</th>';
-        html += '<th class="text-end">Risk<br>%</th>';
+        html += '<th class="text-end">Risk %</th>';
         html += '<th class="text-end">Expected</th>';
         html += '</tr></thead><tbody>';
         
@@ -863,7 +979,8 @@ function loadPreset(presetName) {
     const preset = presets[presetName] || customPresets[presetName];
     if (!preset) return;
     
-    document.getElementById('accountSize').value = preset.accountSize;
+    // Don't update account size - let user keep their own account size
+    // document.getElementById('accountSize').value = preset.accountSize;
     document.getElementById('riskPercent').value = preset.riskPercent;
     document.getElementById('winRate').value = preset.winRate;
     document.getElementById('avgWin').value = preset.avgWin;
