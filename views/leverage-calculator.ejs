@@ -1,0 +1,440 @@
+<%- include('partials/header') %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                Leverage Calculator
+            </h1>
+            <p class="page-subtitle">Calculate Buying Power • Liquidation Price • Margin Requirements</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input Controls -->
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-cog"></i> Position Settings
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="leverageForm">
+                                <div class="input-row">
+                                    <label><i class="fas fa-exchange-alt"></i> Position Type</label>
+                                    <select class="form-select form-select-sm" id="positionType">
+                                        <option value="spot">Spot (No Leverage)</option>
+                                        <option value="margin">Margin Trading</option>
+                                        <option value="futures" selected>Futures/Perpetual</option>
+                                    </select>
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-wallet"></i> Account Balance</label>
+                                    <input type="number" class="form-control form-control-sm" id="accountBalance" value="10000" min="100" step="100" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-dollar-sign"></i> Entry Price</label>
+                                    <input type="number" class="form-control form-control-sm" id="entryPrice" value="50000" step="0.01" min="0.01" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-coins"></i> Position Size</label>
+                                    <input type="number" class="form-control form-control-sm" id="positionSize" value="1" step="0.001" min="0.001" required>
+                                    <small class="text-muted">Units to trade</small>
+                                </div>
+
+                                <div class="input-row mt-4">
+                                    <label class="d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-chart-line"></i> Leverage</span>
+                                        <span class="badge bg-primary" id="leverageBadge">10x</span>
+                                    </label>
+                                    <input type="range" class="form-range" id="leverage" min="1" max="125" value="10" step="1">
+                                    <div class="d-flex justify-content-between text-muted small mt-1">
+                                        <span>1x</span>
+                                        <span>25x</span>
+                                        <span>50x</span>
+                                        <span>100x</span>
+                                        <span>125x</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-check mt-3 mb-3">
+                                    <input class="form-check-input" type="checkbox" id="isShort">
+                                    <label class="form-check-label" for="isShort">
+                                        Short Position
+                                    </label>
+                                </div>
+
+                                <div class="input-row" id="maintenanceMarginRow">
+                                    <label><i class="fas fa-percentage"></i> Maintenance Margin</label>
+                                    <input type="number" class="form-control form-control-sm" id="maintenanceMargin" value="0.4" step="0.1" min="0.1" max="10">
+                                    <small class="text-muted">% for liquidation</small>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mt-3">
+                                    <i class="fas fa-calculator"></i> Calculate
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Leverage Warning -->
+                    <div class="card mt-3" id="warningCard" style="display: none;">
+                        <div class="card-body text-center p-3">
+                            <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                            <p class="mb-0 small" id="warningText"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-9 col-lg-8">
+                    <!-- Key Metrics -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card metric-card border-primary">
+                                <div class="card-body">
+                                    <div class="metric-label">Buying Power</div>
+                                    <div class="metric-value text-primary" id="buyingPower">$0</div>
+                                    <small class="text-muted">Total available</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card metric-card border-warning">
+                                <div class="card-body">
+                                    <div class="metric-label">Required Margin</div>
+                                    <div class="metric-value text-warning" id="requiredMargin">$0</div>
+                                    <small class="text-muted" id="marginPercent">0%</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card metric-card border-danger">
+                                <div class="card-body">
+                                    <div class="metric-label">Liquidation Price</div>
+                                    <div class="metric-value text-danger" id="liquidationPrice">$0</div>
+                                    <small class="text-muted" id="liquidationDistance">0%</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card metric-card border-info">
+                                <div class="card-body">
+                                    <div class="metric-label">Position Value</div>
+                                    <div class="metric-value text-info" id="positionValue">$0</div>
+                                    <small class="text-muted">Notional</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Margin Breakdown -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-coins"></i> Margin Breakdown
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <div class="info-label">Initial Margin</div>
+                                        <div class="info-value" id="initialMargin">$0</div>
+                                        <small class="text-muted">Required to open</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <div class="info-label">Maintenance Margin</div>
+                                        <div class="info-value" id="maintenanceMarginAmount">$0</div>
+                                        <small class="text-muted">To avoid liquidation</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <div class="info-label">Free Margin</div>
+                                        <div class="info-value text-success" id="freeMargin">$0</div>
+                                        <small class="text-muted">Available for trading</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <div class="info-label">Margin Level</div>
+                                        <div class="info-value" id="marginLevel">0%</div>
+                                        <small class="text-muted">Equity / Used Margin</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PnL Scenarios -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-bar"></i> P&L Scenarios
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-dark table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Price Change</th>
+                                        <th class="text-end">New Price</th>
+                                        <th class="text-end">P&L</th>
+                                        <th class="text-end">ROI</th>
+                                        <th class="text-end">Account Balance</th>
+                                        <th class="text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scenariosBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Calculate to see P&L scenarios</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Liquidation Distance Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-ruler"></i> Liquidation Distance
+                        </div>
+                        <div class="card-body">
+                            <div id="liquidationChart" style="height: 120px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<style>
+    .info-box {
+        background: rgba(255,255,255,0.02);
+        padding: 1.25rem;
+        border-radius: 8px;
+        border: 1px solid rgba(0,176,255,0.1);
+    }
+    
+    .info-label {
+        font-size: 0.85rem;
+        color: #9ba1a6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+    }
+    
+    #liquidationChart {
+        position: relative;
+        background: rgba(255,255,255,0.02);
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .liq-bar {
+        position: relative;
+        height: 40px;
+        background: linear-gradient(90deg, #ff4444 0%, #ffaa44 50%, #00ff88 100%);
+        border-radius: 20px;
+        flex: 1;
+        overflow: visible;
+    }
+    
+    .liq-marker {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 50px;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+    
+    .liq-label {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,176,255,0.9);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+    }
+    
+    .form-range::-moz-range-thumb {
+        background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+    }
+</style>
+
+<script>
+    const form = document.getElementById('leverageForm');
+    const leverageSlider = document.getElementById('leverage');
+    const leverageBadge = document.getElementById('leverageBadge');
+    
+    leverageSlider.addEventListener('input', function() {
+        leverageBadge.textContent = this.value + 'x';
+        calculateLeverage();
+    });
+    
+    ['accountBalance', 'entryPrice', 'positionSize', 'maintenanceMargin', 'positionType'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculateLeverage);
+    });
+    
+    document.getElementById('isShort').addEventListener('change', calculateLeverage);
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculateLeverage();
+    });
+    
+    function calculateLeverage() {
+        const accountBalance = parseFloat(document.getElementById('accountBalance').value);
+        const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+        const positionSize = parseFloat(document.getElementById('positionSize').value);
+        const leverage = parseInt(leverageSlider.value);
+        const maintenanceMarginPct = parseFloat(document.getElementById('maintenanceMargin').value) / 100;
+        const isShort = document.getElementById('isShort').checked;
+        const positionType = document.getElementById('positionType').value;
+        
+        if (!accountBalance || !entryPrice || !positionSize) return;
+        
+        // Position value
+        const positionValue = entryPrice * positionSize;
+        document.getElementById('positionValue').textContent = '$' + positionValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // Buying power
+        const buyingPower = accountBalance * (positionType === 'spot' ? 1 : leverage);
+        document.getElementById('buyingPower').textContent = '$' + buyingPower.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // Required margin (initial)
+        const initialMarginPct = positionType === 'spot' ? 1 : (1 / leverage);
+        const requiredMargin = positionValue * initialMarginPct;
+        document.getElementById('requiredMargin').textContent = '$' + requiredMargin.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('marginPercent').textContent = (requiredMargin / accountBalance * 100).toFixed(1) + '% of account';
+        document.getElementById('initialMargin').textContent = '$' + requiredMargin.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // Maintenance margin
+        const maintenanceMarginAmount = positionValue * maintenanceMarginPct;
+        document.getElementById('maintenanceMarginAmount').textContent = '$' + maintenanceMarginAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // Free margin
+        const freeMargin = accountBalance - requiredMargin;
+        document.getElementById('freeMargin').textContent = '$' + freeMargin.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // Margin level
+        const marginLevel = (accountBalance / requiredMargin) * 100;
+        document.getElementById('marginLevel').textContent = marginLevel.toFixed(1) + '%';
+        
+        // Liquidation price
+        let liquidationPrice;
+        if (positionType === 'spot') {
+            liquidationPrice = 0;
+            document.getElementById('liquidationPrice').textContent = 'N/A';
+            document.getElementById('liquidationDistance').textContent = 'No liquidation';
+        } else {
+            if (isShort) {
+                liquidationPrice = entryPrice * (1 + (initialMarginPct - maintenanceMarginPct));
+            } else {
+                liquidationPrice = entryPrice * (1 - (initialMarginPct - maintenanceMarginPct));
+            }
+            document.getElementById('liquidationPrice').textContent = '$' + liquidationPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            const liqDistance = Math.abs((liquidationPrice - entryPrice) / entryPrice * 100);
+            document.getElementById('liquidationDistance').textContent = liqDistance.toFixed(2) + '% away';
+        }
+        
+        // P&L scenarios
+        updateScenarios(entryPrice, positionSize, accountBalance, requiredMargin, isShort, liquidationPrice, positionType);
+        
+        // Liquidation chart
+        if (positionType !== 'spot') {
+            updateLiquidationChart(entryPrice, liquidationPrice, isShort);
+        } else {
+            document.getElementById('liquidationChart').innerHTML = '<p class="text-center text-muted mb-0">Spot trading has no liquidation risk</p>';
+        }
+        
+        // Warnings
+        showWarnings(leverage, freeMargin, accountBalance);
+    }
+    
+    function updateScenarios(entryPrice, positionSize, accountBalance, requiredMargin, isShort, liquidationPrice, positionType) {
+        const changes = [-10, -5, -2, 0, 2, 5, 10, 20];
+        let rows = '';
+        
+        changes.forEach(change => {
+            const newPrice = entryPrice * (1 + change / 100);
+            const priceMove = (newPrice - entryPrice) * positionSize;
+            const pnl = isShort ? -priceMove : priceMove;
+            const roi = (pnl / requiredMargin) * 100;
+            const newBalance = accountBalance + pnl;
+            
+            // Check if liquidated
+            const isLiquidated = positionType !== 'spot' && (
+                (isShort && newPrice >= liquidationPrice) ||
+                (!isShort && newPrice <= liquidationPrice)
+            );
+            
+            const pnlClass = pnl >= 0 ? 'text-success' : 'text-danger';
+            const statusBadge = isLiquidated ? 
+                '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> LIQUIDATED</span>' :
+                (pnl >= 0 ? '<span class="badge bg-success">Profit</span>' : '<span class="badge bg-danger">Loss</span>');
+            
+            rows += `
+                <tr ${isLiquidated ? 'class="table-danger"' : ''}>
+                    <td><strong>${change > 0 ? '+' : ''}${change}%</strong></td>
+                    <td class="text-end">$${newPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td class="text-end ${pnlClass}"><strong>${pnl >= 0 ? '+' : ''}$${pnl.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></td>
+                    <td class="text-end ${pnlClass}"><strong>${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</strong></td>
+                    <td class="text-end">$${newBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td class="text-end">${statusBadge}</td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('scenariosBody').innerHTML = rows;
+    }
+    
+    function updateLiquidationChart(entryPrice, liquidationPrice, isShort) {
+        const distance = Math.abs((liquidationPrice - entryPrice) / entryPrice);
+        const positionPct = isShort ? 100 - (distance * 100) : distance * 100;
+        
+        document.getElementById('liquidationChart').innerHTML = `
+            <div class="liq-bar">
+                <div class="liq-marker" style="left: ${positionPct}%;">
+                    <div class="liq-label">Entry: $${entryPrice.toLocaleString()}</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function showWarnings(leverage, freeMargin, accountBalance) {
+        const warningCard = document.getElementById('warningCard');
+        const warningText = document.getElementById('warningText');
+        
+        if (leverage > 50) {
+            warningCard.style.display = 'block';
+            warningText.textContent = `⚠️ High leverage (${leverage}x) increases risk significantly. Small price movements can lead to liquidation.`;
+        } else if (freeMargin < accountBalance * 0.2) {
+            warningCard.style.display = 'block';
+            warningText.textContent = `⚠️ Low free margin. Consider reducing position size or leverage to maintain buffer.`;
+        } else {
+            warningCard.style.display = 'none';
+        }
+    }
+    
+    // Initial calculation
+    calculateLeverage();
+</script>

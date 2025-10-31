@@ -57,6 +57,15 @@ app.get('/risk-reward', (req, res) => {
     });
 });
 
+// Route for Leverage Calculator
+app.get('/leverage-calculator', (req, res) => {
+    res.render('leverage-calculator', { 
+        title: 'Leverage Calculator - Copper Candle Calculators',
+        description: 'Calculate buying power, liquidation price, and margin requirements',
+        includeChartJs: false
+    });
+});
+
 // API endpoint for simulation
 
 // API endpoint for simulation
