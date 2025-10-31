@@ -39,13 +39,25 @@ app.get('/position-sizer', (req, res) => {
     });
 });
 
+// Route for Portfolio Heat Calculator
 app.get('/portfolio-heat', (req, res) => {
-    res.render('portfolio-heat', {
-        title: 'Portfolio Heat',
-        description: 'Track total risk across multiple open positions and manage portfolio exposure.',
+    res.render('portfolio-heat', { 
+        title: 'Portfolio Heat - Copper Candle Calculators',
+        description: 'Track total portfolio risk across multiple positions',
         includeChartJs: true
     });
 });
+
+// Route for Risk/Reward Analyzer
+app.get('/risk-reward', (req, res) => {
+    res.render('risk-reward', { 
+        title: 'Risk/Reward Analyzer - Copper Candle Calculators',
+        description: 'Analyze trade setups with R-multiples and risk/reward ratios',
+        includeChartJs: false
+    });
+});
+
+// API endpoint for simulation
 
 // API endpoint for simulation
 app.post('/api/simulate', (req, res) => {

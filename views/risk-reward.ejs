@@ -1,0 +1,397 @@
+<%- include('partials/header') %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-balance-scale"></i>
+                Risk/Reward Analyzer
+            </h1>
+            <p class="page-subtitle">Analyze Trade Setups • Calculate R-Multiples • Optimize Entry & Exit</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input Controls -->
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Trade Setup
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="analyzerForm">
+                                <div class="input-row">
+                                    <label><i class="fas fa-dollar-sign"></i> Entry Price</label>
+                                    <input type="number" class="form-control form-control-sm" id="entryPrice" value="100.00" step="0.01" min="0.01" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-stop-circle text-danger"></i> Stop Loss</label>
+                                    <input type="number" class="form-control form-control-sm" id="stopLoss" value="95.00" step="0.01" min="0.01" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-bullseye text-success"></i> Target 1</label>
+                                    <input type="number" class="form-control form-control-sm" id="target1" value="110.00" step="0.01" min="0.01" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-flag text-success"></i> Target 2 (Optional)</label>
+                                    <input type="number" class="form-control form-control-sm" id="target2" value="" step="0.01" min="0.01">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-flag-checkered text-success"></i> Target 3 (Optional)</label>
+                                    <input type="number" class="form-control form-control-sm" id="target3" value="" step="0.01" min="0.01">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-chart-line"></i> Position Size</label>
+                                    <input type="number" class="form-control form-control-sm" id="positionSize" value="100" min="1" step="1" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-wallet"></i> Account Balance</label>
+                                    <input type="number" class="form-control form-control-sm" id="accountBalance" value="10000" min="100" step="100" required>
+                                </div>
+
+                                <div class="form-check mt-3 mb-3">
+                                    <input class="form-check-input" type="checkbox" id="isShort">
+                                    <label class="form-check-label" for="isShort">
+                                        Short Position
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-calculator"></i> Analyze Setup
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-9 col-lg-8">
+                    <!-- Visual Trade Setup -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-area"></i> Trade Setup Visualization
+                        </div>
+                        <div class="card-body">
+                            <div id="tradeVisualization" class="trade-viz"></div>
+                        </div>
+                    </div>
+
+                    <!-- Risk/Reward Metrics -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card metric-card border-danger">
+                                <div class="card-body">
+                                    <div class="metric-label text-danger">Risk Amount</div>
+                                    <div class="metric-value text-danger" id="riskAmount">$0</div>
+                                    <small class="text-muted" id="riskPercent">0%</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card metric-card border-success">
+                                <div class="card-body">
+                                    <div class="metric-label text-success">Reward (T1)</div>
+                                    <div class="metric-value text-success" id="rewardAmount">$0</div>
+                                    <small class="text-muted" id="rewardPercent">0%</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card metric-card border-info">
+                                <div class="card-body">
+                                    <div class="metric-label">R:R Ratio</div>
+                                    <div class="metric-value text-info" id="rrRatio">0:1</div>
+                                    <small class="text-muted">Risk : Reward</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card metric-card border-warning">
+                                <div class="card-body">
+                                    <div class="metric-label">1R Value</div>
+                                    <div class="metric-value text-warning" id="oneRValue">$0</div>
+                                    <small class="text-muted">Per unit risk</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Targets Table -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-table"></i> Target Analysis
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-dark table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Target</th>
+                                        <th class="text-end">Price</th>
+                                        <th class="text-end">Distance</th>
+                                        <th class="text-end">Profit</th>
+                                        <th class="text-end">R-Multiple</th>
+                                        <th class="text-end">R:R</th>
+                                        <th class="text-end">ROI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="targetsTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">Enter trade setup to see analysis</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Breakeven Analysis -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-bar"></i> Win Rate Requirements
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">Minimum win rate needed to breakeven at each target:</p>
+                            <div id="winRateAnalysis" class="row g-3">
+                                <div class="col-12 text-center text-muted">
+                                    <i class="fas fa-calculator fa-2x mb-2"></i>
+                                    <p>Analyze a trade to see win rate requirements</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<style>
+    .trade-viz {
+        position: relative;
+        height: 200px;
+        margin: 2rem 1rem;
+    }
+    
+    .price-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 3px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .price-line::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        border-top: 2px dashed currentColor;
+        opacity: 0.5;
+    }
+    
+    .price-label {
+        position: absolute;
+        left: -60px;
+        background: rgba(255,255,255,0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .price-value {
+        position: absolute;
+        right: -80px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .win-rate-box {
+        padding: 1.5rem;
+        background: rgba(255,255,255,0.02);
+        border-radius: 8px;
+        border: 1px solid rgba(0,176,255,0.2);
+        text-align: center;
+    }
+    
+    .win-rate-label {
+        font-size: 0.9rem;
+        color: #9ba1a6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .win-rate-value {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
+
+<script>
+    const form = document.getElementById('analyzerForm');
+    const tradeViz = document.getElementById('tradeVisualization');
+    const targetsTableBody = document.getElementById('targetsTableBody');
+    const winRateAnalysis = document.getElementById('winRateAnalysis');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        analyzeSetup();
+    });
+    
+    // Real-time updates
+    ['entryPrice', 'stopLoss', 'target1', 'target2', 'target3', 'positionSize', 'accountBalance'].forEach(id => {
+        document.getElementById(id).addEventListener('input', analyzeSetup);
+    });
+    document.getElementById('isShort').addEventListener('change', analyzeSetup);
+    
+    function analyzeSetup() {
+        const entry = parseFloat(document.getElementById('entryPrice').value);
+        const stop = parseFloat(document.getElementById('stopLoss').value);
+        const target1 = parseFloat(document.getElementById('target1').value);
+        const target2 = parseFloat(document.getElementById('target2').value) || null;
+        const target3 = parseFloat(document.getElementById('target3').value) || null;
+        const size = parseInt(document.getElementById('positionSize').value);
+        const accountBalance = parseFloat(document.getElementById('accountBalance').value);
+        const isShort = document.getElementById('isShort').checked;
+        
+        if (!entry || !stop || !target1 || !size || !accountBalance) return;
+        
+        // Calculate risk
+        const riskPerShare = Math.abs(entry - stop);
+        const riskDollar = riskPerShare * size;
+        const riskPercent = (riskDollar / accountBalance) * 100;
+        
+        // Update risk metrics
+        document.getElementById('riskAmount').textContent = '$' + riskDollar.toFixed(2);
+        document.getElementById('riskPercent').textContent = riskPercent.toFixed(2) + '% of account';
+        document.getElementById('oneRValue').textContent = '$' + riskDollar.toFixed(2);
+        
+        // Calculate reward for T1
+        const rewardPerShare = Math.abs(target1 - entry);
+        const rewardDollar = rewardPerShare * size;
+        const rewardPercent = (rewardDollar / accountBalance) * 100;
+        const rrRatio = rewardPerShare / riskPerShare;
+        
+        document.getElementById('rewardAmount').textContent = '$' + rewardDollar.toFixed(2);
+        document.getElementById('rewardPercent').textContent = rewardPercent.toFixed(2) + '% of account';
+        document.getElementById('rrRatio').textContent = '1:' + rrRatio.toFixed(2);
+        
+        // Build targets array
+        const targets = [
+            { name: 'Target 1', price: target1 }
+        ];
+        if (target2) targets.push({ name: 'Target 2', price: target2 });
+        if (target3) targets.push({ name: 'Target 3', price: target3 });
+        
+        // Update visualization
+        updateVisualization(entry, stop, targets, isShort);
+        
+        // Update targets table
+        updateTargetsTable(entry, stop, targets, size, riskDollar);
+        
+        // Update win rate analysis
+        updateWinRateAnalysis(targets, entry, stop);
+    }
+    
+    function updateVisualization(entry, stop, targets, isShort) {
+        const allPrices = [entry, stop, ...targets.map(t => t.price)];
+        const minPrice = Math.min(...allPrices);
+        const maxPrice = Math.max(...allPrices);
+        const range = maxPrice - minPrice;
+        const padding = range * 0.1;
+        
+        const normalize = (price) => {
+            return ((price - minPrice + padding) / (range + 2 * padding)) * 100;
+        };
+        
+        let html = '';
+        
+        // Entry line
+        html += `
+            <div class="price-line" style="bottom: ${normalize(entry)}%; color: #00b0ff;">
+                <div class="price-label"><i class="fas fa-arrow-right"></i> ENTRY</div>
+                <div class="price-value">$${entry.toFixed(2)}</div>
+            </div>
+        `;
+        
+        // Stop loss line
+        html += `
+            <div class="price-line" style="bottom: ${normalize(stop)}%; color: #ff4444;">
+                <div class="price-label"><i class="fas fa-stop-circle"></i> STOP</div>
+                <div class="price-value">$${stop.toFixed(2)}</div>
+            </div>
+        `;
+        
+        // Target lines
+        targets.forEach((target, i) => {
+            html += `
+                <div class="price-line" style="bottom: ${normalize(target.price)}%; color: #00ff88;">
+                    <div class="price-label"><i class="fas fa-flag"></i> ${target.name.toUpperCase()}</div>
+                    <div class="price-value">$${target.price.toFixed(2)}</div>
+                </div>
+            `;
+        });
+        
+        tradeViz.innerHTML = html;
+    }
+    
+    function updateTargetsTable(entry, stop, targets, size, riskDollar) {
+        const rows = targets.map(target => {
+            const distance = Math.abs(target.price - entry);
+            const profit = distance * size;
+            const rMultiple = profit / riskDollar;
+            const rrRatio = distance / Math.abs(entry - stop);
+            const roi = (profit / riskDollar) * 100;
+            
+            return `
+                <tr>
+                    <td><strong class="text-success">${target.name}</strong></td>
+                    <td class="text-end">$${target.price.toFixed(2)}</td>
+                    <td class="text-end">$${distance.toFixed(2)}</td>
+                    <td class="text-end text-success">$${profit.toFixed(2)}</td>
+                    <td class="text-end"><span class="badge bg-success">${rMultiple.toFixed(2)}R</span></td>
+                    <td class="text-end">1:${rrRatio.toFixed(2)}</td>
+                    <td class="text-end">${roi.toFixed(1)}%</td>
+                </tr>
+            `;
+        }).join('');
+        
+        targetsTableBody.innerHTML = rows;
+    }
+    
+    function updateWinRateAnalysis(targets, entry, stop) {
+        const riskPerShare = Math.abs(entry - stop);
+        
+        const boxes = targets.map(target => {
+            const rewardPerShare = Math.abs(target.price - entry);
+            const rrRatio = rewardPerShare / riskPerShare;
+            const breakEvenWinRate = (1 / (1 + rrRatio)) * 100;
+            
+            return `
+                <div class="col-md-4">
+                    <div class="win-rate-box">
+                        <div class="win-rate-label">${target.name}</div>
+                        <div class="win-rate-value">${breakEvenWinRate.toFixed(1)}%</div>
+                        <small class="text-muted">to breakeven</small>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        winRateAnalysis.innerHTML = boxes;
+    }
+    
+    // Initial analysis
+    analyzeSetup();
+</script>
