@@ -1,0 +1,367 @@
+<%- include('partials/header') %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-chart-pie"></i>
+                Trade Expectancy Calculator
+            </h1>
+            <p class="page-subtitle">Calculate Expected Value • Validate Your Edge • Optimize Win Rate</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3 justify-content-center">
+                <!-- Input Card -->
+                <div class="col-lg-5">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-keyboard"></i> Trading Statistics
+                        </div>
+                        <div class="card-body">
+                            <form id="expectancyForm">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-percentage"></i> Win Rate (%)
+                                    </label>
+                                    <input type="number" class="form-control" id="winRate" value="55" min="0" max="100" step="0.1" required>
+                                    <small class="text-muted">Percentage of winning trades</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-arrow-up text-success"></i> Average Win ($)
+                                    </label>
+                                    <input type="number" class="form-control" id="avgWin" value="200" min="0" step="1" required>
+                                    <small class="text-muted">Average profit per winning trade</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-arrow-down text-danger"></i> Average Loss ($)
+                                    </label>
+                                    <input type="number" class="form-control" id="avgLoss" value="100" min="0" step="1" required>
+                                    <small class="text-muted">Average loss per losing trade (positive number)</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-hashtag"></i> Total Trades
+                                    </label>
+                                    <input type="number" class="form-control" id="totalTrades" value="100" min="1" step="1" required>
+                                    <small class="text-muted">Sample size for projection</small>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-calculator"></i> Calculate Expectancy
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Card -->
+                <div class="col-lg-7">
+                    <!-- Key Metrics -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="card metric-card border-primary">
+                                <div class="card-body">
+                                    <div class="metric-label">Trade Expectancy</div>
+                                    <div class="metric-value text-primary" id="expectancy">$0</div>
+                                    <small class="text-muted">Expected $ per trade</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card metric-card" id="edgeCard">
+                                <div class="card-body">
+                                    <div class="metric-label">Trading Edge</div>
+                                    <div class="metric-value" id="edgeStatus">NO EDGE</div>
+                                    <small class="text-muted" id="edgeDescription">Not profitable</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formula Display -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-function"></i> Expectancy Formula
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="formula-box mb-3">
+                                <strong>Expectancy = (Win Rate × Avg Win) - (Loss Rate × Avg Loss)</strong>
+                            </div>
+                            <div id="calculationSteps" class="text-start">
+                                <p class="text-muted mb-2"><strong>Calculation:</strong></p>
+                                <p class="mb-1" id="step1">1. Win Rate × Average Win = ?</p>
+                                <p class="mb-1" id="step2">2. Loss Rate × Average Loss = ?</p>
+                                <p class="mb-1" id="step3">3. Expected Value = ?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profit Projection -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line"></i> Profit Projection
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="projection-box">
+                                        <div class="projection-label">10 Trades</div>
+                                        <div class="projection-value" id="projection10">$0</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="projection-box">
+                                        <div class="projection-label">50 Trades</div>
+                                        <div class="projection-value" id="projection50">$0</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="projection-box">
+                                        <div class="projection-label">100 Trades</div>
+                                        <div class="projection-value" id="projection100">$0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Metrics -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-bar"></i> Performance Metrics
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <div class="info-label">Win/Loss Ratio</div>
+                                        <div class="info-value" id="winLossRatio">0:1</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <div class="info-label">Profit Factor</div>
+                                        <div class="info-value" id="profitFactor">0.00</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <div class="info-label">Expected Wins</div>
+                                        <div class="info-value text-success" id="expectedWins">0</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <div class="info-label">Expected Losses</div>
+                                        <div class="info-value text-danger" id="expectedLosses">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<style>
+    .formula-box {
+        background: rgba(0,176,255,0.1);
+        border: 2px solid rgba(0,176,255,0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 1.1rem;
+        color: #00b0ff;
+    }
+    
+    #calculationSteps {
+        background: rgba(255,255,255,0.02);
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .projection-box {
+        background: rgba(255,255,255,0.02);
+        padding: 1.5rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(0,176,255,0.2);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .projection-box:hover {
+        border-color: rgba(0,176,255,0.5);
+        background: rgba(255,255,255,0.04);
+        transform: translateY(-2px);
+    }
+    
+    .projection-label {
+        font-size: 0.9rem;
+        color: #9ba1a6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .projection-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #fff;
+    }
+    
+    .info-box {
+        background: rgba(255,255,255,0.02);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(0,176,255,0.1);
+        text-align: center;
+    }
+    
+    .info-label {
+        font-size: 0.85rem;
+        color: #9ba1a6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+    }
+    
+    #edgeCard.positive {
+        border-color: #00ff88 !important;
+    }
+    
+    #edgeCard.negative {
+        border-color: #ff4444 !important;
+    }
+    
+    .metric-card {
+        transition: all 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,176,255,0.2);
+    }
+</style>
+
+<script>
+    const form = document.getElementById('expectancyForm');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculateExpectancy();
+    });
+    
+    // Real-time calculation
+    ['winRate', 'avgWin', 'avgLoss', 'totalTrades'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculateExpectancy);
+    });
+    
+    function calculateExpectancy() {
+        const winRate = parseFloat(document.getElementById('winRate').value) / 100;
+        const avgWin = parseFloat(document.getElementById('avgWin').value);
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value);
+        const totalTrades = parseInt(document.getElementById('totalTrades').value);
+        
+        if (isNaN(winRate) || isNaN(avgWin) || isNaN(avgLoss) || isNaN(totalTrades)) return;
+        
+        const lossRate = 1 - winRate;
+        
+        // Calculate expectancy
+        const expectancy = (winRate * avgWin) - (lossRate * avgLoss);
+        
+        // Update expectancy display
+        const expectancyEl = document.getElementById('expectancy');
+        expectancyEl.textContent = '$' + expectancy.toFixed(2);
+        
+        if (expectancy > 0) {
+            expectancyEl.classList.remove('text-danger');
+            expectancyEl.classList.add('text-primary');
+        } else {
+            expectancyEl.classList.remove('text-primary');
+            expectancyEl.classList.add('text-danger');
+        }
+        
+        // Update edge status
+        const edgeCard = document.getElementById('edgeCard');
+        const edgeStatus = document.getElementById('edgeStatus');
+        const edgeDescription = document.getElementById('edgeDescription');
+        
+        if (expectancy > 0) {
+            edgeCard.classList.add('positive', 'border-success');
+            edgeCard.classList.remove('negative', 'border-danger');
+            edgeStatus.textContent = 'POSITIVE EDGE';
+            edgeStatus.classList.add('text-success');
+            edgeStatus.classList.remove('text-danger');
+            
+            if (expectancy > avgLoss * 0.5) {
+                edgeDescription.textContent = 'Strong edge';
+            } else if (expectancy > avgLoss * 0.2) {
+                edgeDescription.textContent = 'Good edge';
+            } else {
+                edgeDescription.textContent = 'Small edge';
+            }
+        } else {
+            edgeCard.classList.add('negative', 'border-danger');
+            edgeCard.classList.remove('positive', 'border-success');
+            edgeStatus.textContent = 'NO EDGE';
+            edgeStatus.classList.add('text-danger');
+            edgeStatus.classList.remove('text-success');
+            edgeDescription.textContent = 'Not profitable long-term';
+        }
+        
+        // Update formula steps
+        const winExpected = winRate * avgWin;
+        const lossExpected = lossRate * avgLoss;
+        
+        document.getElementById('step1').textContent = 
+            `1. Win Rate × Average Win = ${(winRate * 100).toFixed(1)}% × $${avgWin.toFixed(2)} = $${winExpected.toFixed(2)}`;
+        document.getElementById('step2').textContent = 
+            `2. Loss Rate × Average Loss = ${(lossRate * 100).toFixed(1)}% × $${avgLoss.toFixed(2)} = $${lossExpected.toFixed(2)}`;
+        document.getElementById('step3').textContent = 
+            `3. Expected Value = $${winExpected.toFixed(2)} - $${lossExpected.toFixed(2)} = $${expectancy.toFixed(2)}`;
+        
+        // Projections
+        updateProjection('projection10', expectancy * 10);
+        updateProjection('projection50', expectancy * 50);
+        updateProjection('projection100', expectancy * 100);
+        
+        // Additional metrics
+        const winLossRatio = avgWin / avgLoss;
+        document.getElementById('winLossRatio').textContent = winLossRatio.toFixed(2) + ':1';
+        
+        const grossProfit = winRate * totalTrades * avgWin;
+        const grossLoss = lossRate * totalTrades * avgLoss;
+        const profitFactor = grossProfit / grossLoss;
+        document.getElementById('profitFactor').textContent = profitFactor.toFixed(2);
+        
+        const expectedWins = Math.round(winRate * totalTrades);
+        const expectedLosses = totalTrades - expectedWins;
+        document.getElementById('expectedWins').textContent = expectedWins + ' trades';
+        document.getElementById('expectedLosses').textContent = expectedLosses + ' trades';
+    }
+    
+    function updateProjection(elementId, value) {
+        const el = document.getElementById(elementId);
+        el.textContent = (value >= 0 ? '+' : '') + '$' + value.toFixed(2);
+        
+        if (value > 0) {
+            el.classList.add('text-success');
+            el.classList.remove('text-danger');
+        } else {
+            el.classList.add('text-danger');
+            el.classList.remove('text-success');
+        }
+    }
+    
+    // Initial calculation
+    calculateExpectancy();
+</script>

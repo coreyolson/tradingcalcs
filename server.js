@@ -66,6 +66,15 @@ app.get('/leverage-calculator', (req, res) => {
     });
 });
 
+// Route for Trade Expectancy Calculator
+app.get('/trade-expectancy', (req, res) => {
+    res.render('trade-expectancy', { 
+        title: 'Trade Expectancy Calculator - Copper Candle Calculators',
+        description: 'Calculate expected value per trade and validate your edge',
+        includeChartJs: false
+    });
+});
+
 // API endpoint for simulation
 
 // API endpoint for simulation
