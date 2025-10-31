@@ -45,15 +45,6 @@
                         <div class="card-body compact-form">
                             <form id="calculatorForm">
                                 <div class="input-row">
-                                    <label>Asset Type</label>
-                                    <select class="form-control form-control-sm" id="assetType">
-                                        <option value="futures">Futures</option>
-                                        <option value="options">Options</option>
-                                        <option value="stocks">Stocks</option>
-                                    </select>
-                                </div>
-
-                                <div class="input-row">
                                     <label>Account ($)</label>
                                     <input type="number" class="form-control form-control-sm" id="accountSize" value="3125" min="100" step="100">
                                 </div>
@@ -87,7 +78,7 @@
                                 </div>
 
                                 <div class="input-row">
-                                    <label id="contractPriceLabel">Contract Price ($)</label>
+                                    <label>Contract Price ($)</label>
                                     <input type="number" class="form-control form-control-sm" id="contractPrice" value="1.00" min="0.01" max="100" step="0.01">
                                 </div>
 

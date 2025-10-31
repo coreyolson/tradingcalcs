@@ -61,23 +61,6 @@ function initialize() {
     savePresetBtn.addEventListener('click', () => savePresetModal.show());
     confirmSavePresetBtn.addEventListener('click', saveCustomPreset);
     
-    // Asset type change listener
-    const assetTypeSelect = document.getElementById('assetType');
-    const contractPriceLabel = document.getElementById('contractPriceLabel');
-    if (assetTypeSelect && contractPriceLabel) {
-        assetTypeSelect.addEventListener('change', (e) => {
-            const assetType = e.target.value;
-            if (assetType === 'stocks') {
-                contractPriceLabel.textContent = 'Share Price ($)';
-            } else if (assetType === 'options') {
-                contractPriceLabel.textContent = 'Option Price ($)';
-            } else {
-                contractPriceLabel.textContent = 'Contract Price ($)';
-            }
-            runCalculation();
-        });
-    }
-    
     // Load custom presets from localStorage
     loadCustomPresets();
     
@@ -227,15 +210,10 @@ function getFormValues() {
     const commission = parseFloat(document.getElementById('commission').value);
     const stopLoss = parseFloat(document.getElementById('stopLoss').value) / 100;
     const contractStep = parseFloat(document.getElementById('contractStep').value) || 1;
-    const assetType = document.getElementById('assetType').value;
-    
-    // Determine multiplier based on asset type
-    // Futures/Options: $100 per point, Stocks: 1 (price per share)
-    const multiplier = assetType === 'stocks' ? 1 : 100;
     
     // Calculate actual contract size based on risk and contract step
     const riskAmount = accountSize * riskPercent;
-    const maxLossPerContract = contractPrice * multiplier * stopLoss;
+    const maxLossPerContract = contractPrice * 100 * stopLoss;
     const roundTripCommission = commission * 2;
     const totalLossPerContract = maxLossPerContract + roundTripCommission;
     
@@ -271,8 +249,7 @@ function getFormValues() {
         commission,
         tradesPerDay: parseInt(document.getElementById('tradesPerDay').value),
         days: parseInt(document.getElementById('days').value),
-        simulations: 10000,
-        assetType
+        simulations: 10000
     };
 }
 
@@ -286,13 +263,9 @@ function displayResults(data) {
     const riskAmount = metrics.riskPerTrade;
     const stopLossPercent = metrics.stopLoss;
     const contractStep = parseFloat(document.getElementById('contractStep').value) || 1;
-    const assetType = document.getElementById('assetType').value;
-    
-    // Determine multiplier based on asset type
-    const multiplier = assetType === 'stocks' ? 1 : 100;
     
     // Calculate how many contracts based on risk and stop loss
-    const maxLossPerContract = contractPrice * multiplier * stopLossPercent;
+    const maxLossPerContract = contractPrice * 100 * stopLossPercent;
     const roundTripCommission = commission * 2; // Entry + Exit
     const totalLossPerContract = maxLossPerContract + roundTripCommission;
     
@@ -315,29 +288,25 @@ function displayResults(data) {
     }
     
     // Calculate actual costs with validated contract size
-    const entryCost = (actualContracts * contractPrice * multiplier) + (actualContracts * commission);
+    const entryCost = (actualContracts * contractPrice * 100) + (actualContracts * commission);
     const stopLossCost = (actualContracts * maxLossPerContract) + (actualContracts * roundTripCommission);
     
     // Win target should be based on Avg Win %, not expected value
     const avgWinPercent = parseFloat(document.getElementById('avgWin').value) / 100;
-    const winTargetProfit = (actualContracts * contractPrice * multiplier * avgWinPercent) - (actualContracts * roundTripCommission);
+    const winTargetProfit = (actualContracts * contractPrice * 100 * avgWinPercent) - (actualContracts * roundTripCommission);
     
     const tradesPerDay = parseFloat(document.getElementById('tradesPerDay').value);
     const dailyFees = roundTripCommission * actualContracts * tradesPerDay;
     
     // Calculate break-even win rate with fees
     const feesPerTrade = actualContracts * roundTripCommission;
-    const avgWinAmount = actualContracts * contractPrice * multiplier * (parseFloat(document.getElementById('avgWin').value) / 100);
-    const avgLossAmount = actualContracts * contractPrice * multiplier * (parseFloat(document.getElementById('avgLoss').value) / 100);
+    const avgWinAmount = actualContracts * contractPrice * 100 * (parseFloat(document.getElementById('avgWin').value) / 100);
+    const avgLossAmount = actualContracts * contractPrice * 100 * (parseFloat(document.getElementById('avgLoss').value) / 100);
     const breakEvenWR = ((avgLossAmount + feesPerTrade) / (avgWinAmount + avgLossAmount)) * 100;
     
-    // Dynamic labels based on asset type
-    const unitLabel = assetType === 'stocks' ? 'shares' : 'contracts';
-    const sizeLabel = assetType === 'stocks' ? `${actualContracts}` : `${actualContracts}-lot`;
-    
     // Update trade summary
-    document.getElementById('contractSize').textContent = sizeLabel;
-    document.getElementById('contractDesc').textContent = `${actualContracts} ${unitLabel} @ $${contractPrice.toFixed(2)}`;
+    document.getElementById('contractSize').textContent = `${actualContracts}-lot`;
+    document.getElementById('contractDesc').textContent = `${actualContracts} contract${actualContracts > 1 ? 's' : ''} @ $${contractPrice.toFixed(2)}`;
     document.getElementById('entryCost').textContent = `$${entryCost.toFixed(2)}`;
     document.getElementById('stopLossCost').textContent = `-$${stopLossCost.toFixed(2)}`;
     document.getElementById('winTarget').textContent = `+$${Math.max(0, winTargetProfit).toFixed(2)}`;

@@ -14,7 +14,7 @@ app.use(express.static('public'));
 app.post('/api/simulate', (req, res) => {
     const {
         accountSize, riskPercent, winRate, avgWin, avgLoss,
-        contractPrice, commission, tradesPerDay, days, stopLoss, simulations, assetType
+        contractPrice, commission, tradesPerDay, days, stopLoss, simulations
     } = req.body;  try {
     // Validate required parameters
     if (!accountSize || accountSize <= 0) {
@@ -219,6 +219,15 @@ function runMonteCarloSimulation(accountSize, riskPercent, winRate, avgWin, avgL
 function createHistogram(data, bins) {
   const min = Math.min(...data);
   const max = Math.max(...data);
+  
+  // Handle edge case where all values are identical
+  if (min === max) {
+    return {
+      labels: [min],
+      data: [data.length]
+    };
+  }
+  
   const binSize = (max - min) / bins;
   
   const histogram = Array(bins).fill(0);

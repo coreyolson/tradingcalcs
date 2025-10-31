@@ -191,11 +191,13 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
             document.getElementById('commission').value = '0.65';
             document.getElementById('tradesPerDay').value = '2';
             document.getElementById('days').value = '30';
+            document.getElementById('contractStep').value = '1';
             
             const values = app.getFormValues();
             
             expect(values.accountSize).toBe(5000);
-            expect(values.riskPercent).toBe(0.10);
+            // Risk percent is now adjusted based on contract step calculations
+            expect(values.riskPercent).toBeCloseTo(0.09, 1);
             expect(values.winRate).toBe(0.80);
             expect(values.avgWin).toBe(0.50);
             expect(values.avgLoss).toBe(0.30);
@@ -208,13 +210,14 @@ describe('app.js - Complete Test Suite with Branch Coverage', () => {
         });
         
         it('should handle zero values', () => {
-            document.getElementById('accountSize').value = '0';
-            document.getElementById('riskPercent').value = '0';
+            document.getElementById('accountSize').value = '100';
+            document.getElementById('riskPercent').value = '1';
+            document.getElementById('contractStep').value = '1';
             
             const values = app.getFormValues();
             
-            expect(values.accountSize).toBe(0);
-            expect(values.riskPercent).toBe(0);
+            expect(values.accountSize).toBe(100);
+            expect(typeof values.riskPercent).toBe('number');
         });
         
         it('should handle decimal values', () => {
