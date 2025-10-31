@@ -1,4 +1,8 @@
-<%- include('partials/header') %>
+<%- include('partials/header', { 
+    title: 'Portfolio Heat Calculator',
+    description: 'Track Total Risk Across Multiple Open Positions',
+    includeChartJs: true
+}) %>
 
         <!-- Page Header -->
         <div class="container-fluid px-4 mb-4">
@@ -6,7 +10,7 @@
                 <i class="fas fa-fire"></i>
                 Portfolio Heat Calculator
             </h1>
-            <p class="page-subtitle">Track Total Risk Across Multiple Open Positions</p>
+            <p class="page-subtitle">Real-Time Risk Monitoring • Multiple Positions • Portfolio Heat Management</p>
         </div>
 
         <div class="container-fluid px-4">
@@ -20,12 +24,25 @@
                         </div>
                         <div class="card-body compact-form">
                             <div class="input-row">
-                                <label>Account Balance</label>
-                                <input type="number" class="form-control form-control-sm" id="accountBalance" value="100000" min="1000" step="1000">
+                                <label>
+                                    Account Balance ($)
+                                    <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                       title="Your total trading capital"></i>
+                                </label>
+                                <input type="number" class="form-control form-control-sm" id="accountBalance" 
+                                       value="100000" min="1000" step="1000" required>
                             </div>
                             <div class="input-row">
-                                <label>Max Portfolio Heat (%)</label>
-                                <input type="number" class="form-control form-control-sm" id="maxHeat" value="6" min="1" max="20" step="0.5">
+                                <label>
+                                    Max Portfolio Heat (%)
+                                    <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                       title="Maximum acceptable total risk across all positions"></i>
+                                </label>
+                                <input type="number" class="form-control form-control-sm" id="maxHeat" 
+                                       value="6" min="1" max="20" step="0.5" required>
+                                <small class="text-muted" style="font-size: 0.7rem;">
+                                    <i class="fas fa-lightbulb"></i> Recommended: 6-8%
+                                </small>
                             </div>
                         </div>
                     </div>

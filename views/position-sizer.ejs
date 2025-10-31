@@ -1,12 +1,16 @@
-<%- include('partials/header') %>
+<%- include('partials/header', { 
+    title: 'Position Sizing Calculator',
+    description: 'Kelly Criterion, Fixed Percentage, and Risk-Based Position Sizing',
+    includeChartJs: false
+}) %>
 
         <!-- Page Header -->
         <div class="container-fluid px-4 mb-4">
             <h1 class="page-title">
                 <i class="fas fa-bullseye"></i>
-                Position Sizer Calculator
+                Position Sizing Calculator
             </h1>
-            <p class="page-subtitle">Kelly Criterion • Fixed Percentage • Risk-Based Sizing</p>
+            <p class="page-subtitle">Optimal Position Sizing • Three Professional Methods • Real-Time Analysis</p>
         </div>
 
         <div class="container-fluid px-4">
@@ -20,38 +24,93 @@
                         <div class="card-body compact-form">
                             <form id="calculatorForm">
                                 <div class="input-row">
-                                    <label><i class="fas fa-wallet"></i> Account Balance</label>
-                                    <input type="number" class="form-control form-control-sm" id="accountBalance" value="10000" min="100" step="100">
+                                    <label>
+                                        <i class="fas fa-wallet"></i> Account Balance ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Your total trading capital available"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="accountBalance" 
+                                           value="10000" min="100" step="100" required>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-percentage"></i> Win Rate</label>
-                                    <input type="number" class="form-control form-control-sm" id="winRate" value="55" min="0" max="100" step="0.1">
+                                    <label>
+                                        <i class="fas fa-percentage"></i> Win Rate (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Historical percentage of winning trades"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="winRate" 
+                                           value="55" min="0" max="100" step="0.1" required>
+                                    <small class="text-muted" style="font-size: 0.7rem;">Current: <span id="winRateDisplay">55.0%</span></small>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-arrow-up text-success"></i> Average Win</label>
-                                    <input type="number" class="form-control form-control-sm" id="avgWin" value="150" min="1" step="1">
+                                    <label>
+                                        <i class="fas fa-arrow-up text-success"></i> Average Win ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Average profit per winning trade"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="avgWin" 
+                                           value="150" min="1" step="1" required>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-arrow-down text-danger"></i> Average Loss</label>
-                                    <input type="number" class="form-control form-control-sm" id="avgLoss" value="100" min="1" step="1">
+                                    <label>
+                                        <i class="fas fa-arrow-down text-danger"></i> Average Loss ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Average loss per losing trade"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="avgLoss" 
+                                           value="100" min="1" step="1" required>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-stop-circle"></i> Stop Loss %</label>
-                                    <input type="number" class="form-control form-control-sm" id="stopLoss" value="2" min="0.1" max="100" step="0.1">
+                                    <label>
+                                        <i class="fas fa-stop-circle"></i> Stop Loss (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Maximum loss per position as % of entry"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="stopLoss" 
+                                           value="2" min="0.1" max="100" step="0.1" required>
                                 </div>
 
                                 <div class="input-row">
-                                    <label><i class="fas fa-shield-alt"></i> Risk Per Trade %</label>
-                                    <input type="number" class="form-control form-control-sm" id="riskPercent" value="2" min="0.1" max="100" step="0.1">
+                                    <label>
+                                        <i class="fas fa-shield-alt"></i> Risk Per Trade (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Maximum % of account to risk on one trade"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="riskPercent" 
+                                           value="2" min="0.1" max="100" step="0.1" required>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary w-100 mt-3">
-                                    <i class="fas fa-calculator"></i> Calculate Positions
-                                </button>
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-dollar-sign"></i> Price Per Unit ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Current market price per share/contract"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="pricePerUnit" 
+                                           value="100" min="0.01" step="0.01" required>
+                                </div>
+
+                                <hr class="my-3" style="border-color: var(--border-accent); opacity: 0.3;">
+                                
+                                <!-- Quick Stats -->
+                                <div class="alert alert-info p-2 mb-0" style="font-size: 0.75rem;">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Win/Loss Ratio:</span>
+                                        <strong id="wlRatio">1.50</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Expected Value:</span>
+                                        <strong id="expectedValue" class="text-success">+$32.50</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Kelly %:</span>
+                                        <strong id="kellyPercentRaw">4.17%</strong>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -198,48 +257,74 @@
 <%- include('partials/footer') %>
 
 <script>
-    document.getElementById('calculatorForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
+    // Real-time calculation function
+    function calculate() {
         // Get inputs
-        const accountBalance = parseFloat(document.getElementById('accountBalance').value);
-        const winRate = parseFloat(document.getElementById('winRate').value) / 100;
-        const avgWin = parseFloat(document.getElementById('avgWin').value);
-        const avgLoss = parseFloat(document.getElementById('avgLoss').value);
-        const stopLoss = parseFloat(document.getElementById('stopLoss').value) / 100;
-        const riskPercent = parseFloat(document.getElementById('riskPercent').value) / 100;
+        const accountBalance = parseFloat(document.getElementById('accountBalance').value) || 0;
+        const winRate = parseFloat(document.getElementById('winRate').value) / 100 || 0;
+        const avgWin = parseFloat(document.getElementById('avgWin').value) || 0;
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value) || 1;
+        const stopLoss = parseFloat(document.getElementById('stopLoss').value) / 100 || 0.01;
+        const riskPercent = parseFloat(document.getElementById('riskPercent').value) / 100 || 0.01;
+        const pricePerUnit = parseFloat(document.getElementById('pricePerUnit').value) || 1;
         
-        // Kelly Criterion: f* = (bp - q) / b
+        // Update win rate display
+        document.getElementById('winRateDisplay').textContent = (winRate * 100).toFixed(1) + '%';
+        
+        // Calculate key metrics
         const winLossRatio = avgWin / avgLoss;
         const lossRate = 1 - winRate;
+        const expectedValue = (winRate * avgWin) - (lossRate * avgLoss);
+        
+        // Update quick stats
+        document.getElementById('wlRatio').textContent = winLossRatio.toFixed(2) + ':1';
+        document.getElementById('expectedValue').textContent = (expectedValue >= 0 ? '+' : '') + '$' + expectedValue.toFixed(2);
+        document.getElementById('expectedValue').className = expectedValue >= 0 ? 'text-success' : 'text-danger';
+        
+        // Kelly Criterion: f* = (bp - q) / b where b = win/loss ratio, p = win rate, q = loss rate
         const kellyFraction = (winLossRatio * winRate - lossRate) / winLossRatio;
-        const kellyPercentSafe = Math.max(0, Math.min(kellyFraction * 0.5, 0.25));
+        const kellyPercentFull = Math.max(0, kellyFraction);
+        const kellyPercentHalf = kellyPercentFull * 0.5; // Half Kelly for safety
+        const kellyPercentSafe = Math.min(kellyPercentHalf, 0.25); // Cap at 25%
         const kellyAmount = accountBalance * kellyPercentSafe;
+        const kellySize = Math.floor(kellyAmount / pricePerUnit);
+        
+        document.getElementById('kellyPercentRaw').textContent = (kellyPercentFull * 100).toFixed(2) + '%';
+        document.getElementById('kellyPercentRaw').className = kellyPercentFull > 0.25 ? 'text-warning' : '';
         
         // Fixed Percentage Method
         const fixedAmount = accountBalance * riskPercent;
+        const fixedSize = Math.floor(fixedAmount / pricePerUnit);
         
-        // Risk-Based Method
+        // Risk-Based Method (using stop loss)
         const riskAmount = accountBalance * riskPercent;
         const riskBasedAmount = riskAmount / stopLoss;
-        
-        const pricePerUnit = 100;
-        
-        const kellySize = Math.floor(kellyAmount / pricePerUnit);
-        const fixedSize = Math.floor(fixedAmount / pricePerUnit);
         const riskSize = Math.floor(riskBasedAmount / pricePerUnit);
         
         // Update Kelly Results
         document.getElementById('kellySize').textContent = kellySize.toLocaleString();
         document.getElementById('kellyPercent').textContent = (kellyPercentSafe * 100).toFixed(2) + '%';
         document.getElementById('kellyDollar').textContent = '$' + kellyAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        document.getElementById('kellyRisk').textContent = '$' + (kellyAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('kellyRisk').textContent = '$' + (kellySize * pricePerUnit * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
+        // Add Kelly recommendation badge
+        let kellyBadge = '';
+        if (kellyPercentFull <= 0) {
+            kellyBadge = '<span class="badge bg-danger ms-2">No Edge</span>';
+        } else if (kellyPercentFull > 0.25) {
+            kellyBadge = '<span class="badge bg-warning ms-2">High Risk</span>';
+        } else if (kellyPercentFull > 0.15) {
+            kellyBadge = '<span class="badge bg-success ms-2">Strong Edge</span>';
+        } else {
+            kellyBadge = '<span class="badge bg-info ms-2">Moderate Edge</span>';
+        }
+        document.querySelector('.card-header.bg-success small').innerHTML = 'Optimal Growth ' + kellyBadge;
         
         // Update Fixed Results
         document.getElementById('fixedSize').textContent = fixedSize.toLocaleString();
         document.getElementById('fixedPercent').textContent = (riskPercent * 100).toFixed(2) + '%';
         document.getElementById('fixedDollar').textContent = '$' + fixedAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        document.getElementById('fixedRisk').textContent = '$' + (fixedAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('fixedRisk').textContent = '$' + (fixedSize * pricePerUnit * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         
         // Update Risk-Based Results
         document.getElementById('riskSize').textContent = riskSize.toLocaleString();
@@ -249,15 +334,59 @@
         
         // Update Comparison Table
         document.getElementById('compKellySize').textContent = kellySize.toLocaleString();
-        document.getElementById('compKellyRisk').textContent = '$' + (kellyAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('compKellyRisk').textContent = '$' + (kellySize * pricePerUnit * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         document.getElementById('compKellyPercent').textContent = (kellyPercentSafe * 100).toFixed(2) + '%';
         
         document.getElementById('compFixedSize').textContent = fixedSize.toLocaleString();
-        document.getElementById('compFixedRisk').textContent = '$' + (fixedAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('compFixedRisk').textContent = '$' + (fixedSize * pricePerUnit * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         document.getElementById('compFixedPercent').textContent = (riskPercent * 100).toFixed(2) + '%';
         
         document.getElementById('compRiskSize').textContent = riskSize.toLocaleString();
         document.getElementById('compRiskRisk').textContent = '$' + riskAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         document.getElementById('compRiskPercent').textContent = ((riskBasedAmount / accountBalance) * 100).toFixed(2) + '%';
+        
+        // Highlight recommended method
+        highlightBestMethod(kellySize, fixedSize, riskSize, kellyPercentFull);
+    }
+    
+    function highlightBestMethod(kellySize, fixedSize, riskSize, kellyFraction) {
+        // Remove all highlights
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.style.boxShadow = '';
+            card.style.transform = '';
+        });
+        
+        // Determine best method
+        let bestCard;
+        if (kellyFraction > 0 && kellyFraction <= 0.25) {
+            // Kelly has edge and is reasonable
+            bestCard = document.querySelector('.metric-card.border-success');
+        } else if (kellyFraction > 0.25) {
+            // Kelly too aggressive, use fixed %
+            bestCard = document.querySelector('.metric-card.border-info');
+        } else {
+            // No edge, use risk-based as safest
+            bestCard = document.querySelector('.metric-card.border-warning');
+        }
+        
+        if (bestCard) {
+            bestCard.style.boxShadow = '0 0 20px rgba(0, 176, 255, 0.4)';
+            bestCard.style.transform = 'scale(1.02)';
+            bestCard.style.transition = 'all 0.3s ease';
+        }
+    }
+    
+    // Add real-time updates to all inputs
+    ['accountBalance', 'winRate', 'avgWin', 'avgLoss', 'stopLoss', 'riskPercent', 'pricePerUnit'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
     });
+    
+    // Prevent form submission and calculate instead
+    document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculate();
+    });
+    
+    // Initial calculation
+    calculate();
 </script>
