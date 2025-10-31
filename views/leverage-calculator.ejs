@@ -441,4 +441,22 @@
     
     // Initial calculation
     calculateLeverage();
+    
+    // Auto-fill from profile
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            if (profile && profile.accountSize) {
+                document.getElementById('accountBalance').value = profile.accountSize;
+                calculateLeverage();
+                PersonalizationEngine.trackCalculatorUsage('Leverage Calculator');
+            }
+        }
+    }
+    
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    autoFillFromProfile();
 </script>
+

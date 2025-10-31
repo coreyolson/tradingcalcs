@@ -418,6 +418,32 @@
         calculate();
     });
     
+    // Auto-fill from profile
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            if (profile) {
+                if (profile.accountSize) {
+                    document.getElementById('startingBalance').value = profile.accountSize;
+                }
+                if (profile.targetMonthlyReturn) {
+                    document.getElementById('monthlyReturn').value = profile.targetMonthlyReturn;
+                }
+                if (profile.timeHorizon) {
+                    document.getElementById('timePeriod').value = profile.timeHorizon;
+                }
+                calculate();
+                PersonalizationEngine.trackCalculatorUsage('Compound Growth');
+            }
+        }
+    }
+    
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    autoFillFromProfile();
+    
     // Initial calculation
     calculate();
 </script>
+

@@ -448,6 +448,38 @@
         calculate();
     });
     
+    // Auto-fill from profile
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            if (profile) {
+                if (profile.accountSize) {
+                    document.getElementById('peakBalance').value = profile.accountSize;
+                }
+                if (profile.winRate) {
+                    document.getElementById('winRate').value = profile.winRate;
+                }
+                if (profile.avgWin) {
+                    document.getElementById('avgWin').value = (profile.avgWin / profile.accountSize * 100).toFixed(1);
+                }
+                if (profile.avgLoss) {
+                    document.getElementById('avgLoss').value = (profile.avgLoss / profile.accountSize * 100).toFixed(1);
+                }
+                if (profile.tradesPerDay) {
+                    document.getElementById('tradesPerDay').value = profile.tradesPerDay;
+                }
+                calculate();
+                PersonalizationEngine.trackCalculatorUsage('Drawdown Recovery');
+            }
+        }
+    }
+    
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    autoFillFromProfile();
+    
     // Initial calculation
     calculate();
 </script>
+

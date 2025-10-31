@@ -399,6 +399,25 @@
         });
     }
     
+    // Auto-fill from profile
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            if (profile && profile.avgWin && profile.avgLoss) {
+                document.getElementById('avgWin').value = profile.avgWin;
+                document.getElementById('avgLoss').value = profile.avgLoss;
+                calculateBreakeven();
+                PersonalizationEngine.trackCalculatorUsage('Breakeven Calculator');
+            }
+        }
+    }
+    
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    autoFillFromProfile();
+    
     // Initial calculation
     calculateBreakeven();
 </script>
+

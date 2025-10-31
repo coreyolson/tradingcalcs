@@ -466,4 +466,23 @@
     
     // Initial analysis
     analyzeSetup();
+    
+    // Auto-fill from profile
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            if (profile && profile.riskPercentPerTrade) {
+                // Risk/Reward doesn't have many profile fields to auto-fill
+                // Entry, stop, targets are trade-specific
+                // But we can show a banner if profile exists
+                PersonalizationEngine.trackCalculatorUsage('Risk/Reward Analyzer');
+            }
+        }
+    }
+    
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    autoFillFromProfile();
 </script>
+

@@ -529,6 +529,28 @@
         tbody.innerHTML = rows;
     }
     
+        // Auto-fill from profile
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            if (profile && profile.winRate && profile.avgWin && profile.avgLoss) {
+                document.getElementById('currentWinRate').value = profile.winRate;
+                document.getElementById('avgWin').value = profile.avgWin;
+                document.getElementById('avgLoss').value = profile.avgLoss;
+                if (profile.totalTrades) {
+                    document.getElementById('totalTrades').value = profile.totalTrades;
+                }
+                updateAnalysis();
+                PersonalizationEngine.trackCalculatorUsage('Win Rate Impact');
+            }
+        }
+    }
+    
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    autoFillFromProfile();
+    
     // Initial analysis
     updateAnalysis();
 </script>
