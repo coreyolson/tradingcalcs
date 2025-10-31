@@ -387,6 +387,74 @@
         calculate();
     });
     
-    // Initial calculation
+    // Auto-fill from profile if available
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            
+            if (profile.accountSize) {
+                document.getElementById('accountBalance').value = profile.accountSize;
+            }
+            if (profile.winRate) {
+                document.getElementById('winRate').value = profile.winRate;
+            }
+            if (profile.avgWin) {
+                document.getElementById('avgWin').value = profile.avgWin;
+            }
+            if (profile.avgLoss) {
+                document.getElementById('avgLoss').value = profile.avgLoss;
+            }
+            if (profile.riskPercentPerTrade) {
+                document.getElementById('riskPercent').value = profile.riskPercentPerTrade;
+            }
+            
+            // Show notification that profile was loaded
+            if (PersonalizationEngine.isProfileComplete()) {
+                showProfileLoadedNotification();
+            }
+            
+            // Track calculator usage
+            PersonalizationEngine.trackCalculatorUsage('Position Sizer');
+        }
+    }
+    
+    function showProfileLoadedNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-success';
+        notification.style.cssText = 'position: fixed; top: 80px; right: 20px; z-index: 1050; max-width: 350px; animation: slideInRight 0.3s ease;';
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+                <div>
+                    <strong>Profile Loaded</strong><br>
+                    <small>Your metrics have been auto-filled</small>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
+    // Listen for profile updates
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    // Initial auto-fill and calculation
+    autoFillFromProfile();
     calculate();
 </script>
+
+<style>
+    @keyframes slideInRight {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(400px); opacity: 0; }
+    }
+</style>

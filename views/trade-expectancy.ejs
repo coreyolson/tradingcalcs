@@ -368,4 +368,39 @@
     
     // Initial calculation
     calculateExpectancy();
+    
+    // Auto-fill from profile if available
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            
+            if (profile.winRate) {
+                document.getElementById('winRate').value = profile.winRate;
+            }
+            if (profile.avgWin) {
+                document.getElementById('avgWin').value = profile.avgWin;
+            }
+            if (profile.avgLoss) {
+                document.getElementById('avgLoss').value = profile.avgLoss;
+            }
+            if (profile.totalTrades) {
+                document.getElementById('totalTrades').value = profile.totalTrades;
+            }
+            
+            // Recalculate with profile data
+            if (PersonalizationEngine.isProfileComplete()) {
+                calculateExpectancy();
+            }
+            
+            // Track calculator usage
+            PersonalizationEngine.trackCalculatorUsage('Trade Expectancy');
+        }
+    }
+    
+    // Listen for profile updates
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    // Auto-fill on page load
+    autoFillFromProfile();
 </script>

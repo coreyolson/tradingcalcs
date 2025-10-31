@@ -575,9 +575,9 @@
                 Measure your edge. Master your risk.
             </p>
             <div class="fade-in-up delay-3">
-                <a href="/contract-calculator" class="cta-main">
-                    ⚡ Start Calculating Now
-                </a>
+                <button type="button" class="cta-main" id="setupProfileBtnHero" style="border: none; cursor: pointer;">
+                    ⚡ Set Up Your Profile
+                </button>
                 <p class="cta-tagline">No logins. No tracking. Just results.</p>
             </div>
         </div>
@@ -588,6 +588,77 @@
                 50% { transform: translateY(-15px); }
             }
         </style>
+
+        <!-- Personalized Dashboard (shown when profile exists) -->
+        <div id="personalizedDashboard" style="display: none;" class="mb-5 fade-in-up">
+            <div class="card" style="background: linear-gradient(135deg, rgba(214, 139, 69, 0.05) 0%, rgba(0, 176, 255, 0.05) 100%); border: 1px solid rgba(214, 139, 69, 0.3); border-radius: 16px; overflow: hidden;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <i class="fas fa-user-circle" style="font-size: 2.5rem; color: #d68b45;"></i>
+                                <div>
+                                    <h4 style="color: #d68b45; font-weight: 700; margin-bottom: 0.25rem;">Welcome Back, Trader</h4>
+                                    <p style="color: #9ba1a6; margin-bottom: 0; font-size: 0.9rem;">Your metrics are pre-loaded across all calculators</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Stats Row -->
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <div style="background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.2); border-radius: 8px; padding: 0.75rem; text-align: center;">
+                                        <div style="color: #9ba1a6; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Account</div>
+                                        <div style="color: #00ff88; font-size: 1.3rem; font-weight: 700;" id="dashAccountSize">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div style="background: rgba(0, 176, 255, 0.05); border: 1px solid rgba(0, 176, 255, 0.2); border-radius: 8px; padding: 0.75rem; text-align: center;">
+                                        <div style="color: #9ba1a6; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Win Rate</div>
+                                        <div style="color: #00b0ff; font-size: 1.3rem; font-weight: 700;" id="dashWinRate">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div style="background: rgba(214, 139, 69, 0.05); border: 1px solid rgba(214, 139, 69, 0.2); border-radius: 8px; padding: 0.75rem; text-align: center;">
+                                        <div style="color: #9ba1a6; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Expectancy</div>
+                                        <div style="color: #d68b45; font-size: 1.3rem; font-weight: 700;" id="dashExpectancy">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div style="background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; padding: 0.75rem; text-align: center;">
+                                        <div style="color: #9ba1a6; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Risk/Trade</div>
+                                        <div style="color: #a855f7; font-size: 1.3rem; font-weight: 700;" id="dashRiskPercent">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 mt-4 mt-lg-0">
+                            <!-- Recommendations Panel -->
+                            <div id="recommendationsPanel" style="display: none;">
+                                <div style="background: rgba(214, 139, 69, 0.1); border: 1px solid rgba(214, 139, 69, 0.3); border-radius: 8px; padding: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                        <i class="fas fa-lightbulb" style="color: #d68b45;"></i>
+                                        <h6 style="color: #d68b45; font-weight: 700; margin-bottom: 0; font-size: 0.9rem;">
+                                            <span id="recCount">0</span> Recommendations
+                                        </h6>
+                                    </div>
+                                    <div id="recommendationsList" style="max-height: 120px; overflow-y: auto;">
+                                        <!-- Recommendations will be inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- No Recommendations Message -->
+                            <div id="noRecommendations" style="text-align: center; padding: 1rem;">
+                                <i class="fas fa-check-circle" style="color: #00ff88; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                <p style="color: #00ff88; margin-bottom: 0; font-size: 0.9rem; font-weight: 600;">All Systems Green</p>
+                                <p style="color: #9ba1a6; margin-bottom: 0; font-size: 0.75rem;">Your profile looks good!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Feature Grid -->
         <div class="row g-4 mb-5">
@@ -633,7 +704,7 @@
                     <div class="feature-icon" style="color: var(--violet-glow);">
                         <i class="fas fa-calculator"></i>
                     </div>
-                    <div class="feature-number">9</div>
+                    <div class="feature-number">12</div>
                     <div class="feature-label">Live Calculators</div>
                     <div class="feature-subtext">professional tools</div>
                 </div>
@@ -939,57 +1010,63 @@
             </h3>
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
-                    <div class="coming-soon-card">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                 style="width: 50px; height: 50px; background: rgba(214,139,69,0.15); border: 1px solid var(--copper);">
-                                <i class="fas fa-arrow-trend-down" style="font-size: 1.4rem; color: var(--copper);"></i>
+                    <a href="/drawdown-recovery" class="text-decoration-none">
+                        <div class="coming-soon-card" style="opacity: 1; border-color: var(--green-glow);">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 50px; height: 50px; background: rgba(0,255,136,0.15); border: 1px solid var(--green-glow);">
+                                    <i class="fas fa-arrow-trend-down" style="font-size: 1.4rem; color: var(--green-glow);"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Drawdown Recovery</h5>
+                                    <span class="eta-badge" style="background: var(--green-glow); color: #000; border-color: var(--green-glow);">LIVE NOW</span>
+                                </div>
                             </div>
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Drawdown Recovery</h5>
-                                <span class="eta-badge">Coming Soon</span>
-                            </div>
+                            <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
+                                Calculate return needed to recover from drawdowns and time to recovery
+                            </p>
                         </div>
-                        <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
-                            Calculate return needed to recover from drawdowns and time to recovery
-                        </p>
-                    </div>
+                    </a>
                 </div>
                 
                 <div class="col-lg-4 col-md-6">
-                    <div class="coming-soon-card">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                 style="width: 50px; height: 50px; background: rgba(214,139,69,0.15); border: 1px solid var(--copper);">
-                                <i class="fas fa-chart-line" style="font-size: 1.4rem; color: var(--copper);"></i>
+                    <a href="/compound-growth" class="text-decoration-none">
+                        <div class="coming-soon-card" style="opacity: 1; border-color: var(--green-glow);">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 50px; height: 50px; background: rgba(0,255,136,0.15); border: 1px solid var(--green-glow);">
+                                    <i class="fas fa-chart-line" style="font-size: 1.4rem; color: var(--green-glow);"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Compound Growth</h5>
+                                    <span class="eta-badge" style="background: var(--green-glow); color: #000; border-color: var(--green-glow);">LIVE NOW</span>
+                                </div>
                             </div>
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Compound Growth</h5>
-                                <span class="eta-badge">Coming Soon</span>
-                            </div>
+                            <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
+                                Project account growth with consistent returns and regular deposits
+                            </p>
                         </div>
-                        <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
-                            Project account growth with consistent returns and regular deposits
-                        </p>
-                    </div>
+                    </a>
                 </div>
                 
                 <div class="col-lg-4 col-md-6">
-                    <div class="coming-soon-card">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                 style="width: 50px; height: 50px; background: rgba(214,139,69,0.15); border: 1px solid var(--copper);">
-                                <i class="fas fa-bullseye" style="font-size: 1.4rem; color: var(--copper);"></i>
+                    <a href="/time-to-goal" class="text-decoration-none">
+                        <div class="coming-soon-card" style="opacity: 1; border-color: var(--green-glow);">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 50px; height: 50px; background: rgba(0,255,136,0.15); border: 1px solid var(--green-glow);">
+                                    <i class="fas fa-bullseye" style="font-size: 1.4rem; color: var(--green-glow);"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Time to Goal</h5>
+                                    <span class="eta-badge" style="background: var(--green-glow); color: #000; border-color: var(--green-glow);">LIVE NOW</span>
+                                </div>
                             </div>
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Time to Goal</h5>
-                                <span class="eta-badge">Coming Soon</span>
-                            </div>
+                            <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
+                                Calculate realistic timeline to reach account milestones
+                            </p>
                         </div>
-                        <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
-                            Calculate realistic timeline to reach account milestones
-                        </p>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -1134,11 +1211,105 @@
         </footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-    </div>
+    <!-- Include Profile Modal -->
+    <%- include('partials/profile-modal') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/personalization.js"></script>
+    <script>
+        // Populate Personalized Dashboard on Homepage
+        document.addEventListener('DOMContentLoaded', function() {
+            const profile = PersonalizationEngine.loadProfile();
+            
+            // Setup hero button to open profile modal
+            const heroBtn = document.getElementById('setupProfileBtnHero');
+            if (heroBtn) {
+                heroBtn.addEventListener('click', function() {
+                    const modalEl = document.getElementById('profileSetupModal');
+                    if (modalEl) {
+                        const modal = new bootstrap.Modal(modalEl);
+                        modal.show();
+                    }
+                });
+            }
+            
+            if (PersonalizationEngine.isProfileComplete()) {
+                showPersonalizedDashboard(profile);
+                // Hide the setup button, show calculator link instead
+                if (heroBtn) {
+                    heroBtn.textContent = '⚡ Open Calculators';
+                    heroBtn.onclick = function() { window.location.href = '/position-sizer'; };
+                }
+            }
+        });
+        
+        function showPersonalizedDashboard(profile) {
+            const dashboard = document.getElementById('personalizedDashboard');
+            if (!dashboard) return;
+            
+            // Show dashboard
+            dashboard.style.display = 'block';
+            
+            // Populate quick stats
+            if (profile.accountSize) {
+                document.getElementById('dashAccountSize').textContent = '$' + profile.accountSize.toLocaleString();
+            }
+            
+            if (profile.winRate) {
+                document.getElementById('dashWinRate').textContent = profile.winRate + '%';
+            }
+            
+            // Calculate and show expectancy
+            if (profile.winRate && profile.avgWin && profile.avgLoss) {
+                const expectancy = (profile.winRate / 100 * profile.avgWin) - ((100 - profile.winRate) / 100 * profile.avgLoss);
+                const expectancyEl = document.getElementById('dashExpectancy');
+                expectancyEl.textContent = '$' + expectancy.toFixed(2);
+                
+                // Color code based on expectancy
+                if (expectancy > 0) {
+                    expectancyEl.style.color = '#00ff88';
+                } else {
+                    expectancyEl.style.color = '#ff6b6b';
+                }
+            }
+            
+            if (profile.riskPercentPerTrade) {
+                document.getElementById('dashRiskPercent').textContent = profile.riskPercentPerTrade + '%';
+            }
+            
+            // Show recommendations
+            const recommendations = PersonalizationEngine.getRecommendations();
+            if (recommendations.length > 0) {
+                document.getElementById('recommendationsPanel').style.display = 'block';
+                document.getElementById('noRecommendations').style.display = 'none';
+                document.getElementById('recCount').textContent = recommendations.length;
+                
+                const recList = document.getElementById('recommendationsList');
+                recList.innerHTML = recommendations.map(rec => {
+                    const iconClass = rec.priority === 'critical' ? 'fa-exclamation-circle' : 
+                                     rec.priority === 'high' ? 'fa-exclamation-triangle' : 
+                                     rec.priority === 'medium' ? 'fa-info-circle' : 'fa-lightbulb';
+                    const iconColor = rec.priority === 'critical' ? '#ff6b6b' : 
+                                     rec.priority === 'high' ? '#fca311' : 
+                                     rec.priority === 'medium' ? '#00b0ff' : '#9ba1a6';
+                    
+                    return `
+                        <div style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div style="display: flex; align-items: start; gap: 0.5rem;">
+                                <i class="fas ${iconClass}" style="color: ${iconColor}; margin-top: 0.25rem; font-size: 0.8rem;"></i>
+                                <div style="flex: 1;">
+                                    <div style="color: #fff; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.15rem;">${rec.title}</div>
+                                    <div style="color: #9ba1a6; font-size: 0.75rem;">${rec.message}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                document.getElementById('recommendationsPanel').style.display = 'none';
+                document.getElementById('noRecommendations').style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>

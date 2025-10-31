@@ -1,0 +1,423 @@
+<%- include('partials/header', { 
+    title: 'Compound Growth Calculator',
+    description: 'Project account growth with consistent returns and regular deposits',
+    includeChartJs: true
+}) %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                Compound Growth Calculator
+            </h1>
+            <p class="page-subtitle">Long-Term Projections • Monthly Contributions • Growth Visualization</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input Controls -->
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Growth Parameters
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="growthForm">
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-wallet"></i> Starting Balance ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Initial account capital"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="startingBalance" 
+                                           value="10000" min="100" step="1000" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-percentage"></i> Monthly Return (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Expected average monthly return"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="monthlyReturn" 
+                                           value="5" min="-50" max="100" step="0.1" required>
+                                    <small class="text-muted" style="font-size: 0.7rem;">
+                                        Annual: <span id="annualReturn">79.6%</span>
+                                    </small>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-dollar-sign text-success"></i> Monthly Deposit ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Additional capital added each month"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="monthlyDeposit" 
+                                           value="1000" min="0" step="100" required>
+                                    <small class="text-muted" style="font-size: 0.7rem;">
+                                        Annual: <span id="annualDeposit">$12,000</span>
+                                    </small>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-calendar"></i> Time Period (Months)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="How many months to project growth"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="timePeriod" 
+                                           value="12" min="1" max="120" step="1" required>
+                                    <small class="text-muted" style="font-size: 0.7rem;">
+                                        <span id="timeYears">1.0 years</span>
+                                    </small>
+                                </div>
+
+                                <hr class="my-3" style="border-color: var(--border-accent); opacity: 0.3;">
+
+                                <!-- Contribution Toggle -->
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-cog"></i> Deposit Timing
+                                    </label>
+                                    <select class="form-select form-select-sm" id="depositTiming">
+                                        <option value="start">Start of Month</option>
+                                        <option value="end" selected>End of Month</option>
+                                    </select>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-chart-area"></i> Compounding
+                                    </label>
+                                    <select class="form-select form-select-sm" id="compoundingFrequency">
+                                        <option value="monthly" selected>Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                        <option value="annual">Annual</option>
+                                    </select>
+                                </div>
+
+                                <hr class="my-3" style="border-color: var(--border-accent); opacity: 0.3;">
+                                
+                                <!-- Quick Stats -->
+                                <div class="alert alert-success p-2 mb-0" style="font-size: 0.75rem;">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Final Balance:</span>
+                                        <strong id="finalBalanceQuick">$28,127</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Total Deposits:</span>
+                                        <strong id="totalDepositsQuick">$12,000</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Total Gains:</span>
+                                        <strong id="totalGainsQuick" class="text-success">$6,127</strong>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-8 col-lg-7">
+                    <!-- Key Metrics Cards -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <div class="card metric-card border-success">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Final Balance</div>
+                                    <div class="metric-value text-success" id="finalBalance">$28,127</div>
+                                    <small class="text-muted">After 12 months</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-info">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Total Gains</div>
+                                    <div class="metric-value text-info" id="totalGains">$6,127</div>
+                                    <small class="text-muted">From returns</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-primary">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Total ROI</div>
+                                    <div class="metric-value text-primary" id="totalROI">+61.3%</div>
+                                    <small class="text-muted">Return on investment</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-warning">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">CAGR</div>
+                                    <div class="metric-value text-warning" id="cagr">79.6%</div>
+                                    <small class="text-muted">Annualized</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Growth Chart -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-area"></i> Account Growth Over Time
+                        </div>
+                        <div class="card-body">
+                            <canvas id="growthChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Breakdown -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-table"></i> Monthly Breakdown</span>
+                            <small class="text-muted">Scroll for all months</small>
+                        </div>
+                        <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-dark table-sm table-hover mb-0 sticky-header">
+                                <thead style="position: sticky; top: 0; background: #1a1f2e; z-index: 10;">
+                                    <tr>
+                                        <th>Month</th>
+                                        <th class="text-end">Starting</th>
+                                        <th class="text-end">Deposit</th>
+                                        <th class="text-end">Gain</th>
+                                        <th class="text-end">Ending</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="breakdownTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Calculating...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<script>
+    let growthChart = null;
+    
+    // Real-time calculation function
+    function calculate() {
+        const startingBalance = parseFloat(document.getElementById('startingBalance').value) || 0;
+        const monthlyReturnPercent = parseFloat(document.getElementById('monthlyReturn').value) / 100 || 0;
+        const monthlyDeposit = parseFloat(document.getElementById('monthlyDeposit').value) || 0;
+        const timePeriod = parseInt(document.getElementById('timePeriod').value) || 1;
+        const depositTiming = document.getElementById('depositTiming').value;
+        const compoundingFrequency = document.getElementById('compoundingFrequency').value;
+        
+        // Update derived values
+        const annualReturnPercent = (Math.pow(1 + monthlyReturnPercent, 12) - 1) * 100;
+        document.getElementById('annualReturn').textContent = annualReturnPercent.toFixed(1) + '%';
+        document.getElementById('annualDeposit').textContent = '$' + (monthlyDeposit * 12).toLocaleString();
+        document.getElementById('timeYears').textContent = (timePeriod / 12).toFixed(1) + ' years';
+        
+        // Calculate month by month
+        const monthlyData = [];
+        let balance = startingBalance;
+        let totalDeposits = 0;
+        
+        for (let month = 0; month <= timePeriod; month++) {
+            const monthData = {
+                month: month,
+                startBalance: balance,
+                deposit: month > 0 ? monthlyDeposit : 0,
+                gain: 0,
+                endBalance: balance
+            };
+            
+            if (month > 0) {
+                // Add deposit at start of month if selected
+                if (depositTiming === 'start') {
+                    balance += monthlyDeposit;
+                    totalDeposits += monthlyDeposit;
+                }
+                
+                // Calculate gain
+                const gain = balance * monthlyReturnPercent;
+                monthData.gain = gain;
+                balance += gain;
+                
+                // Add deposit at end of month if selected
+                if (depositTiming === 'end') {
+                    balance += monthlyDeposit;
+                    totalDeposits += monthlyDeposit;
+                }
+                
+                monthData.endBalance = balance;
+            }
+            
+            monthlyData.push(monthData);
+        }
+        
+        const finalBalance = balance;
+        const totalGains = finalBalance - startingBalance - totalDeposits;
+        const totalInvested = startingBalance + totalDeposits;
+        const totalROI = ((finalBalance - totalInvested) / totalInvested) * 100;
+        
+        // Calculate CAGR
+        const years = timePeriod / 12;
+        const cagr = years > 0 ? (Math.pow(finalBalance / startingBalance, 1 / years) - 1) * 100 : 0;
+        
+        // Update metrics
+        document.getElementById('finalBalance').textContent = '$' + finalBalance.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('totalGains').textContent = '$' + totalGains.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('totalROI').textContent = (totalROI >= 0 ? '+' : '') + totalROI.toFixed(1) + '%';
+        document.getElementById('cagr').textContent = cagr.toFixed(1) + '%';
+        
+        // Update quick stats
+        document.getElementById('finalBalanceQuick').textContent = '$' + finalBalance.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('totalDepositsQuick').textContent = '$' + totalDeposits.toLocaleString();
+        document.getElementById('totalGainsQuick').textContent = '$' + totalGains.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
+        // Update chart
+        updateGrowthChart(monthlyData);
+        
+        // Update breakdown table
+        updateBreakdownTable(monthlyData);
+    }
+    
+    function updateGrowthChart(monthlyData) {
+        const canvas = document.getElementById('growthChart');
+        const ctx = canvas.getContext('2d');
+        
+        const balanceData = monthlyData.map(m => ({ x: m.month, y: m.endBalance }));
+        
+        // Destroy existing chart
+        if (growthChart) {
+            growthChart.destroy();
+        }
+        
+        // Create new chart
+        growthChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'Account Balance',
+                        data: balanceData,
+                        borderColor: '#00ff88',
+                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#9ba1a6',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 25, 34, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#9ba1a6',
+                        borderColor: '#00ff88',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            title: function(context) {
+                                return 'Month ' + context[0].parsed.x;
+                            },
+                            label: function(context) {
+                                return 'Balance: $' + context.parsed.y.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Month',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { 
+                            color: '#9ba1a6',
+                            stepSize: 1
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Balance ($)',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#9ba1a6',
+                            callback: function(value) {
+                                return '$' + (value / 1000).toFixed(0) + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateBreakdownTable(monthlyData) {
+        const tbody = document.getElementById('breakdownTableBody');
+        let rows = '';
+        
+        // Skip month 0 (starting point)
+        for (let i = 1; i < monthlyData.length; i++) {
+            const data = monthlyData[i];
+            const gainClass = data.gain >= 0 ? 'text-success' : 'text-danger';
+            
+            rows += `
+                <tr>
+                    <td><strong>Month ${data.month}</strong></td>
+                    <td class="text-end">$${data.startBalance.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
+                    <td class="text-end text-info">$${data.deposit.toLocaleString()}</td>
+                    <td class="text-end ${gainClass}">$${data.gain.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
+                    <td class="text-end"><strong>$${data.endBalance.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</strong></td>
+                </tr>
+            `;
+        }
+        
+        tbody.innerHTML = rows;
+    }
+    
+    // Add real-time updates to all inputs
+    ['startingBalance', 'monthlyReturn', 'monthlyDeposit', 'timePeriod', 'depositTiming', 'compoundingFrequency'].forEach(id => {
+        const element = document.getElementById(id);
+        element.addEventListener('input', calculate);
+        element.addEventListener('change', calculate);
+    });
+    
+    // Prevent form submission
+    document.getElementById('growthForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculate();
+    });
+    
+    // Initial calculation
+    calculate();
+</script>

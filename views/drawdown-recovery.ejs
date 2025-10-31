@@ -1,0 +1,453 @@
+<%- include('partials/header', { 
+    title: 'Drawdown Recovery Calculator',
+    description: 'Calculate return needed to recover from drawdowns',
+    includeChartJs: true
+}) %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-arrow-trend-down"></i>
+                Drawdown Recovery Calculator
+            </h1>
+            <p class="page-subtitle">Recovery Analysis • Time Projections • Risk Assessment</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input Controls -->
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Drawdown Parameters
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="recoveryForm">
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-wallet"></i> Peak Account Balance ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Highest account value before drawdown"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="peakBalance" 
+                                           value="100000" min="1000" step="1000" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-chart-line-down text-danger"></i> Current Balance ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Current account value after drawdown"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="currentBalance" 
+                                           value="85000" min="100" step="1000" required>
+                                    <small class="text-danger" style="font-size: 0.7rem;">
+                                        Drawdown: <span id="drawdownPercent">15.0%</span> (<span id="drawdownDollar">$15,000</span>)
+                                    </small>
+                                </div>
+
+                                <hr class="my-3" style="border-color: var(--border-accent); opacity: 0.3;">
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-percentage"></i> Expected Win Rate (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Your historical win percentage"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="winRate" 
+                                           value="60" min="1" max="99" step="1" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-arrow-up text-success"></i> Average Win (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Average return per winning trade"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="avgWin" 
+                                           value="3" min="0.1" step="0.1" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-arrow-down text-danger"></i> Average Loss (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Average loss per losing trade"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="avgLoss" 
+                                           value="2" min="0.1" step="0.1" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-calendar-day"></i> Trades Per Day
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Average number of trades per trading day"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="tradesPerDay" 
+                                           value="3" min="1" max="50" step="1" required>
+                                </div>
+
+                                <hr class="my-3" style="border-color: var(--border-accent); opacity: 0.3;">
+                                
+                                <!-- Quick Stats -->
+                                <div class="alert alert-info p-2 mb-0" style="font-size: 0.75rem;">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Expected Return/Trade:</span>
+                                        <strong id="expectedReturn" class="text-success">+0.6%</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Recovery Needed:</span>
+                                        <strong id="recoveryNeeded" class="text-warning">17.6%</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Win/Loss Ratio:</span>
+                                        <strong id="wlRatio">1.5:1</strong>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-8 col-lg-7">
+                    <!-- Key Metrics Cards -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <div class="card metric-card border-danger">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Drawdown</div>
+                                    <div class="metric-value text-danger" id="drawdownDisplay">-15.0%</div>
+                                    <small class="text-muted">From peak</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-warning">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Gain Needed</div>
+                                    <div class="metric-value text-warning" id="gainNeeded">+17.6%</div>
+                                    <small class="text-muted">To recover</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-info">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Est. Trades</div>
+                                    <div class="metric-value text-info" id="tradesNeeded">50</div>
+                                    <small class="text-muted">To breakeven</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-success">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Time Est.</div>
+                                    <div class="metric-value text-success" id="timeNeeded">17 days</div>
+                                    <small class="text-muted">Trading days</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recovery Chart -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-area"></i> Projected Recovery Path
+                        </div>
+                        <div class="card-body">
+                            <canvas id="recoveryChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recovery Scenarios -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-table"></i> Recovery Scenarios
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-dark table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Scenario</th>
+                                        <th class="text-end">Return/Trade</th>
+                                        <th class="text-end">Est. Trades</th>
+                                        <th class="text-end">Est. Days</th>
+                                        <th class="text-end">Probability</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scenariosTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Calculating scenarios...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<script>
+    let recoveryChart = null;
+    
+    // Real-time calculation function
+    function calculate() {
+        const peakBalance = parseFloat(document.getElementById('peakBalance').value) || 0;
+        const currentBalance = parseFloat(document.getElementById('currentBalance').value) || 0;
+        const winRate = parseFloat(document.getElementById('winRate').value) / 100 || 0;
+        const avgWin = parseFloat(document.getElementById('avgWin').value) / 100 || 0;
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value) / 100 || 0;
+        const tradesPerDay = parseInt(document.getElementById('tradesPerDay').value) || 1;
+        
+        if (!peakBalance || !currentBalance) return;
+        
+        // Calculate drawdown
+        const drawdownDollar = peakBalance - currentBalance;
+        const drawdownPercent = (drawdownDollar / peakBalance) * 100;
+        
+        // Calculate recovery needed (key insight: need more gain % than loss %)
+        const recoveryNeeded = (drawdownDollar / currentBalance) * 100;
+        
+        // Update drawdown displays
+        document.getElementById('drawdownPercent').textContent = drawdownPercent.toFixed(1) + '%';
+        document.getElementById('drawdownDollar').textContent = '$' + drawdownDollar.toLocaleString();
+        document.getElementById('drawdownDisplay').textContent = '-' + drawdownPercent.toFixed(1) + '%';
+        document.getElementById('gainNeeded').textContent = '+' + recoveryNeeded.toFixed(1) + '%';
+        document.getElementById('recoveryNeeded').textContent = recoveryNeeded.toFixed(1) + '%';
+        
+        // Calculate expected return per trade
+        const lossRate = 1 - winRate;
+        const expectedReturnPerTrade = (winRate * avgWin) - (lossRate * avgLoss);
+        const wlRatio = avgWin / avgLoss;
+        
+        document.getElementById('expectedReturn').textContent = (expectedReturnPerTrade >= 0 ? '+' : '') + 
+            (expectedReturnPerTrade * 100).toFixed(2) + '%';
+        document.getElementById('expectedReturn').className = expectedReturnPerTrade >= 0 ? 'text-success' : 'text-danger';
+        document.getElementById('wlRatio').textContent = wlRatio.toFixed(2) + ':1';
+        
+        // Estimate trades needed (simplified compound calculation)
+        let tradesNeeded = 0;
+        let simulatedBalance = currentBalance;
+        const maxTrades = 1000; // Safety limit
+        
+        if (expectedReturnPerTrade > 0) {
+            while (simulatedBalance < peakBalance && tradesNeeded < maxTrades) {
+                // Simulate a trade with expected return
+                simulatedBalance *= (1 + expectedReturnPerTrade);
+                tradesNeeded++;
+            }
+        }
+        
+        const daysNeeded = Math.ceil(tradesNeeded / tradesPerDay);
+        
+        document.getElementById('tradesNeeded').textContent = tradesNeeded;
+        document.getElementById('timeNeeded').textContent = daysNeeded + ' days';
+        
+        // Update chart
+        updateRecoveryChart(currentBalance, peakBalance, expectedReturnPerTrade, tradesNeeded);
+        
+        // Update scenarios table
+        updateScenariosTable(currentBalance, peakBalance, winRate, avgWin, avgLoss, tradesPerDay, expectedReturnPerTrade);
+    }
+    
+    function updateRecoveryChart(startBalance, targetBalance, returnPerTrade, estimatedTrades) {
+        const canvas = document.getElementById('recoveryChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Generate recovery path data
+        const dataPoints = [];
+        let balance = startBalance;
+        dataPoints.push({ x: 0, y: balance });
+        
+        for (let trade = 1; trade <= Math.min(estimatedTrades, 200); trade++) {
+            balance *= (1 + returnPerTrade);
+            if (trade % 5 === 0) { // Sample every 5 trades to reduce points
+                dataPoints.push({ x: trade, y: balance });
+            }
+        }
+        
+        // Add final point
+        if (dataPoints[dataPoints.length - 1].x !== estimatedTrades) {
+            dataPoints.push({ x: estimatedTrades, y: targetBalance });
+        }
+        
+        // Destroy existing chart
+        if (recoveryChart) {
+            recoveryChart.destroy();
+        }
+        
+        // Create new chart
+        recoveryChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'Account Balance',
+                        data: dataPoints,
+                        borderColor: '#00b0ff',
+                        backgroundColor: 'rgba(0, 176, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Target (Peak)',
+                        data: [
+                            { x: 0, y: targetBalance },
+                            { x: estimatedTrades, y: targetBalance }
+                        ],
+                        borderColor: '#00ff88',
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        pointRadius: 0,
+                        fill: false
+                    },
+                    {
+                        label: 'Starting Point',
+                        data: [
+                            { x: 0, y: startBalance },
+                            { x: estimatedTrades, y: startBalance }
+                        ],
+                        borderColor: '#ff4444',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#9ba1a6',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 25, 34, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#9ba1a6',
+                        borderColor: '#00b0ff',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return 'Balance: $' + context.parsed.y.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                }
+                                return context.dataset.label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Number of Trades',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#9ba1a6' }
+                    },
+                    y: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Account Balance ($)',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#9ba1a6',
+                            callback: function(value) {
+                                return '$' + (value / 1000).toFixed(0) + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateScenariosTable(currentBalance, peakBalance, winRate, avgWin, avgLoss, tradesPerDay, baseReturn) {
+        const tbody = document.getElementById('scenariosTableBody');
+        const scenarios = [
+            { name: 'Optimistic', multiplier: 1.5, prob: '25%' },
+            { name: 'Expected', multiplier: 1.0, prob: '50%' },
+            { name: 'Conservative', multiplier: 0.7, prob: '75%' },
+            { name: 'Pessimistic', multiplier: 0.5, prob: '90%' }
+        ];
+        
+        let rows = '';
+        
+        scenarios.forEach(scenario => {
+            const returnPerTrade = baseReturn * scenario.multiplier;
+            
+            // Calculate trades needed
+            let trades = 0;
+            let balance = currentBalance;
+            const maxTrades = 1000;
+            
+            if (returnPerTrade > 0) {
+                while (balance < peakBalance && trades < maxTrades) {
+                    balance *= (1 + returnPerTrade);
+                    trades++;
+                }
+            } else {
+                trades = 999; // Can't recover with negative return
+            }
+            
+            const days = Math.ceil(trades / tradesPerDay);
+            
+            const rowClass = scenario.name === 'Expected' ? 'table-primary' : '';
+            const tradesDisplay = trades < maxTrades ? trades : '999+';
+            const daysDisplay = days < 365 ? days + ' days' : Math.ceil(days / 252) + ' years';
+            
+            rows += `
+                <tr class="${rowClass}">
+                    <td><strong>${scenario.name}</strong></td>
+                    <td class="text-end">${(returnPerTrade * 100).toFixed(2)}%</td>
+                    <td class="text-end">${tradesDisplay}</td>
+                    <td class="text-end">${daysDisplay}</td>
+                    <td class="text-end"><span class="badge bg-info">${scenario.prob}</span></td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = rows;
+    }
+    
+    // Add real-time updates to all inputs
+    ['peakBalance', 'currentBalance', 'winRate', 'avgWin', 'avgLoss', 'tradesPerDay'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
+    });
+    
+    // Prevent form submission
+    document.getElementById('recoveryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculate();
+    });
+    
+    // Initial calculation
+    calculate();
+</script>

@@ -93,6 +93,33 @@ app.get('/sharpe-ratio', (req, res) => {
     });
 });
 
+// Route for Drawdown Recovery Calculator
+app.get('/drawdown-recovery', (req, res) => {
+    res.render('drawdown-recovery', { 
+        title: 'Drawdown Recovery Calculator - Copper Candle Calculators',
+        description: 'Calculate return needed to recover from drawdowns and time projections',
+        includeChartJs: true
+    });
+});
+
+// Route for Compound Growth Calculator
+app.get('/compound-growth', (req, res) => {
+    res.render('compound-growth', { 
+        title: 'Compound Growth Calculator - Copper Candle Calculators',
+        description: 'Project account growth with consistent returns and regular deposits',
+        includeChartJs: true
+    });
+});
+
+// Route for Time to Goal Calculator
+app.get('/time-to-goal', (req, res) => {
+    res.render('time-to-goal', { 
+        title: 'Time to Goal Calculator - Copper Candle Calculators',
+        description: 'Calculate realistic timeline to reach account milestones',
+        includeChartJs: true
+    });
+});
+
 // Route for Breakeven Calculator
 app.get('/breakeven-calculator', (req, res) => {
     res.render('breakeven-calculator', { 
@@ -571,6 +598,24 @@ app.post('/api/export-csv', (req, res) => {
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename=trading-projection.csv');
   res.send(csv);
+});
+
+// About page
+app.get('/about', (req, res) => {
+    res.render('about', {
+        title: 'About Copper Candle - Professional Trading Calculators',
+        description: 'Learn about our mission to provide free, privacy-focused trading calculators for disciplined traders',
+        includeChartJs: false
+    });
+});
+
+// Methodology page (coming soon)
+app.get('/methodology', (req, res) => {
+    res.render('methodology', {
+        title: 'Methodology - Copper Candle Calculators',
+        description: 'Detailed explanations of all formulas and calculations used in our trading tools',
+        includeChartJs: false
+    });
 });
 
 // Serve the main page

@@ -1,0 +1,468 @@
+<%- include('partials/header', { 
+    title: 'Time to Goal Calculator',
+    description: 'Calculate realistic timeline to reach account milestones',
+    includeChartJs: true
+}) %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-bullseye"></i>
+                Time to Goal Calculator
+            </h1>
+            <p class="page-subtitle">Account Milestones • Realistic Timelines • Achievement Projections</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input Controls -->
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Goal Parameters
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="goalForm">
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-wallet"></i> Current Balance ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Your current account size"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="currentBalance" 
+                                           value="10000" min="100" step="1000" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-flag-checkered text-success"></i> Goal Balance ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Target account size you want to reach"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="goalBalance" 
+                                           value="100000" min="1000" step="5000" required>
+                                    <small class="text-success" style="font-size: 0.7rem;">
+                                        Gain Needed: <span id="gainNeeded">+900%</span>
+                                    </small>
+                                </div>
+
+                                <hr class="my-3" style="border-color: var(--border-accent); opacity: 0.3;">
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-percentage"></i> Win Rate (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Your historical win percentage"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="winRate" 
+                                           value="60" min="1" max="99" step="1" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-arrow-up text-success"></i> Average Win (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Average return per winning trade"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="avgWin" 
+                                           value="3" min="0.1" step="0.1" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-arrow-down text-danger"></i> Average Loss (%)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Average loss per losing trade"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="avgLoss" 
+                                           value="2" min="0.1" step="0.1" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-calendar-day"></i> Trades Per Day
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Average number of trades per trading day"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="tradesPerDay" 
+                                           value="3" min="1" max="50" step="1" required>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>
+                                        <i class="fas fa-dollar-sign text-info"></i> Monthly Deposit ($)
+                                        <i class="fas fa-info-circle text-muted" style="font-size: 0.7rem; cursor: help;" 
+                                           title="Additional capital added each month"></i>
+                                    </label>
+                                    <input type="number" class="form-control form-control-sm" id="monthlyDeposit" 
+                                           value="0" min="0" step="100">
+                                </div>
+
+                                <hr class="my-3" style="border-color: var(--border-accent); opacity: 0.3;">
+                                
+                                <!-- Quick Stats -->
+                                <div class="alert alert-info p-2 mb-0" style="font-size: 0.75rem;">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Expected Return/Trade:</span>
+                                        <strong id="expectedReturn" class="text-success">+0.6%</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Daily Expected Return:</span>
+                                        <strong id="dailyReturn">+1.8%</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Monthly Expected Return:</span>
+                                        <strong id="monthlyReturn">~40%</strong>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-8 col-lg-7">
+                    <!-- Key Metrics Cards -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <div class="card metric-card border-success">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Time to Goal</div>
+                                    <div class="metric-value text-success" id="timeToGoal">6.2 months</div>
+                                    <small class="text-muted">Expected timeline</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-info">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Trades Needed</div>
+                                    <div class="metric-value text-info" id="tradesNeeded">560</div>
+                                    <small class="text-muted">Approximate</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-warning">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Trading Days</div>
+                                    <div class="metric-value text-warning" id="tradingDays">187</div>
+                                    <small class="text-muted">Approximate</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card metric-card border-primary">
+                                <div class="card-body text-center">
+                                    <div class="metric-label">Target Date</div>
+                                    <div class="metric-value text-primary" id="targetDate" style="font-size: 1rem;">May 2026</div>
+                                    <small class="text-muted">Estimated</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Chart -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line"></i> Projected Path to Goal
+                        </div>
+                        <div class="card-body">
+                            <canvas id="goalChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Milestone Breakdown -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-list-check"></i> Milestone Breakdown
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-dark table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Milestone</th>
+                                        <th class="text-end">Balance</th>
+                                        <th class="text-end">Trades</th>
+                                        <th class="text-end">Days</th>
+                                        <th class="text-end">Est. Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="milestonesTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Calculating milestones...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<script>
+    let goalChart = null;
+    
+    // Real-time calculation function
+    function calculate() {
+        const currentBalance = parseFloat(document.getElementById('currentBalance').value) || 0;
+        const goalBalance = parseFloat(document.getElementById('goalBalance').value) || 0;
+        const winRate = parseFloat(document.getElementById('winRate').value) / 100 || 0;
+        const avgWin = parseFloat(document.getElementById('avgWin').value) / 100 || 0;
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value) / 100 || 0;
+        const tradesPerDay = parseInt(document.getElementById('tradesPerDay').value) || 1;
+        const monthlyDeposit = parseFloat(document.getElementById('monthlyDeposit').value) || 0;
+        
+        if (!currentBalance || !goalBalance) return;
+        
+        // Calculate gain needed
+        const gainNeededPercent = ((goalBalance - currentBalance) / currentBalance) * 100;
+        document.getElementById('gainNeeded').textContent = '+' + gainNeededPercent.toFixed(0) + '%';
+        
+        // Calculate expected return per trade
+        const lossRate = 1 - winRate;
+        const expectedReturnPerTrade = (winRate * avgWin) - (lossRate * avgLoss);
+        const dailyReturn = expectedReturnPerTrade * tradesPerDay;
+        const monthlyReturnApprox = Math.pow(1 + expectedReturnPerTrade, tradesPerDay * 20) - 1; // ~20 trading days/month
+        
+        document.getElementById('expectedReturn').textContent = (expectedReturnPerTrade >= 0 ? '+' : '') + 
+            (expectedReturnPerTrade * 100).toFixed(2) + '%';
+        document.getElementById('expectedReturn').className = expectedReturnPerTrade >= 0 ? 'text-success' : 'text-danger';
+        document.getElementById('dailyReturn').textContent = (dailyReturn >= 0 ? '+' : '') + 
+            (dailyReturn * 100).toFixed(1) + '%';
+        document.getElementById('monthlyReturn').textContent = '~' + (monthlyReturnApprox * 100).toFixed(0) + '%';
+        
+        // Simulate trading to goal
+        let balance = currentBalance;
+        let totalTrades = 0;
+        let months = 0;
+        const pathData = [{ trades: 0, balance: balance, months: 0 }];
+        const maxTrades = 10000; // Safety limit
+        const tradesPerMonth = tradesPerDay * 20; // Approximate
+        
+        if (expectedReturnPerTrade > 0) {
+            while (balance < goalBalance && totalTrades < maxTrades) {
+                // Simulate one trade
+                balance *= (1 + expectedReturnPerTrade);
+                totalTrades++;
+                
+                // Add monthly deposit every ~20 trading days
+                if (totalTrades % tradesPerMonth === 0) {
+                    balance += monthlyDeposit;
+                    months++;
+                }
+                
+                // Record path every 10 trades
+                if (totalTrades % 10 === 0 || balance >= goalBalance) {
+                    pathData.push({
+                        trades: totalTrades,
+                        balance: balance,
+                        months: months + (totalTrades % tradesPerMonth) / tradesPerMonth
+                    });
+                }
+            }
+        }
+        
+        const tradingDays = Math.ceil(totalTrades / tradesPerDay);
+        const monthsNeeded = tradingDays / 20; // ~20 trading days per month
+        
+        // Calculate target date
+        const today = new Date();
+        const targetDate = new Date(today);
+        targetDate.setMonth(targetDate.getMonth() + Math.ceil(monthsNeeded));
+        const targetDateStr = targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        
+        // Update metrics
+        document.getElementById('timeToGoal').textContent = monthsNeeded < 12 ? 
+            monthsNeeded.toFixed(1) + ' months' : 
+            (monthsNeeded / 12).toFixed(1) + ' years';
+        document.getElementById('tradesNeeded').textContent = totalTrades.toLocaleString();
+        document.getElementById('tradingDays').textContent = tradingDays.toLocaleString();
+        document.getElementById('targetDate').textContent = targetDateStr;
+        
+        // Update chart
+        updateGoalChart(pathData, goalBalance);
+        
+        // Update milestones table
+        updateMilestonesTable(currentBalance, goalBalance, pathData, tradesPerDay);
+    }
+    
+    function updateGoalChart(pathData, goalBalance) {
+        const canvas = document.getElementById('goalChart');
+        const ctx = canvas.getContext('2d');
+        
+        const chartData = pathData.map(p => ({ x: p.trades, y: p.balance }));
+        const maxTrades = pathData[pathData.length - 1].trades;
+        
+        // Destroy existing chart
+        if (goalChart) {
+            goalChart.destroy();
+        }
+        
+        // Create new chart
+        goalChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'Account Balance',
+                        data: chartData,
+                        borderColor: '#00b0ff',
+                        backgroundColor: 'rgba(0, 176, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Goal',
+                        data: [
+                            { x: 0, y: goalBalance },
+                            { x: maxTrades, y: goalBalance }
+                        ],
+                        borderColor: '#00ff88',
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#9ba1a6',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 25, 34, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#9ba1a6',
+                        borderColor: '#00b0ff',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return 'Balance: $' + context.parsed.y.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                }
+                                return context.dataset.label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Number of Trades',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#9ba1a6' }
+                    },
+                    y: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Account Balance ($)',
+                            color: '#9ba1a6',
+                            font: { size: 13, weight: '600' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#9ba1a6',
+                            callback: function(value) {
+                                return '$' + (value / 1000).toFixed(0) + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function updateMilestonesTable(startBalance, goalBalance, pathData, tradesPerDay) {
+        const tbody = document.getElementById('milestonesTableBody');
+        
+        // Generate milestones at key percentages
+        const milestones = [];
+        const range = goalBalance - startBalance;
+        const percentages = [25, 50, 75, 90, 100];
+        
+        percentages.forEach(pct => {
+            const targetBalance = startBalance + (range * pct / 100);
+            
+            // Find closest path data point
+            let closestPoint = pathData[0];
+            for (const point of pathData) {
+                if (point.balance >= targetBalance) {
+                    closestPoint = point;
+                    break;
+                }
+            }
+            
+            const days = Math.ceil(closestPoint.trades / tradesPerDay);
+            const today = new Date();
+            const estDate = new Date(today);
+            estDate.setDate(estDate.getDate() + days);
+            
+            milestones.push({
+                name: pct + '% Complete',
+                balance: targetBalance,
+                trades: closestPoint.trades,
+                days: days,
+                date: estDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            });
+        });
+        
+        let rows = '';
+        milestones.forEach((milestone, index) => {
+            const rowClass = index === milestones.length - 1 ? 'table-success' : '';
+            const icon = index === milestones.length - 1 ? 
+                '<i class="fas fa-flag-checkered text-success"></i> ' : 
+                '<i class="fas fa-flag"></i> ';
+            
+            rows += `
+                <tr class="${rowClass}">
+                    <td>${icon}${milestone.name}</td>
+                    <td class="text-end"><strong>$${milestone.balance.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</strong></td>
+                    <td class="text-end">${milestone.trades.toLocaleString()}</td>
+                    <td class="text-end">${milestone.days.toLocaleString()}</td>
+                    <td class="text-end">${milestone.date}</td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = rows;
+    }
+    
+    // Add real-time updates to all inputs
+    ['currentBalance', 'goalBalance', 'winRate', 'avgWin', 'avgLoss', 'tradesPerDay', 'monthlyDeposit'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
+    });
+    
+    // Prevent form submission
+    document.getElementById('goalForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculate();
+    });
+    
+    // Initial calculation
+    calculate();
+</script>

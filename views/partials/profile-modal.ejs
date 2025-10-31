@@ -1,0 +1,489 @@
+<!-- Profile Setup Modal -->
+<div class="modal fade" id="profileSetupModal" tabindex="-1" aria-labelledby="profileSetupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="background: linear-gradient(135deg, #1a1f25 0%, #24292e 100%); border: 1px solid rgba(214, 139, 69, 0.3);">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(214, 139, 69, 0.2);">
+                <h5 class="modal-title" id="profileSetupModalLabel" style="color: #d68b45; font-weight: 700;">
+                    <i class="fas fa-user-circle me-2"></i>
+                    <span id="profileModalTitle">Set Up Your Trading Profile</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Welcome Message -->
+                <div id="welcomeMessage" class="alert" style="background: rgba(0, 176, 255, 0.1); border: 1px solid rgba(0, 176, 255, 0.3); color: #00b0ff;">
+                    <h6 style="color: #00b0ff; font-weight: 700; margin-bottom: 0.5rem;">
+                        <i class="fas fa-info-circle me-2"></i>Personalize Your Experience
+                    </h6>
+                    <p style="margin-bottom: 0; font-size: 0.9rem;">
+                        Save your trading metrics once and all calculators will auto-fill with your data. 
+                        <strong>100% private</strong> - stored only in your browser, never sent to any server.
+                    </p>
+                </div>
+                
+                <!-- Profile Completeness Progress -->
+                <div id="profileProgress" class="mb-4" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span style="color: #9ba1a6; font-size: 0.85rem;">Profile Completeness</span>
+                        <span id="progressPercent" style="color: #00ff88; font-weight: 700;">0%</span>
+                    </div>
+                    <div class="progress" style="height: 8px; background: rgba(255,255,255,0.1);">
+                        <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%; background: linear-gradient(90deg, #00b0ff 0%, #00ff88 100%);"></div>
+                    </div>
+                </div>
+                
+                <!-- Profile Form -->
+                <form id="profileForm">
+                    <!-- Account Info Section -->
+                    <div class="mb-4">
+                        <h6 style="color: #d68b45; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(214, 139, 69, 0.2);">
+                            <i class="fas fa-wallet me-2"></i>Account Information
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="profileAccountSize" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Account Size ($)
+                                    <i class="fas fa-info-circle ms-1" style="font-size: 0.7rem; cursor: help;" 
+                                       title="Your current trading account balance"></i>
+                                </label>
+                                <input type="number" class="form-control" id="profileAccountSize" min="0" step="100" placeholder="10000">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="profileRiskPercent" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Risk Per Trade (%)
+                                    <i class="fas fa-info-circle ms-1" style="font-size: 0.7rem; cursor: help;" 
+                                       title="Percentage of account you risk on each trade (1-2% recommended)"></i>
+                                </label>
+                                <input type="number" class="form-control" id="profileRiskPercent" min="0.1" max="10" step="0.1" value="2">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Metrics Section -->
+                    <div class="mb-4">
+                        <h6 style="color: #d68b45; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(214, 139, 69, 0.2);">
+                            <i class="fas fa-chart-line me-2"></i>Performance Metrics
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="profileWinRate" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Win Rate (%)
+                                </label>
+                                <input type="number" class="form-control" id="profileWinRate" min="0" max="100" step="1" placeholder="55">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="profileAvgWin" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Avg Win ($)
+                                </label>
+                                <input type="number" class="form-control" id="profileAvgWin" min="0" step="10" placeholder="300">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="profileAvgLoss" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Avg Loss ($)
+                                </label>
+                                <input type="number" class="form-control" id="profileAvgLoss" min="0" step="10" placeholder="150">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="profileTotalTrades" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Total Trades (Sample Size)
+                                </label>
+                                <input type="number" class="form-control" id="profileTotalTrades" min="0" step="1" placeholder="50">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="profileTradesPerDay" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Trades Per Day
+                                </label>
+                                <input type="number" class="form-control" id="profileTradesPerDay" min="0" step="0.5" placeholder="2">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Trading Style Section -->
+                    <div class="mb-4">
+                        <h6 style="color: #d68b45; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(214, 139, 69, 0.2);">
+                            <i class="fas fa-bullseye me-2"></i>Trading Style
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="profileTradingStyle" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Trading Style
+                                </label>
+                                <select class="form-select" id="profileTradingStyle">
+                                    <option value="">Select style...</option>
+                                    <option value="scalper">Scalper (10-50+ trades/day)</option>
+                                    <option value="day">Day Trader (1-10 trades/day)</option>
+                                    <option value="swing">Swing Trader (2-5 trades/week)</option>
+                                    <option value="position">Position Trader (1-2 trades/month)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="profileRiskProfile" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Risk Profile
+                                </label>
+                                <select class="form-select" id="profileRiskProfile">
+                                    <option value="conservative" selected>Conservative (1-2% risk)</option>
+                                    <option value="moderate">Moderate (2-3% risk)</option>
+                                    <option value="aggressive">Aggressive (3-5% risk)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Goals Section -->
+                    <div class="mb-4">
+                        <h6 style="color: #d68b45; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(214, 139, 69, 0.2);">
+                            <i class="fas fa-flag-checkered me-2"></i>Goals (Optional)
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="profileTargetReturn" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Target Monthly Return (%)
+                                </label>
+                                <input type="number" class="form-control" id="profileTargetReturn" min="0" step="1" placeholder="5">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="profileAccountGoal" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Account Goal ($)
+                                </label>
+                                <input type="number" class="form-control" id="profileAccountGoal" min="0" step="1000" placeholder="50000">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="profileTimeHorizon" class="form-label" style="color: #9ba1a6; font-size: 0.85rem;">
+                                    Time Horizon (months)
+                                </label>
+                                <input type="number" class="form-control" id="profileTimeHorizon" min="1" step="1" placeholder="12">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Privacy Notice -->
+                    <div class="alert" style="background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.2);">
+                        <div style="display: flex; align-items: start; gap: 0.75rem;">
+                            <i class="fas fa-lock" style="color: #00ff88; margin-top: 0.1rem;"></i>
+                            <div style="flex: 1;">
+                                <h6 style="color: #00ff88; font-weight: 700; margin-bottom: 0.25rem; font-size: 0.85rem;">
+                                    100% Private & Secure
+                                </h6>
+                                <p style="color: #9ba1a6; margin-bottom: 0; font-size: 0.8rem;">
+                                    All data stored locally in your browser using localStorage. Never sent to any server. 
+                                    No cookies, no tracking, no accounts required. Delete anytime from browser settings.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer" style="border-top: 1px solid rgba(214, 139, 69, 0.2); gap: 0.5rem;">
+                <button type="button" class="btn btn-outline-secondary" id="skipProfileBtn" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Skip For Now
+                </button>
+                <button type="button" class="btn btn-outline-danger" id="resetProfileBtn" style="display: none;">
+                    <i class="fas fa-trash me-2"></i>Reset Profile
+                </button>
+                <button type="button" class="btn btn-primary" id="saveProfileBtn" style="background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%); border: none;">
+                    <i class="fas fa-save me-2"></i>Save Profile
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/personalization.js"></script>
+<script>
+// Profile Setup & Management
+(function() {
+    let modal = null;
+    const form = document.getElementById('profileSetupModal') ? document.getElementById('profileForm') : null;
+    const profileWidgetContainer = document.getElementById('headerProfileWidget');
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializeProfile);
+    
+    function initializeProfile() {
+        // Wait for Bootstrap to be available
+        if (typeof bootstrap === 'undefined') {
+            console.log('Waiting for Bootstrap to load...');
+            setTimeout(initializeProfile, 100);
+            return;
+        }
+        
+        // Initialize modal after Bootstrap is loaded
+        const modalEl = document.getElementById('profileSetupModal');
+        if (modalEl) {
+            modal = new bootstrap.Modal(modalEl);
+        }
+        
+        const profile = PersonalizationEngine.loadProfile();
+        
+        console.log('Personalization Engine initialized', {
+            isComplete: PersonalizationEngine.isProfileComplete(),
+            profile: profile
+        });
+        
+        // Show profile widget if profile exists
+        if (PersonalizationEngine.isProfileComplete()) {
+            createProfileWidget();
+            showProfileWidget(profile);
+            prefillCalculatorWithProfile();
+        } else {
+            // Show setup button for first-time users
+            createSetupButton();
+            // Show setup modal on first visit
+            if (profile.showWelcome !== false) {
+                setTimeout(() => modal.show(), 1000);
+            }
+        }
+        
+        // Update progress if modal is open
+        updateProfileProgress();
+        
+        // Populate form with existing data
+        populateForm(profile);
+    }
+    
+    function createSetupButton() {
+        profileWidgetContainer.innerHTML = `
+            <button class="btn btn-sm" type="button" id="setupProfileBtn"
+                    style="background: rgba(214, 139, 69, 0.1); border: 1px solid rgba(214, 139, 69, 0.3); color: #d68b45;">
+                <i class="fas fa-user-plus me-2"></i>Set Up Profile
+            </button>
+        `;
+        document.getElementById('setupProfileBtn').addEventListener('click', function() {
+            modal.show();
+        });
+    }
+    
+    function createProfileWidget() {
+        profileWidgetContainer.innerHTML = `
+            <div class="dropdown">
+                <button class="btn btn-sm dropdown-toggle" type="button" id="profileDropdown" 
+                        data-bs-toggle="dropdown" aria-expanded="false"
+                        style="background: rgba(214, 139, 69, 0.1); border: 1px solid rgba(214, 139, 69, 0.3); color: #d68b45;">
+                    <i class="fas fa-user-circle me-2"></i>
+                    <span id="profileUsername">My Profile</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown" 
+                    style="background: linear-gradient(135deg, #1a1f25 0%, #24292e 100%); border: 1px solid rgba(214, 139, 69, 0.3); min-width: 280px;">
+                    
+                    <!-- Profile Quick Stats -->
+                    <li class="px-3 py-2" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                            <div style="flex: 1;">
+                                <div style="color: #9ba1a6; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Account Size</div>
+                                <div style="color: #00ff88; font-size: 1.1rem; font-weight: 700;" id="quickAccountSize">-</div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="color: #9ba1a6; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Win Rate</div>
+                                <div style="color: #00b0ff; font-size: 1.1rem; font-weight: 700;" id="quickWinRate">-</div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Risk Profile Badge -->
+                    <li class="px-3 py-2" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i id="riskProfileIcon" class="fas fa-shield-alt" style="color: #00ff88;"></i>
+                            <div style="flex: 1;">
+                                <div style="color: #9ba1a6; font-size: 0.7rem;">Risk Profile</div>
+                                <div style="color: #fff; font-size: 0.9rem; font-weight: 600;" id="quickRiskProfile">Conservative</div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Recommendations Count -->
+                    <li class="px-3 py-2" id="recommendationsItem" style="border-bottom: 1px solid rgba(255,255,255,0.1); display: none;">
+                        <a href="#" style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem;" id="viewRecommendations">
+                            <i class="fas fa-lightbulb" style="color: #d68b45;"></i>
+                            <div style="flex: 1;">
+                                <div style="color: #d68b45; font-size: 0.9rem; font-weight: 600;">
+                                    <span id="recommendationsCount">0</span> Recommendations
+                                </div>
+                                <div style="color: #9ba1a6; font-size: 0.75rem;">Click to view</div>
+                            </div>
+                        </a>
+                    </li>
+                    
+                    <!-- Actions -->
+                    <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.1);"></li>
+                    <li>
+                        <a class="dropdown-item" href="#" id="editProfileBtn" style="color: #9ba1a6; font-size: 0.85rem;">
+                            <i class="fas fa-edit me-2" style="width: 20px;"></i>Edit Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" id="exportProfileBtn" style="color: #9ba1a6; font-size: 0.85rem;">
+                            <i class="fas fa-download me-2" style="width: 20px;"></i>Export Data
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" id="clearProfileBtn" style="color: #ff6b6b; font-size: 0.85rem;">
+                            <i class="fas fa-trash me-2" style="width: 20px;"></i>Clear Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        `;
+        
+        // Attach event listeners
+        document.getElementById('editProfileBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            const profile = PersonalizationEngine.loadProfile();
+            populateForm(profile);
+            modal.show();
+        });
+        
+        document.getElementById('exportProfileBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            PersonalizationEngine.exportProfile();
+            showToast('Profile Exported!', 'Your profile has been downloaded as JSON.', 'success');
+        });
+        
+        document.getElementById('clearProfileBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (PersonalizationEngine.resetProfile()) {
+                location.reload();
+            }
+        });
+    }
+    
+    function populateForm(profile) {
+        document.getElementById('profileAccountSize').value = profile.accountSize || '';
+        document.getElementById('profileRiskPercent').value = profile.riskPercentPerTrade || 2;
+        document.getElementById('profileWinRate').value = profile.winRate || '';
+        document.getElementById('profileAvgWin').value = profile.avgWin || '';
+        document.getElementById('profileAvgLoss').value = profile.avgLoss || '';
+        document.getElementById('profileTotalTrades').value = profile.totalTrades || '';
+        document.getElementById('profileTradesPerDay').value = profile.tradesPerDay || '';
+        document.getElementById('profileTradingStyle').value = profile.tradingStyle || '';
+        document.getElementById('profileRiskProfile').value = profile.riskProfile || 'conservative';
+        document.getElementById('profileTargetReturn').value = profile.targetMonthlyReturn || '';
+        document.getElementById('profileAccountGoal').value = profile.accountGoal || '';
+        document.getElementById('profileTimeHorizon').value = profile.timeHorizon || '';
+        
+        // Show reset button if profile exists
+        if (profile.createdAt) {
+            document.getElementById('resetProfileBtn').style.display = 'block';
+            document.getElementById('profileModalTitle').textContent = 'Edit Your Trading Profile';
+            document.getElementById('welcomeMessage').style.display = 'none';
+            document.getElementById('profileProgress').style.display = 'block';
+        }
+    }
+    
+    function updateProfileProgress() {
+        const percent = PersonalizationEngine.getProfileCompleteness();
+        document.getElementById('progressBar').style.width = percent + '%';
+        document.getElementById('progressPercent').textContent = percent + '%';
+    }
+    
+    // Save Profile
+    document.getElementById('saveProfileBtn').addEventListener('click', function() {
+        const profileData = {
+            accountSize: parseFloat(document.getElementById('profileAccountSize').value) || null,
+            riskPercentPerTrade: parseFloat(document.getElementById('profileRiskPercent').value) || 2,
+            winRate: parseFloat(document.getElementById('profileWinRate').value) || null,
+            avgWin: parseFloat(document.getElementById('profileAvgWin').value) || null,
+            avgLoss: parseFloat(document.getElementById('profileAvgLoss').value) || null,
+            totalTrades: parseInt(document.getElementById('profileTotalTrades').value) || 0,
+            tradesPerDay: parseFloat(document.getElementById('profileTradesPerDay').value) || null,
+            tradingStyle: document.getElementById('profileTradingStyle').value || null,
+            riskProfile: document.getElementById('profileRiskProfile').value || 'conservative',
+            targetMonthlyReturn: parseFloat(document.getElementById('profileTargetReturn').value) || null,
+            accountGoal: parseFloat(document.getElementById('profileAccountGoal').value) || null,
+            timeHorizon: parseInt(document.getElementById('profileTimeHorizon').value) || null,
+            showWelcome: false
+        };
+        
+        const saved = PersonalizationEngine.updateProfile(profileData);
+        if (saved) {
+            modal.hide();
+            showProfileWidget(saved);
+            prefillCalculatorWithProfile();
+            
+            // Show success toast
+            showToast('Profile Saved!', 'Your trading profile has been saved successfully.', 'success');
+        }
+    });
+    
+    // Skip Profile
+    document.getElementById('skipProfileBtn').addEventListener('click', function() {
+        PersonalizationEngine.updateProfile({ showWelcome: false });
+    });
+    
+    // Reset Profile
+    document.getElementById('resetProfileBtn').addEventListener('click', function() {
+        if (PersonalizationEngine.resetProfile()) {
+            modal.hide();
+            location.reload();
+        }
+    });
+    
+    
+    function showProfileWidget(profile) {
+        // Update quick stats
+        if (profile.accountSize) {
+            document.getElementById('quickAccountSize').textContent = '$' + profile.accountSize.toLocaleString();
+        }
+        if (profile.winRate) {
+            document.getElementById('quickWinRate').textContent = profile.winRate + '%';
+        }
+        
+        // Update risk profile
+        const riskInfo = PersonalizationEngine.getRiskProfileDescription(profile.riskProfile);
+        document.getElementById('quickRiskProfile').textContent = riskInfo.title;
+        document.getElementById('riskProfileIcon').className = 'fas ' + riskInfo.icon;
+        document.getElementById('riskProfileIcon').style.color = riskInfo.color;
+        
+        // Show recommendations
+        const recommendations = PersonalizationEngine.getRecommendations();
+        if (recommendations.length > 0) {
+            document.getElementById('recommendationsItem').style.display = 'block';
+            document.getElementById('recommendationsCount').textContent = recommendations.length;
+        }
+    }
+    
+    function prefillCalculatorWithProfile() {
+        // This will be called by individual calculator pages
+        window.dispatchEvent(new CustomEvent('profileLoaded'));
+    }
+    
+    function showToast(title, message, type = 'info') {
+        // Simple toast notification (can be enhanced)
+        const toast = document.createElement('div');
+        toast.className = 'position-fixed bottom-0 end-0 p-3';
+        toast.style.zIndex = '11';
+        toast.innerHTML = `
+            <div class="toast show" role="alert" style="background: linear-gradient(135deg, #1a1f25 0%, #24292e 100%); border: 1px solid rgba(214, 139, 69, 0.3);">
+                <div class="toast-header" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1); color: #d68b45;">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong class="me-auto">${title}</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body" style="color: #9ba1a6;">
+                    ${message}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
+    
+    // Listen for form inputs to update progress
+    form?.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('change', updateProfileProgress);
+    });
+})();
+</script>

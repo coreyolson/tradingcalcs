@@ -445,6 +445,36 @@
     accountBalanceInput.addEventListener('input', updateDisplay);
     maxHeatInput.addEventListener('input', updateDisplay);
 
-    // Initial display
+    // Auto-fill from profile if available
+    function autoFillFromProfile() {
+        if (typeof PersonalizationEngine !== 'undefined') {
+            const profile = PersonalizationEngine.loadProfile();
+            
+            if (profile.accountSize) {
+                accountBalanceInput.value = profile.accountSize;
+            }
+            if (profile.maxPortfolioHeat) {
+                maxHeatInput.value = profile.maxPortfolioHeat;
+            } else if (profile.riskProfile) {
+                // Set max heat based on risk profile
+                const heatLimits = {
+                    conservative: 8,
+                    moderate: 12,
+                    aggressive: 15
+                };
+                maxHeatInput.value = heatLimits[profile.riskProfile] || 8;
+            }
+            
+            // Track calculator usage
+            PersonalizationEngine.trackCalculatorUsage('Portfolio Heat');
+        }
+    }
+    
+    // Listen for profile updates
+    window.addEventListener('profileLoaded', autoFillFromProfile);
+    window.addEventListener('profileUpdated', autoFillFromProfile);
+    
+    // Initial auto-fill and display
+    autoFillFromProfile();
     updateDisplay();
 </script>

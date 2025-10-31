@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> - Copper Candle</title>
+    <meta name="description" content="<%= pageDescription %>">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/style.css">
+    
+    <style>
+        .formula-card {
+            background: linear-gradient(135deg, #1a1f25 0%, #24292e 100%);
+            border: 1px solid rgba(214, 139, 69, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .formula-card:hover {
+            border-color: rgba(214, 139, 69, 0.4);
+            box-shadow: 0 4px 12px rgba(214, 139, 69, 0.1);
+        }
+        
+        .formula-title {
+            color: #d68b45;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .formula-math {
+            background: rgba(0, 176, 255, 0.05);
+            border-left: 3px solid #00b0ff;
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #00ff88;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .formula-explanation {
+            color: #9ba1a6;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        
+        .variable-list {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .variable-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            align-items: baseline;
+        }
+        
+        .variable-symbol {
+            color: #00b0ff;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            min-width: 60px;
+        }
+        
+        .variable-description {
+            color: #9ba1a6;
+            flex: 1;
+        }
+        
+        .reference-badge {
+            display: inline-block;
+            background: rgba(214, 139, 69, 0.1);
+            border: 1px solid rgba(214, 139, 69, 0.3);
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            color: #d68b45;
+            margin: 0.25rem;
+            transition: all 0.2s ease;
+        }
+        
+        .reference-badge:hover {
+            background: rgba(214, 139, 69, 0.2);
+            border-color: rgba(214, 139, 69, 0.5);
+        }
+        
+        .category-header {
+            color: #00b0ff;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 176, 255, 0.2);
+        }
+        
+        .verification-box {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 176, 255, 0.05) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .verification-title {
+            color: #00ff88;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .example-box {
+            background: rgba(214, 139, 69, 0.05);
+            border-left: 3px solid #d68b45;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .example-title {
+            color: #d68b45;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header', { 
+        pageTitle, 
+        pageDescription, 
+        includeChartJs: false 
+    }) %>
+
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <!-- Sidebar Navigation -->
+                <div class="sticky-top" style="top: 100px;">
+                    <div class="card" style="background: linear-gradient(135deg, #1a1f25 0%, #24292e 100%); border: 1px solid rgba(214, 139, 69, 0.2);">
+                        <div class="card-body">
+                            <h6 style="color: #d68b45; font-weight: 700; margin-bottom: 1rem;">
+                                <i class="fas fa-list me-2"></i>Quick Navigation
+                            </h6>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+                                <li style="margin-bottom: 0.5rem;">
+                                    <a href="#position-sizing" style="color: #9ba1a6; text-decoration: none; transition: color 0.2s;">
+                                        <i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Position Sizing
+                                    </a>
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    <a href="#risk-management" style="color: #9ba1a6; text-decoration: none; transition: color 0.2s;">
+                                        <i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Risk Management
+                                    </a>
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    <a href="#performance" style="color: #9ba1a6; text-decoration: none; transition: color 0.2s;">
+                                        <i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Performance Metrics
+                                    </a>
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    <a href="#monte-carlo" style="color: #9ba1a6; text-decoration: none; transition: color 0.2s;">
+                                        <i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Monte Carlo Simulations
+                                    </a>
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    <a href="#growth" style="color: #9ba1a6; text-decoration: none; transition: color 0.2s;">
+                                        <i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Growth Calculators
+                                    </a>
+                                </li>
+                            </ul>
+                            
+                            <hr style="border-color: rgba(255,255,255,0.1); margin: 1.5rem 0;">
+                            
+                            <h6 style="color: #00ff88; font-weight: 700; margin-bottom: 1rem; font-size: 0.75rem;">
+                                <i class="fas fa-shield-alt me-2"></i>VERIFICATION
+                            </h6>
+                            <p style="color: #9ba1a6; font-size: 0.75rem; margin-bottom: 0;">
+                                All formulas are open-source and can be verified in our client-side JavaScript code.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <!-- Hero Section -->
+                <div class="text-center mb-5">
+                    <h1 class="display-4" style="color: #d68b45; font-weight: 700;">
+                        <i class="fas fa-book me-3"></i>Methodology & Formulas
+                    </h1>
+                    <p class="lead" style="color: #9ba1a6;">
+                        Transparent calculations backed by academic research and industry best practices.
+                    </p>
+                </div>
+
+                <!-- Position Sizing Category -->
+                <h2 id="position-sizing" class="category-header">
+                    <i class="fas fa-calculator me-2"></i>Position Sizing
+                </h2>
+
+                <!-- Kelly Criterion -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-balance-scale"></i>
+                        Kelly Criterion
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        The Kelly Criterion determines the optimal fraction of your capital to risk per trade to maximize long-term growth. Developed by John L. Kelly Jr. at Bell Labs in 1956, it balances growth rate against risk of ruin.
+                    </p>
+                    
+                    <div class="formula-math">
+                        f* = (bp - q) / b
+                    </div>
+                    
+                    <div class="variable-list">
+                        <div class="variable-item">
+                            <span class="variable-symbol">f*</span>
+                            <span class="variable-description">Optimal fraction of capital to risk (Kelly percentage)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">b</span>
+                            <span class="variable-description">Net odds received on the bet (avg win / avg loss)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">p</span>
+                            <span class="variable-description">Probability of winning (win rate as decimal)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">q</span>
+                            <span class="variable-description">Probability of losing (1 - p)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">
+                            <i class="fas fa-lightbulb me-2"></i>Example
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            If you have a 60% win rate with an average win of $300 and average loss of $150:<br>
+                            b = 300/150 = 2, p = 0.60, q = 0.40<br>
+                            f* = (2 × 0.60 - 0.40) / 2 = <strong style="color: #00ff88;">40%</strong>
+                        </p>
+                    </div>
+                    
+                    <div class="verification-box">
+                        <div class="verification-title">
+                            <i class="fas fa-check-circle"></i>
+                            How to Verify
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0.5rem;">
+                            1. Open browser DevTools (F12)<br>
+                            2. View source code in <code>/public/calculations.js</code><br>
+                            3. Search for <code>calculateKellyCriterion()</code> function
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <span class="reference-badge">
+                            <i class="fas fa-book-open me-1"></i>
+                            Fortune's Formula (Poundstone, 2005)
+                        </span>
+                        <span class="reference-badge">
+                            <i class="fas fa-graduation-cap me-1"></i>
+                            Bell System Technical Journal (1956)
+                        </span>
+                        <span class="reference-badge">
+                            <i class="fas fa-chart-line me-1"></i>
+                            Ed Thorp - Beat the Dealer
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Fixed Percentage -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-percentage"></i>
+                        Fixed Percentage Position Sizing
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Risk a fixed percentage of your account on each trade. Simple, conservative, and widely used by institutional traders. Automatically scales position size with account growth or drawdown.
+                    </p>
+                    
+                    <div class="formula-math">
+                        Position Size = (Account Balance × Risk%) / Risk Per Share
+                    </div>
+                    
+                    <div class="variable-list">
+                        <div class="variable-item">
+                            <span class="variable-symbol">Risk%</span>
+                            <span class="variable-description">Percentage of account to risk (typically 1-2%)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">Risk/Share</span>
+                            <span class="variable-description">Entry price - stop loss price</span>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">
+                            <i class="fas fa-lightbulb me-2"></i>Example
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            $10,000 account, 2% risk, entry at $50, stop at $48 (risk $2/share):<br>
+                            Position Size = ($10,000 × 0.02) / $2 = <strong style="color: #00ff88;">100 shares</strong><br>
+                            Total Position Value = 100 × $50 = <strong style="color: #00ff88;">$5,000</strong>
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <span class="reference-badge">
+                            <i class="fas fa-book-open me-1"></i>
+                            Van K. Tharp - Trade Your Way to Financial Freedom
+                        </span>
+                        <span class="reference-badge">
+                            <i class="fas fa-university me-1"></i>
+                            Ryan Jones - The Trading Game
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Risk Management Category -->
+                <h2 id="risk-management" class="category-header">
+                    <i class="fas fa-shield-alt me-2"></i>Risk Management
+                </h2>
+
+                <!-- Risk of Ruin -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Risk of Ruin
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Probability of losing your entire trading account. Critical for understanding long-term survival. Based on Ralph Vince's work in portfolio mathematics.
+                    </p>
+                    
+                    <div class="formula-math">
+                        RoR = ((1 - W) / (1 + W))^(A / U)
+                    </div>
+                    
+                    <div class="variable-list">
+                        <div class="variable-item">
+                            <span class="variable-symbol">RoR</span>
+                            <span class="variable-description">Risk of Ruin (probability as decimal)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">W</span>
+                            <span class="variable-description">Winning advantage (win rate - loss rate)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">A</span>
+                            <span class="variable-description">Account size in units</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">U</span>
+                            <span class="variable-description">Average number of units risked per trade</span>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-box">
+                        <div class="verification-title">
+                            <i class="fas fa-check-circle"></i>
+                            Implementation Note
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            We use Monte Carlo simulation (10,000 iterations) to calculate practical risk of ruin by simulating random trade sequences based on your win rate and average win/loss.
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <span class="reference-badge">
+                            <i class="fas fa-book-open me-1"></i>
+                            Ralph Vince - Portfolio Mathematics
+                        </span>
+                        <span class="reference-badge">
+                            <i class="fas fa-chart-line me-1"></i>
+                            Optimal f Theory
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Portfolio Heat -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-fire"></i>
+                        Portfolio Heat
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Total risk across all open positions as a percentage of account. Prevents over-leveraging by tracking cumulative exposure.
+                    </p>
+                    
+                    <div class="formula-math">
+                        Heat = Σ(Position Risk) / Account Balance × 100
+                    </div>
+                    
+                    <div class="variable-list">
+                        <div class="variable-item">
+                            <span class="variable-symbol">Position Risk</span>
+                            <span class="variable-description">Shares × (Entry - Stop Loss)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">Σ</span>
+                            <span class="variable-description">Sum of all open positions</span>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">
+                            <i class="fas fa-lightbulb me-2"></i>Recommended Limits
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            <strong style="color: #00ff88;">Conservative:</strong> 6-8% total portfolio heat<br>
+                            <strong style="color: #d68b45;">Moderate:</strong> 8-12% total portfolio heat<br>
+                            <strong style="color: #ff6b6b;">Aggressive:</strong> 12-15% total portfolio heat (not recommended)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics Category -->
+                <h2 id="performance" class="category-header">
+                    <i class="fas fa-chart-line me-2"></i>Performance Metrics
+                </h2>
+
+                <!-- Trade Expectancy -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Trade Expectancy (Expected Value)
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Average amount you expect to win or lose per trade over many trades. Positive expectancy is essential for long-term profitability.
+                    </p>
+                    
+                    <div class="formula-math">
+                        E = (Win Rate × Avg Win) - (Loss Rate × Avg Loss)
+                    </div>
+                    
+                    <div class="variable-list">
+                        <div class="variable-item">
+                            <span class="variable-symbol">E</span>
+                            <span class="variable-description">Expected value per trade</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">Win Rate</span>
+                            <span class="variable-description">Winning trades / total trades (as decimal)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">Avg Win</span>
+                            <span class="variable-description">Average profit on winning trades</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">Avg Loss</span>
+                            <span class="variable-description">Average loss on losing trades (positive number)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">
+                            <i class="fas fa-lightbulb me-2"></i>Example
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            55% win rate, $400 avg win, $200 avg loss:<br>
+                            E = (0.55 × $400) - (0.45 × $200) = $220 - $90 = <strong style="color: #00ff88;">$130 per trade</strong>
+                        </p>
+                    </div>
+                    
+                    <div class="verification-box">
+                        <div class="verification-title">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Sample Size Warning
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            Minimum 30 trades recommended for statistical significance. Results with fewer trades may not be reliable.
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <span class="reference-badge">
+                            <i class="fas fa-book-open me-1"></i>
+                            Van K. Tharp - Super Trader
+                        </span>
+                        <span class="reference-badge">
+                            <i class="fas fa-calculator me-1"></i>
+                            Mark Douglas - Trading in the Zone
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Sharpe Ratio -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-trophy"></i>
+                        Sharpe Ratio
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Risk-adjusted return measure developed by Nobel laureate William Sharpe. Measures excess return per unit of risk (volatility).
+                    </p>
+                    
+                    <div class="formula-math">
+                        Sharpe = (R - Rf) / σ
+                    </div>
+                    
+                    <div class="variable-list">
+                        <div class="variable-item">
+                            <span class="variable-symbol">R</span>
+                            <span class="variable-description">Average return (annualized)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">Rf</span>
+                            <span class="variable-description">Risk-free rate (typically 3-5% annually)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">σ</span>
+                            <span class="variable-description">Standard deviation of returns (volatility)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">
+                            <i class="fas fa-lightbulb me-2"></i>Interpretation
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            <strong style="color: #ff6b6b;">&lt; 1.0:</strong> Poor risk-adjusted returns<br>
+                            <strong style="color: #d68b45;">1.0 - 2.0:</strong> Good risk-adjusted returns<br>
+                            <strong style="color: #00ff88;">&gt; 2.0:</strong> Excellent risk-adjusted returns<br>
+                            <strong style="color: #00b0ff;">&gt; 3.0:</strong> Exceptional (institutional grade)
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <span class="reference-badge">
+                            <i class="fas fa-graduation-cap me-1"></i>
+                            William Sharpe - Nobel Prize (1990)
+                        </span>
+                        <span class="reference-badge">
+                            <i class="fas fa-book-open me-1"></i>
+                            Portfolio Theory & Capital Markets
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Breakeven Calculator -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-balance-scale-right"></i>
+                        Breakeven Win Rate
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Minimum win rate required to break even given your average win/loss ratio. Critical for evaluating if your strategy is profitable.
+                    </p>
+                    
+                    <div class="formula-math">
+                        Breakeven % = Avg Loss / (Avg Win + Avg Loss)
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">
+                            <i class="fas fa-lightbulb me-2"></i>Example
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            If avg win = $300, avg loss = $100:<br>
+                            Breakeven = $100 / ($300 + $100) = <strong style="color: #00ff88;">25%</strong><br>
+                            You need to win at least 25% of trades to break even.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Monte Carlo Category -->
+                <h2 id="monte-carlo" class="category-header">
+                    <i class="fas fa-dice me-2"></i>Monte Carlo Simulations
+                </h2>
+
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-random"></i>
+                        Monte Carlo Methodology
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        We use Monte Carlo simulation to model thousands of possible future outcomes based on your trading statistics. This provides probabilistic estimates rather than deterministic predictions.
+                    </p>
+                    
+                    <div class="verification-box">
+                        <div class="verification-title">
+                            <i class="fas fa-cogs"></i>
+                            Implementation Details
+                        </div>
+                        <div style="color: #9ba1a6;">
+                            <p><strong>Number of Simulations:</strong> 10,000 random paths</p>
+                            <p><strong>Random Walk:</strong> Each trade outcome (win/loss) randomly selected based on your win rate</p>
+                            <p><strong>Win Amount:</strong> Normally distributed around your average win (σ = 20% of mean)</p>
+                            <p><strong>Loss Amount:</strong> Normally distributed around your average loss (σ = 20% of mean)</p>
+                            <p style="margin-bottom: 0;"><strong>Output:</strong> Distribution of final account balances, median outcome, percentile ranges (10th, 25th, 75th, 90th)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">
+                            <i class="fas fa-lightbulb me-2"></i>Why Monte Carlo?
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            Real trading results vary due to randomness. Monte Carlo shows the <em>range</em> of possible outcomes, not just the average. This helps you understand best-case, worst-case, and most-likely scenarios.
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <span class="reference-badge">
+                            <i class="fas fa-book-open me-1"></i>
+                            A Random Walk Down Wall Street (Malkiel)
+                        </span>
+                        <span class="reference-badge">
+                            <i class="fas fa-chart-area me-1"></i>
+                            Curtis Faith - Way of the Turtle
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Growth Calculators Category -->
+                <h2 id="growth" class="category-header">
+                    <i class="fas fa-seedling me-2"></i>Growth Calculators
+                </h2>
+
+                <!-- Compound Growth -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-chart-line"></i>
+                        Compound Growth Formula
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Calculate account growth with compounding returns over time. Uses geometric mean for accurate multi-period returns.
+                    </p>
+                    
+                    <div class="formula-math">
+                        Final = Initial × (1 + r)^t
+                    </div>
+                    
+                    <div class="variable-list">
+                        <div class="variable-item">
+                            <span class="variable-symbol">Initial</span>
+                            <span class="variable-description">Starting account balance</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">r</span>
+                            <span class="variable-description">Average return per period (as decimal)</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">t</span>
+                            <span class="variable-description">Number of periods</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawdown Recovery -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-medkit"></i>
+                        Drawdown Recovery
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Calculate the gain required to recover from a drawdown. Drawdowns are asymmetric: a 50% loss requires a 100% gain to recover.
+                    </p>
+                    
+                    <div class="formula-math">
+                        Required Gain = Drawdown / (1 - Drawdown)
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Asymmetric Recovery
+                        </div>
+                        <p style="color: #9ba1a6; margin-bottom: 0;">
+                            <strong>10% drawdown</strong> → requires <strong style="color: #00ff88;">11.1% gain</strong><br>
+                            <strong>25% drawdown</strong> → requires <strong style="color: #d68b45;">33.3% gain</strong><br>
+                            <strong>50% drawdown</strong> → requires <strong style="color: #ff6b6b;">100% gain</strong><br>
+                            This is why risk management is critical!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Time to Goal -->
+                <div class="formula-card">
+                    <div class="formula-title">
+                        <i class="fas fa-clock"></i>
+                        Time to Goal (Compound Interest)
+                    </div>
+                    
+                    <p class="formula-explanation">
+                        Calculate how long it takes to reach a financial goal with consistent returns and optional monthly contributions.
+                    </p>
+                    
+                    <div class="formula-math">
+                        t = ln(Goal / Initial) / ln(1 + r)
+                    </div>
+                    
+                    <div class="variable-list">
+                        <div class="variable-item">
+                            <span class="variable-symbol">t</span>
+                            <span class="variable-description">Time periods required</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">Goal</span>
+                            <span class="variable-description">Target account balance</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">Initial</span>
+                            <span class="variable-description">Starting account balance</span>
+                        </div>
+                        <div class="variable-item">
+                            <span class="variable-symbol">r</span>
+                            <span class="variable-description">Expected return per period</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="alert alert-warning mt-5" style="background: rgba(214, 139, 69, 0.1); border: 1px solid rgba(214, 139, 69, 0.3); color: #d68b45;">
+                    <h5 style="color: #d68b45; font-weight: 700;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Educational Use Only
+                    </h5>
+                    <p style="margin-bottom: 0;">
+                        These formulas are provided for educational purposes. Trading involves substantial risk of loss. Past performance does not guarantee future results. Always conduct your own research and consider consulting a financial advisor before making trading decisions.
+                    </p>
+                </div>
+
+                <!-- Open Source Section -->
+                <div class="card mt-4" style="background: linear-gradient(135deg, rgba(0, 176, 255, 0.05) 0%, rgba(0, 255, 136, 0.05) 100%); border: 1px solid rgba(0, 176, 255, 0.2);">
+                    <div class="card-body text-center">
+                        <h5 style="color: #00b0ff; font-weight: 700; margin-bottom: 1rem;">
+                            <i class="fas fa-code me-2"></i>100% Open Source
+                        </h5>
+                        <p style="color: #9ba1a6; margin-bottom: 1.5rem;">
+                            All calculations run in your browser. View the source code, verify the math, or contribute improvements.
+                        </p>
+                        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                            <a href="/public/calculations.js" class="btn btn-outline-primary" style="border-color: #00b0ff; color: #00b0ff;">
+                                <i class="fas fa-file-code me-2"></i>View calculations.js
+                            </a>
+                            <a href="https://github.com" class="btn btn-outline-success" style="border-color: #00ff88; color: #00ff88;" target="_blank">
+                                <i class="fab fa-github me-2"></i>GitHub (Coming Soon)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smooth Scrolling for Navigation -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
