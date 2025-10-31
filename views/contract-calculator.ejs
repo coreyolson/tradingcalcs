@@ -1,0 +1,219 @@
+<%- include('partials/header') %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                Contract Trading Calculator
+            </h1>
+            <p class="page-subtitle">Risk Analysis & Monte Carlo Simulation</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input Controls -->
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Parameters
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="calculatorForm">
+                                <div class="input-row">
+                                    <label>Account ($)</label>
+                                    <input type="number" class="form-control form-control-sm" id="accountSize" value="3125" min="100" step="100">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Risk (%)</label>
+                                    <input type="number" class="form-control form-control-sm" id="riskPercent" value="8" min="1" max="95" step="1">
+                                    <small class="text-warning" style="font-size: 0.7rem; display: none;" id="riskWarning">
+                                        <i class="fas fa-exclamation-triangle"></i> Risk capped at 95%
+                                    </small>
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Win Rate (%)</label>
+                                    <input type="number" class="form-control form-control-sm" id="winRate" value="80" min="1" max="100" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Avg Win (%)</label>
+                                    <input type="number" class="form-control form-control-sm" id="avgWin" value="50" min="1" max="10000" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Avg Loss (%)</label>
+                                    <input type="number" class="form-control form-control-sm" id="avgLoss" value="30" min="1" max="100" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Stop Loss (%)</label>
+                                    <input type="number" class="form-control form-control-sm" id="stopLoss" value="50" min="1" max="100" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Contract Price ($)</label>
+                                    <input type="number" class="form-control form-control-sm" id="contractPrice" value="1.00" min="0.01" max="100" step="0.01">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Commission ($)</label>
+                                    <input type="number" class="form-control form-control-sm" id="commission" value="0.65" min="0" max="10" step="0.01">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Trades/Day</label>
+                                    <input type="number" class="form-control form-control-sm" id="tradesPerDay" value="2" min="1" max="50" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Days</label>
+                                    <input type="number" class="form-control form-control-sm" id="days" value="30" min="1" max="500" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label>Simulations</label>
+                                    <input type="number" class="form-control form-control-sm" id="simulations" value="10000" min="1000" max="100000" step="1000">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mt-3" id="calculateBtn">
+                                    <i class="fas fa-calculator"></i> Calculate
+                                </button>
+                                <button type="button" class="btn btn-secondary w-100 mt-2" id="resetBtn">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </form>
+
+                            <!-- Presets -->
+                            <div class="mt-3">
+                                <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Presets</label>
+                                <div class="btn-group-vertical w-100" role="group">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" data-preset="conservative">Conservative</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" data-preset="moderate">Moderate</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" data-preset="aggressive">Aggressive</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-9 col-lg-8">
+                    <!-- Loading Indicator -->
+                    <div id="loadingIndicator" class="text-center py-5" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Running Monte Carlo simulations...</p>
+                    </div>
+
+                    <!-- Results Container -->
+                    <div id="resultsContainer" style="display: none;">
+                        <!-- Key Metrics Row -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card metric-card">
+                                    <div class="card-body">
+                                        <div class="metric-label">Expected Value</div>
+                                        <div class="metric-value" id="expectedValue">--</div>
+                                        <small class="text-muted">Per trade</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card metric-card">
+                                    <div class="card-body">
+                                        <div class="metric-label">Kelly Fraction</div>
+                                        <div class="metric-value" id="kellyFraction">--</div>
+                                        <small class="text-muted">Optimal bet size</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card metric-card">
+                                    <div class="card-body">
+                                        <div class="metric-label">Profit Factor</div>
+                                        <div class="metric-value" id="profitFactor">--</div>
+                                        <small class="text-muted">Wins/Losses</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card metric-card">
+                                    <div class="card-body">
+                                        <div class="metric-label">Sharpe Ratio</div>
+                                        <div class="metric-value" id="sharpeRatio">--</div>
+                                        <small class="text-muted">Risk-adjusted</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Monte Carlo Results -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <i class="fas fa-dice"></i> Monte Carlo Simulation Results
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <canvas id="monteCarloChart"></canvas>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table class="table table-sm table-dark">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Mean Ending Balance:</td>
+                                                    <td class="text-end" id="mcMean">--</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Median:</td>
+                                                    <td class="text-end" id="mcMedian">--</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>5th Percentile:</td>
+                                                    <td class="text-end" id="mc5th">--</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>95th Percentile:</td>
+                                                    <td class="text-end" id="mc95th">--</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Worst Case:</td>
+                                                    <td class="text-end" id="mcWorst">--</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Best Case:</td>
+                                                    <td class="text-end" id="mcBest">--</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ruin Probability:</td>
+                                                    <td class="text-end" id="mcRuin">--</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Projection -->
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-area"></i> Account Growth Projection
+                            </div>
+                            <div class="card-body">
+                                <canvas id="projectionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<!-- Include calculation functions -->
+<script src="/calculations.js"></script>
+<script src="/app.js"></script>

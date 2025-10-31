@@ -25,6 +25,10 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/style.css">
     
+    <% if (pageStyle) { %>
+        <%- pageStyle %>
+    <% } %>
+    
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

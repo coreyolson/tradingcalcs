@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copper Candle — Professional Trading Calculators</title>
+    <meta name="description" content="Measure your edge. Master your risk. Advanced Monte Carlo simulations and position sizing tools for disciplined traders.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/style.css">
+    
+    <style>
+        :root {
+            --copper: #d68b45;
+            --copper-glow: rgba(214, 139, 69, 0.4);
+            --blue-accent: #00b0ff;
+            --base-dark: #0a0f1a;
+            --card-dark: #141922;
+            --text-white: #eaeaea;
+            --text-muted: #9ba1a6;
+            --green-glow: #00ff88;
+            --cyan-glow: #00d4ff;
+            --amber-glow: #fca311;
+            --violet-glow: #a855f7;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--base-dark);
+            color: var(--text-white);
+            letter-spacing: 0.2px;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f3a 50%, #0a0f1a 100%);
+            background-size: 400% 400%;
+            animation: auroraShift 20s ease infinite;
+        }
+        
+        @keyframes auroraShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .candle-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 3rem;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .candle-flame {
+            fill: var(--copper);
+            filter: drop-shadow(0 0 20px var(--copper-glow));
+            animation: flicker 2s ease-in-out infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.8rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            margin-bottom: 3rem;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Calculator Cards */
+        .calculator-section {
+            padding: 5rem 0;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--copper);
+        }
+        
+        .calc-card {
+            background: var(--card-dark);
+            border: 1px solid rgba(0, 176, 255, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            height: 100%;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .calc-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--copper);
+            box-shadow: 0 10px 30px rgba(214, 139, 69, 0.3);
+        }
+        
+        .calc-card.live {
+            border-color: var(--green-glow);
+        }
+        
+        .calc-card.live:hover {
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+        
+        .calc-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .calc-card.live .calc-icon {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid var(--green-glow);
+            color: var(--green-glow);
+        }
+        
+        .calc-card:not(.live) .calc-icon {
+            background: rgba(214, 139, 69, 0.15);
+            border: 1px solid var(--copper);
+            color: var(--copper);
+        }
+        
+        .calc-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: 0.75rem;
+        }
+        
+        .calc-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .badge-live {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--green-glow);
+            color: #000;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-soon {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(156, 163, 175, 0.2);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        
+        .category-header i {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="aurora-bg"></div>
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <svg class="candle-icon" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="copper-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ffb86c;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#d68b45;stop-opacity:1" />
+                </linearGradient>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            <ellipse cx="50" cy="130" rx="20" ry="6" fill="url(#copper-gradient)" opacity="0.3"/>
+            <rect x="35" y="50" width="30" height="80" rx="2" fill="url(#copper-gradient)"/>
+            <ellipse cx="50" cy="50" rx="15" ry="5" fill="#ffb86c"/>
+            <path class="candle-flame" d="M 50 30 Q 45 40 50 50 Q 55 40 50 30 Z" fill="#fca311" filter="url(#glow)"/>
+            <path d="M 50 20 Q 47 30 50 35 Q 53 30 50 20 Z" fill="#ffeb3b" opacity="0.6">
+                <animate attributeName="opacity" values="0.6;0.3;0.6" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+        </svg>
+        
+        <h1 class="hero-title">Copper Candle</h1>
+        <p class="hero-subtitle">Light Your Edge</p>
+        
+        <div class="text-center mt-4">
+            <a href="#calculators" class="btn btn-lg" style="background: linear-gradient(135deg, #ffb86c, #fca311); border: none; color: #000; font-weight: 600; padding: 1rem 2.5rem;">
+                Explore Calculators
+                <i class="fas fa-arrow-down ms-2"></i>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Calculators Section -->
+    <section id="calculators" class="calculator-section">
+        <div class="container">
+            <!-- Risk & Position Management -->
+            <div class="mb-5">
+                <div class="category-header">
+                    <i class="fas fa-shield-alt" style="color: var(--copper);"></i>
+                    <h2 class="section-title mb-0">Risk & Position Management</h2>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/contract-calculator" class="calc-card live">
+                            <div class="calc-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3 class="calc-title">Contract Calculator</h3>
+                            <p class="calc-description">Monte Carlo simulations, Kelly Criterion, risk metrics, and account projections</p>
+                            <span class="badge-live">LIVE NOW</span>
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/position-sizer" class="calc-card live">
+                            <div class="calc-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h3 class="calc-title">Position Sizer</h3>
+                            <p class="calc-description">Kelly Criterion, fixed percentage, and risk-based position sizing methods</p>
+                            <span class="badge-live">LIVE NOW</span>
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <h3 class="calc-title">Portfolio Heat</h3>
+                            <p class="calc-description">Calculate total portfolio risk across multiple open positions</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <h3 class="calc-title">Risk/Reward Analyzer</h3>
+                            <p class="calc-description">Analyze trade setups with entry, stop loss, and target levels</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <h3 class="calc-title">Leverage Calculator</h3>
+                            <p class="calc-description">Calculate buying power, liquidation price, and margin requirements</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance & Expectancy -->
+            <div class="mb-5">
+                <div class="category-header">
+                    <i class="fas fa-chart-bar" style="color: var(--cyan-glow);"></i>
+                    <h2 class="section-title mb-0" style="color: var(--cyan-glow);">Performance & Expectancy</h2>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <h3 class="calc-title">Trade Expectancy</h3>
+                            <p class="calc-description">Calculate expected profit per trade and validate your trading edge</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-equals"></i>
+                            </div>
+                            <h3 class="calc-title">Breakeven Calculator</h3>
+                            <p class="calc-description">Calculate required win rate to breakeven given win/loss ratio</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <h3 class="calc-title">Win Rate Impact</h3>
+                            <p class="calc-description">Visualize how changes in win rate affect profitability</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <h3 class="calc-title">Sharpe Ratio</h3>
+                            <p class="calc-description">Calculate risk-adjusted returns and performance metrics</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Growth & Recovery -->
+            <div class="mb-5">
+                <div class="category-header">
+                    <i class="fas fa-rocket" style="color: var(--amber-glow);"></i>
+                    <h2 class="section-title mb-0" style="color: var(--amber-glow);">Growth & Recovery</h2>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <h3 class="calc-title">Compound Growth</h3>
+                            <p class="calc-description">Project account growth over time with compound returns</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <h3 class="calc-title">Drawdown Recovery</h3>
+                            <p class="calc-description">Calculate required return to recover from drawdowns</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-crosshairs"></i>
+                            </div>
+                            <h3 class="calc-title">Goal Calculator</h3>
+                            <p class="calc-description">Calculate timeframe to reach account goals</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Advanced Analysis -->
+            <div class="mb-5">
+                <div class="category-header">
+                    <i class="fas fa-brain" style="color: var(--violet-glow);"></i>
+                    <h2 class="section-title mb-0" style="color: var(--violet-glow);">Advanced Analysis</h2>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-dice"></i>
+                            </div>
+                            <h3 class="calc-title">Monte Carlo Suite</h3>
+                            <p class="calc-description">Advanced multi-scenario simulation and analysis</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="calc-card">
+                            <div class="calc-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3 class="calc-title">Edge Validator</h3>
+                            <p class="calc-description">Statistical validation of your trading edge</p>
+                            <span class="badge-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer style="background: linear-gradient(180deg, transparent 0%, #0a0f1a 100%); border-top: 1px solid rgba(0, 176, 255, 0.1); margin-top: 5rem; padding: 4rem 0 2rem;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <p style="color: #6c757d; font-size: 0.9rem; margin: 0;">
+                        © 2025 Copper Candle. All calculations run locally in your browser.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p style="color: #9ba1a6; font-size: 0.9rem; margin: 0;">
+                        <i class="fas fa-lock me-2" style="color: var(--green-glow);"></i>
+                        Privacy First • No Tracking • 100% Client-Side
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
