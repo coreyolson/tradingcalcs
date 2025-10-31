@@ -39,6 +39,14 @@ app.get('/position-sizer', (req, res) => {
     });
 });
 
+app.get('/portfolio-heat', (req, res) => {
+    res.render('portfolio-heat', {
+        title: 'Portfolio Heat',
+        description: 'Track total risk across multiple open positions and manage portfolio exposure.',
+        includeChartJs: true
+    });
+});
+
 // API endpoint for simulation
 app.post('/api/simulate', (req, res) => {
     const {

@@ -1,0 +1,433 @@
+<%- include('partials/header') %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-fire"></i>
+                Portfolio Heat Calculator
+            </h1>
+            <p class="page-subtitle">Track Total Risk Across Multiple Open Positions</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Account & Position Management -->
+                <div class="col-xl-4 col-lg-5">
+                    <!-- Account Settings -->
+                    <div class="card input-card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-wallet"></i> Account Settings
+                        </div>
+                        <div class="card-body compact-form">
+                            <div class="input-row">
+                                <label>Account Balance</label>
+                                <input type="number" class="form-control form-control-sm" id="accountBalance" value="100000" min="1000" step="1000">
+                            </div>
+                            <div class="input-row">
+                                <label>Max Portfolio Heat (%)</label>
+                                <input type="number" class="form-control form-control-sm" id="maxHeat" value="6" min="1" max="20" step="0.5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Position Form -->
+                    <div class="card input-card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-plus-circle"></i> Add Position
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="addPositionForm">
+                                <div class="input-row">
+                                    <label>Symbol</label>
+                                    <input type="text" class="form-control form-control-sm" id="symbol" placeholder="AAPL" required>
+                                </div>
+                                <div class="input-row">
+                                    <label>Entry Price</label>
+                                    <input type="number" class="form-control form-control-sm" id="entryPrice" placeholder="150.00" step="0.01" required>
+                                </div>
+                                <div class="input-row">
+                                    <label>Stop Loss</label>
+                                    <input type="number" class="form-control form-control-sm" id="stopLoss" placeholder="145.00" step="0.01" required>
+                                </div>
+                                <div class="input-row">
+                                    <label>Position Size (shares/contracts)</label>
+                                    <input type="number" class="form-control form-control-sm" id="positionSize" placeholder="100" min="1" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 mt-3">
+                                    <i class="fas fa-plus"></i> Add Position
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Open Positions List -->
+                    <div class="card input-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-list"></i> Open Positions</span>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="clearAllBtn">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="positionsList" class="position-list">
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <p class="mb-0">No open positions</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Heat Analysis -->
+                <div class="col-xl-8 col-lg-7">
+                    <!-- Heat Gauge -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-temperature-high"></i> Portfolio Heat
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="heat-gauge-container mb-4">
+                                <div class="heat-gauge">
+                                    <div class="heat-fill" id="heatFill"></div>
+                                </div>
+                                <div class="heat-percentage" id="heatPercentage">0%</div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="heat-stat">
+                                        <div class="stat-label">Current Heat</div>
+                                        <div class="stat-value" id="currentHeat">$0</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="heat-stat">
+                                        <div class="stat-label">Available Heat</div>
+                                        <div class="stat-value text-success" id="availableHeat">$0</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="heat-stat">
+                                        <div class="stat-label">Max Heat</div>
+                                        <div class="stat-value text-info" id="maxHeatDisplay">$0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Position Details Table -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-table"></i> Position Risk Breakdown
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-sm table-hover mb-0" id="positionsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th class="text-end">Entry</th>
+                                            <th class="text-end">Stop</th>
+                                            <th class="text-end">Size</th>
+                                            <th class="text-end">Risk $</th>
+                                            <th class="text-end">Heat %</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="positionsTableBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">No positions to display</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Analysis -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-pie"></i> Risk Analysis
+                        </div>
+                        <div class="card-body">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<style>
+    .position-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .position-item {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.2s;
+    }
+    
+    .position-item:hover {
+        background: rgba(255,255,255,0.02);
+    }
+    
+    .position-item:last-child {
+        border-bottom: none;
+    }
+    
+    .heat-gauge-container {
+        position: relative;
+        padding: 2rem 0;
+    }
+    
+    .heat-gauge {
+        height: 60px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 30px;
+        overflow: hidden;
+        position: relative;
+        border: 2px solid rgba(0,176,255,0.3);
+    }
+    
+    .heat-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #00ff88 0%, #fca311 50%, #ff4444 100%);
+        transition: width 0.5s ease;
+        width: 0%;
+    }
+    
+    .heat-percentage {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-top: 1rem;
+        background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .heat-stat {
+        padding: 1rem;
+        background: rgba(255,255,255,0.02);
+        border-radius: 8px;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        color: #9ba1a6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #eaeaea;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<script>
+    let positions = [];
+    let riskChart = null;
+
+    // DOM Elements
+    const accountBalanceInput = document.getElementById('accountBalance');
+    const maxHeatInput = document.getElementById('maxHeat');
+    const addPositionForm = document.getElementById('addPositionForm');
+    const positionsList = document.getElementById('positionsList');
+    const positionsTableBody = document.getElementById('positionsTableBody');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    
+    // Heat display elements
+    const heatFill = document.getElementById('heatFill');
+    const heatPercentage = document.getElementById('heatPercentage');
+    const currentHeat = document.getElementById('currentHeat');
+    const availableHeat = document.getElementById('availableHeat');
+    const maxHeatDisplay = document.getElementById('maxHeatDisplay');
+
+    // Add position handler
+    addPositionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const symbol = document.getElementById('symbol').value.toUpperCase();
+        const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+        const stopLoss = parseFloat(document.getElementById('stopLoss').value);
+        const positionSize = parseInt(document.getElementById('positionSize').value);
+        
+        const risk = Math.abs(entryPrice - stopLoss) * positionSize;
+        
+        positions.push({
+            id: Date.now(),
+            symbol,
+            entryPrice,
+            stopLoss,
+            positionSize,
+            risk
+        });
+        
+        addPositionForm.reset();
+        updateDisplay();
+    });
+
+    // Clear all positions
+    clearAllBtn.addEventListener('click', function() {
+        if (positions.length === 0) return;
+        if (confirm('Remove all positions?')) {
+            positions = [];
+            updateDisplay();
+        }
+    });
+
+    // Remove single position
+    function removePosition(id) {
+        positions = positions.filter(p => p.id !== id);
+        updateDisplay();
+    }
+
+    // Update all displays
+    function updateDisplay() {
+        const accountBalance = parseFloat(accountBalanceInput.value);
+        const maxHeatPercent = parseFloat(maxHeatInput.value) / 100;
+        const maxHeatDollar = accountBalance * maxHeatPercent;
+        
+        const totalRisk = positions.reduce((sum, p) => sum + p.risk, 0);
+        const heatPercent = (totalRisk / accountBalance) * 100;
+        const available = maxHeatDollar - totalRisk;
+        
+        // Update heat gauge
+        const gaugePercent = Math.min((totalRisk / maxHeatDollar) * 100, 100);
+        heatFill.style.width = gaugePercent + '%';
+        heatPercentage.textContent = heatPercent.toFixed(2) + '%';
+        
+        if (heatPercent > maxHeatPercent * 100) {
+            heatPercentage.style.color = '#ff4444';
+        } else if (heatPercent > maxHeatPercent * 80) {
+            heatPercentage.style.color = '#fca311';
+        } else {
+            heatPercentage.style.background = 'linear-gradient(135deg, #00b0ff 0%, #d68b45 100%)';
+            heatPercentage.style.webkitBackgroundClip = 'text';
+            heatPercentage.style.webkitTextFillColor = 'transparent';
+            heatPercentage.style.backgroundClip = 'text';
+        }
+        
+        // Update stats
+        currentHeat.textContent = '$' + totalRisk.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        availableHeat.textContent = '$' + Math.max(0, available).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        maxHeatDisplay.textContent = '$' + maxHeatDollar.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
+        // Update positions list
+        if (positions.length === 0) {
+            positionsList.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <p class="mb-0">No open positions</p>
+                </div>
+            `;
+            positionsTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No positions to display</td></tr>';
+        } else {
+            positionsList.innerHTML = positions.map(p => `
+                <div class="position-item">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <strong class="text-info">${p.symbol}</strong>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removePosition(${p.id})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="small text-muted">
+                        Entry: $${p.entryPrice.toFixed(2)} | Stop: $${p.stopLoss.toFixed(2)}<br>
+                        Size: ${p.positionSize} | Risk: $${p.risk.toFixed(2)}
+                    </div>
+                </div>
+            `).join('');
+            
+            positionsTableBody.innerHTML = positions.map(p => `
+                <tr>
+                    <td><strong class="text-info">${p.symbol}</strong></td>
+                    <td class="text-end">$${p.entryPrice.toFixed(2)}</td>
+                    <td class="text-end">$${p.stopLoss.toFixed(2)}</td>
+                    <td class="text-end">${p.positionSize}</td>
+                    <td class="text-end">$${p.risk.toFixed(2)}</td>
+                    <td class="text-end">${((p.risk/accountBalance)*100).toFixed(2)}%</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger" onclick="removePosition(${p.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Update chart
+        updateChart();
+    }
+
+    // Update risk chart
+    function updateChart() {
+        const ctx = document.getElementById('riskChart').getContext('2d');
+        
+        if (riskChart) {
+            riskChart.destroy();
+        }
+        
+        if (positions.length === 0) {
+            return;
+        }
+        
+        riskChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: positions.map(p => p.symbol),
+                datasets: [{
+                    data: positions.map(p => p.risk),
+                    backgroundColor: [
+                        '#00b0ff',
+                        '#d68b45',
+                        '#00ff88',
+                        '#fca311',
+                        '#a855f7',
+                        '#00d4ff',
+                        '#ff6b6b'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#eaeaea',
+                            padding: 15,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: $${value.toFixed(2)} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Update on account changes
+    accountBalanceInput.addEventListener('input', updateDisplay);
+    maxHeatInput.addEventListener('input', updateDisplay);
+
+    // Initial display
+    updateDisplay();
+</script>
