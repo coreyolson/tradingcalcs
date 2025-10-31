@@ -742,27 +742,28 @@ describe('Server.js - Complete Branch Coverage', () => {
     });
 
     describe('calculateTargetProjections', () => {
-      test('should calculate target projections', () => {
-        const results = calculateTargetProjections(5000, 100, [2, 3, 5, 10]);
+      test('should calculate target projections with compounding', () => {
+        // Using dailyGrowthRate = 0.02 (2% daily growth)
+        const results = calculateTargetProjections(5000, 0.02, [2, 3, 5, 10]);
         
         expect(results).toHaveLength(4);
         expect(results[0].targetMultiple).toBe(2);
         expect(results[0].targetAmount).toBe(10000);
-        expect(results[0].daysNeeded).toBe(50);
+        // days = log(2) / log(1.02) ≈ 35
+        expect(results[0].daysNeeded).toBeGreaterThan(30);
+        expect(results[0].daysNeeded).toBeLessThan(40);
         
         expect(results[1].targetMultiple).toBe(3);
         expect(results[1].targetAmount).toBe(15000);
       });
 
-      test('should return Never for negative daily profit', () => {
-        const results = calculateTargetProjections(5000, -50, [2]);
+      test('should return Never for negative daily growth rate', () => {
+        const results = calculateTargetProjections(5000, -0.01, [2]);
         
         expect(results[0].daysNeeded).toBe('Never');
-        expect(results[0].weeksNeeded).toBe('Never');
-        expect(results[0].monthsNeeded).toBe('Never');
       });
 
-      test('should return Never for zero daily profit', () => {
+      test('should return Never for zero daily growth rate', () => {
         const results = calculateTargetProjections(5000, 0, [2]);
         
         expect(results[0].daysNeeded).toBe('Never');

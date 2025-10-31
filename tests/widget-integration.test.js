@@ -67,8 +67,6 @@ describe('Widget Integration Tests', () => {
                 expect(target).toHaveProperty('targetMultiple');
                 expect(target).toHaveProperty('targetAmount');
                 expect(target).toHaveProperty('daysNeeded');
-                expect(target).toHaveProperty('weeksNeeded');
-                expect(target).toHaveProperty('monthsNeeded');
             });
         });
 

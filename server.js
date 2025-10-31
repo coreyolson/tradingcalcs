@@ -76,7 +76,7 @@ app.post('/api/simulate', (req, res) => {
 
     // New features
     const riskOfRuin = calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss || avgLoss);
-    const targetProjections = calculateTargetProjections(accountSize, expectedDailyProfit, [2, 3, 4, 5, 10, 20, 50, 100]);
+    const targetProjections = calculateTargetProjections(accountSize, dailyGrowthRate, [2, 3, 4, 5, 10, 20, 50, 100]);
     const timeBasedAnalysis = calculateTimeBasedAnalysis(projection, tradesPerDay);
     const recoveryCalculations = calculateRecoveryScenarios(riskPercent, avgWin, [10, 20, 30, 40, 50]);
     const sharpeRatio = calculateSharpeRatio(monteCarloResults, accountSize, tradesPerDay * days);
@@ -357,23 +357,29 @@ function calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss
 }
 
 // 2. Calculate target-based projections
-function calculateTargetProjections(accountSize, dailyProfit, targetMultiples) {
+function calculateTargetProjections(accountSize, dailyGrowthRate, targetMultiples) {
   const results = [];
   
   for (const multiple of targetMultiples) {
     const targetAmount = accountSize * multiple;
+    
+    // Calculate days needed using compounding formula
+    // targetAmount = accountSize * (1 + dailyGrowthRate)^days
+    // days = log(targetAmount / accountSize) / log(1 + dailyGrowthRate)
+    let daysNeeded;
+    if (dailyGrowthRate <= 0) {
+      daysNeeded = 'Never';
+    } else {
+      daysNeeded = Math.ceil(Math.log(multiple) / Math.log(1 + dailyGrowthRate));
+    }
+    
     const profitNeeded = targetAmount - accountSize;
-    const daysNeeded = dailyProfit > 0 ? Math.ceil(profitNeeded / dailyProfit) : Infinity;
-    const weeksNeeded = Math.ceil(daysNeeded / 5);
-    const monthsNeeded = Math.ceil(daysNeeded / 21);
     
     results.push({
       targetMultiple: multiple,
       targetAmount: Math.round(targetAmount * 100) / 100,
       profitNeeded: Math.round(profitNeeded * 100) / 100,
-      daysNeeded: daysNeeded === Infinity ? 'Never' : daysNeeded,
-      weeksNeeded: weeksNeeded === Infinity ? 'Never' : weeksNeeded,
-      monthsNeeded: monthsNeeded === Infinity ? 'Never' : monthsNeeded
+      daysNeeded: daysNeeded === 'Never' ? 'Never' : daysNeeded
     });
   }
   
