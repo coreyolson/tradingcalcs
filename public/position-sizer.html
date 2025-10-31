@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Position Sizer Calculator | Copper Candle Trading Tools</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .brand-header {
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f3a 100%);
+            border-bottom: 1px solid rgba(0, 176, 255, 0.2);
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .brand-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .brand-logo:hover {
+            opacity: 0.8;
+        }
+        
+        .candle-icon-small {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #9ba1a6;
+            font-size: 1.1rem;
+        }
+        
+        .metric-card .card-header {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-value small {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.7;
+            margin-left: 0.5rem;
+        }
+        
+        .metric-details {
+            font-size: 0.85rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-row span {
+            color: #9ba1a6;
+        }
+        
+        .detail-row strong {
+            color: #eaeaea;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Brand Header -->
+        <header class="brand-header">
+            <div class="container-fluid px-4">
+                <a href="index.html" class="brand-logo">
+                    <svg class="candle-icon-small" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="copper-grad-small" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ffb86c;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#d68b45;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow-small">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <ellipse cx="50" cy="130" rx="20" ry="6" fill="url(#copper-grad-small)" opacity="0.3"/>
+                        <rect x="35" y="50" width="30" height="80" rx="2" fill="url(#copper-grad-small)"/>
+                        <ellipse cx="50" cy="50" rx="15" ry="5" fill="#ffb86c"/>
+                        <path d="M 50 30 Q 45 40 50 50 Q 55 40 50 30 Z" fill="#fca311" filter="url(#glow-small)" opacity="0.9">
+                            <animate attributeName="opacity" values="0.9;0.7;0.9" dur="2s" repeatCount="indefinite"/>
+                        </path>
+                        <path d="M 50 20 Q 47 30 50 35 Q 53 30 50 20 Z" fill="#ffeb3b" opacity="0.6">
+                            <animate attributeName="opacity" values="0.6;0.3;0.6" dur="1.5s" repeatCount="indefinite"/>
+                        </path>
+                    </svg>
+                    COPPER CANDLE
+                </a>
+            </div>
+        </header>
+        
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-bullseye"></i>
+                Position Sizer Calculator
+            </h1>
+            <p class="page-subtitle">Kelly Criterion • Fixed Percentage • Risk-Based Sizing</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input Controls -->
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Parameters
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="calculatorForm">
+                                <div class="input-row">
+                                    <label><i class="fas fa-wallet"></i> Account Balance</label>
+                                    <input type="number" class="form-control form-control-sm" id="accountBalance" value="10000" min="100" step="100">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-percentage"></i> Win Rate</label>
+                                    <input type="number" class="form-control form-control-sm" id="winRate" value="55" min="0" max="100" step="0.1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-arrow-up text-success"></i> Average Win</label>
+                                    <input type="number" class="form-control form-control-sm" id="avgWin" value="150" min="1" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-arrow-down text-danger"></i> Average Loss</label>
+                                    <input type="number" class="form-control form-control-sm" id="avgLoss" value="100" min="1" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-stop-circle"></i> Stop Loss %</label>
+                                    <input type="number" class="form-control form-control-sm" id="stopLoss" value="2" min="0.1" max="100" step="0.1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-shield-alt"></i> Risk Per Trade %</label>
+                                    <input type="number" class="form-control form-control-sm" id="riskPercent" value="2" min="0.1" max="100" step="0.1">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mt-3">
+                                    <i class="fas fa-calculator"></i> Calculate Positions
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-9 col-lg-8">
+                    <div class="row g-3">
+                        <!-- Kelly Criterion Card -->
+                        <div class="col-lg-4">
+                            <div class="card metric-card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fas fa-chart-line"></i> Kelly Criterion
+                                    <small class="d-block opacity-75">Optimal Growth</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="metric-value text-success">
+                                        <span id="kellySize">--</span>
+                                        <small>contracts</small>
+                                    </div>
+                                    <div class="metric-details">
+                                        <div class="detail-row">
+                                            <span>Portfolio %:</span>
+                                            <strong id="kellyPercent">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Dollar Amount:</span>
+                                            <strong id="kellyDollar">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Risk Amount:</span>
+                                            <strong id="kellyRisk">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fixed Percentage Card -->
+                        <div class="col-lg-4">
+                            <div class="card metric-card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-percentage"></i> Fixed Percentage
+                                    <small class="d-block opacity-75">Conservative</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="metric-value text-info">
+                                        <span id="fixedSize">--</span>
+                                        <small>contracts</small>
+                                    </div>
+                                    <div class="metric-details">
+                                        <div class="detail-row">
+                                            <span>Portfolio %:</span>
+                                            <strong id="fixedPercent">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Dollar Amount:</span>
+                                            <strong id="fixedDollar">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Risk Amount:</span>
+                                            <strong id="fixedRisk">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Risk-Based Card -->
+                        <div class="col-lg-4">
+                            <div class="card metric-card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <i class="fas fa-shield-alt"></i> Risk-Based
+                                    <small class="d-block opacity-75">Stop Loss Adjusted</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="metric-value text-warning">
+                                        <span id="riskSize">--</span>
+                                        <small>contracts</small>
+                                    </div>
+                                    <div class="metric-details">
+                                        <div class="detail-row">
+                                            <span>Portfolio %:</span>
+                                            <strong id="riskPercent2">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Dollar Amount:</span>
+                                            <strong id="riskDollar">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Risk Amount:</span>
+                                            <strong id="riskRisk">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comparison Table -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-table"></i> Method Comparison
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-dark table-sm table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Method</th>
+                                                <th class="text-end">Position Size</th>
+                                                <th class="text-end">Risk ($)</th>
+                                                <th class="text-end">Portfolio %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><i class="fas fa-chart-line text-success"></i> Kelly Criterion</td>
+                                                <td class="text-end" id="compKellySize">--</td>
+                                                <td class="text-end" id="compKellyRisk">--</td>
+                                                <td class="text-end" id="compKellyPercent">--</td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fas fa-percentage text-info"></i> Fixed Percentage</td>
+                                                <td class="text-end" id="compFixedSize">--</td>
+                                                <td class="text-end" id="compFixedRisk">--</td>
+                                                <td class="text-end" id="compFixedPercent">--</td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fas fa-shield-alt text-warning"></i> Risk-Based</td>
+                                                <td class="text-end" id="compRiskSize">--</td>
+                                                <td class="text-end" id="compRiskRisk">--</td>
+                                                <td class="text-end" id="compRiskPercent">--</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(180deg, transparent 0%, #0a0f1a 100%); border-top: 1px solid rgba(0, 176, 255, 0.1); margin-top: 5rem; padding: 4rem 0 2rem;">
+        <div class="container-fluid px-4">
+            <div class="row g-4 mb-4">
+                <!-- Brand Column -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <svg width="40" height="56" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="copper-grad-footer" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ffb86c;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#d68b45;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="35" y="50" width="30" height="80" rx="2" fill="url(#copper-grad-footer)"/>
+                            <ellipse cx="50" cy="50" rx="15" ry="5" fill="#ffb86c"/>
+                            <path d="M 50 30 Q 45 40 50 50 Q 55 40 50 30 Z" fill="#fca311" opacity="0.9"/>
+                        </svg>
+                        <div>
+                            <div style="font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Copper Candle</div>
+                            <div style="color: #9ba1a6; font-size: 0.9rem;">Light your edge</div>
+                        </div>
+                    </div>
+                    <p style="color: #9ba1a6; font-size: 0.9rem; line-height: 1.6;">
+                        Professional trading calculators for serious traders. All calculations run privately in your browser.
+                    </p>
+                </div>
+
+                <!-- Risk & Position Tools -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h5 style="color: #d68b45; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
+                        <i class="fas fa-shield-alt me-1" style="font-size: 0.8rem;"></i> Risk & Position
+                    </h5>
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+                        <li style="margin-bottom: 0.5rem;">
+                            <a href="contract-calculator.html" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
+                                <i class="fas fa-chart-line me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Contract Calculator
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <a href="position-sizer.html" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
+                                <i class="fas fa-bullseye me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Position Sizer
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-fire me-2" style="font-size: 0.7rem;"></i>Portfolio Heat
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-balance-scale me-2" style="font-size: 0.7rem;"></i>Risk/Reward
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-layer-group me-2" style="font-size: 0.7rem;"></i>Leverage Calc
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Performance Tools -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h5 style="color: #00d4ff; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
+                        <i class="fas fa-chart-bar me-1" style="font-size: 0.8rem;"></i> Performance
+                    </h5>
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-calculator me-2" style="font-size: 0.7rem;"></i>Trade Expectancy
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-equals me-2" style="font-size: 0.7rem;"></i>Breakeven Calc
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-chart-pie me-2" style="font-size: 0.7rem;"></i>Win Rate Impact
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-tachometer-alt me-2" style="font-size: 0.7rem;"></i>Sharpe Ratio
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Growth Tools -->
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h5 style="color: #fca311; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
+                        <i class="fas fa-rocket me-1" style="font-size: 0.8rem;"></i> Growth
+                    </h5>
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-seedling me-2" style="font-size: 0.7rem;"></i>Compound Growth
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-heartbeat me-2" style="font-size: 0.7rem;"></i>Drawdown Recovery
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-crosshairs me-2" style="font-size: 0.7rem;"></i>Goal Calculator
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Advanced Tools -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 style="color: #a855f7; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
+                        <i class="fas fa-brain me-1" style="font-size: 0.8rem;"></i> Advanced
+                    </h5>
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-dice me-2" style="font-size: 0.7rem;"></i>Monte Carlo Suite
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.5rem;">
+                            <span style="color: #6c757d;">
+                                <i class="fas fa-brain me-2" style="font-size: 0.7rem;"></i>Edge Validator
+                            </span>
+                        </li>
+                    </ul>
+                    
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                        <h6 style="color: #00ff88; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;">
+                            <i class="fas fa-lock me-1"></i> Privacy First
+                        </h6>
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.8rem;">
+                            <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
+                                <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>No Registration
+                            </li>
+                            <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
+                                <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>100% Client-Side
+                            </li>
+                            <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
+                                <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>No Tracking
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; margin-top: 2rem;">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <p style="color: #6c757d; font-size: 0.85rem; margin: 0;">
+                            © 2025 Copper Candle. All calculations run locally in your browser.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <a href="index.html" style="color: #00b0ff; text-decoration: none; font-size: 0.85rem; font-weight: 500;">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get inputs
+            const accountBalance = parseFloat(document.getElementById('accountBalance').value);
+            const winRate = parseFloat(document.getElementById('winRate').value) / 100;
+            const avgWin = parseFloat(document.getElementById('avgWin').value);
+            const avgLoss = parseFloat(document.getElementById('avgLoss').value);
+            const stopLoss = parseFloat(document.getElementById('stopLoss').value) / 100;
+            const riskPercent = parseFloat(document.getElementById('riskPercent').value) / 100;
+            
+            // Kelly Criterion: f* = (bp - q) / b
+            // where b = win/loss ratio, p = win probability, q = loss probability
+            const winLossRatio = avgWin / avgLoss;
+            const lossRate = 1 - winRate;
+            const kellyFraction = (winLossRatio * winRate - lossRate) / winLossRatio;
+            const kellyPercentSafe = Math.max(0, Math.min(kellyFraction * 0.5, 0.25)); // Half Kelly, max 25%
+            const kellyAmount = accountBalance * kellyPercentSafe;
+            
+            // Fixed Percentage Method
+            const fixedAmount = accountBalance * riskPercent;
+            
+            // Risk-Based Method (using stop loss)
+            const riskAmount = accountBalance * riskPercent;
+            const riskBasedAmount = riskAmount / stopLoss;
+            
+            // Assume $100 per contract/share for position sizing
+            const pricePerUnit = 100;
+            
+            const kellySize = Math.floor(kellyAmount / pricePerUnit);
+            const fixedSize = Math.floor(fixedAmount / pricePerUnit);
+            const riskSize = Math.floor(riskBasedAmount / pricePerUnit);
+            
+            // Update Kelly Results
+            document.getElementById('kellySize').textContent = kellySize.toLocaleString();
+            document.getElementById('kellyPercent').textContent = (kellyPercentSafe * 100).toFixed(2) + '%';
+            document.getElementById('kellyDollar').textContent = '$' + kellyAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('kellyRisk').textContent = '$' + (kellyAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            // Update Fixed Results
+            document.getElementById('fixedSize').textContent = fixedSize.toLocaleString();
+            document.getElementById('fixedPercent').textContent = (riskPercent * 100).toFixed(2) + '%';
+            document.getElementById('fixedDollar').textContent = '$' + fixedAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('fixedRisk').textContent = '$' + (fixedAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            // Update Risk-Based Results
+            document.getElementById('riskSize').textContent = riskSize.toLocaleString();
+            document.getElementById('riskPercent2').textContent = ((riskBasedAmount / accountBalance) * 100).toFixed(2) + '%';
+            document.getElementById('riskDollar').textContent = '$' + riskBasedAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('riskRisk').textContent = '$' + riskAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            // Update Comparison Table
+            document.getElementById('compKellySize').textContent = kellySize.toLocaleString();
+            document.getElementById('compKellyRisk').textContent = '$' + (kellyAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('compKellyPercent').textContent = (kellyPercentSafe * 100).toFixed(2) + '%';
+            
+            document.getElementById('compFixedSize').textContent = fixedSize.toLocaleString();
+            document.getElementById('compFixedRisk').textContent = '$' + (fixedAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('compFixedPercent').textContent = (riskPercent * 100).toFixed(2) + '%';
+            
+            document.getElementById('compRiskSize').textContent = riskSize.toLocaleString();
+            document.getElementById('compRiskRisk').textContent = '$' + riskAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('compRiskPercent').textContent = ((riskBasedAmount / accountBalance) * 100).toFixed(2) + '%';
+        });
+    </script>
+</body>
+</html>

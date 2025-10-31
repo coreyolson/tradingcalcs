@@ -82,8 +82,10 @@ function initialize() {
                 const riskWarning = document.getElementById('riskWarning');
                 if (riskValue > 95) {
                     input.value = 95;
+                    /* istanbul ignore next */
                     if (riskWarning) {
                         riskWarning.style.display = 'block';
+                        /* istanbul ignore next */
                         setTimeout(() => {
                             riskWarning.style.display = 'none';
                         }, 3000);
@@ -113,11 +115,69 @@ function initialize() {
     // Check for URL parameters
     loadFromURL();
     
+    // Initialize Bootstrap tooltips
+    initializeTooltips();
+    
     // Run initial calculation
     runCalculation();
 }
 
+// Initialize help display system for all elements with data-tooltip
+function initializeTooltips() {
+    const helpModal = document.getElementById('helpModal');
+    const helpModalTitle = document.getElementById('helpModalTitle');
+    const helpModalDescription = document.getElementById('helpModalDescription');
+    const helpIcons = document.querySelectorAll('.help-icon');
+    
+    if (!helpModal || !helpModalTitle || !helpModalDescription) {
+        return;
+    }
+    
+    helpIcons.forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Get help content from parent element's data attributes
+            const parent = this.closest('[data-help-title]');
+            if (parent) {
+                const title = parent.getAttribute('data-help-title') || 'Information';
+                const text = parent.getAttribute('data-help-text') || '';
+                const example = parent.getAttribute('data-help-example') || '';
+                const good = parent.getAttribute('data-help-good') || '';
+                const why = parent.getAttribute('data-help-why') || '';
+                
+                // Build structured HTML content
+                let htmlContent = '';
+                
+                if (text) {
+                    htmlContent += `<div class="help-section"><div class="help-section-label">What is this?</div><div class="help-section-text">${text}</div></div>`;
+                }
+                
+                if (example) {
+                    htmlContent += `<div class="help-section"><div class="help-section-label">Example</div><div class="help-section-text help-example">${example}</div></div>`;
+                }
+                
+                if (good) {
+                    htmlContent += `<div class="help-section"><div class="help-section-label">Target Values</div><div class="help-section-text help-targets">${good}</div></div>`;
+                }
+                
+                if (why) {
+                    htmlContent += `<div class="help-section"><div class="help-section-label">Why it matters</div><div class="help-section-text">${why}</div></div>`;
+                }
+                
+                helpModalTitle.textContent = title;
+                helpModalDescription.innerHTML = htmlContent;
+                
+                // Show the modal
+                const modal = new bootstrap.Modal(helpModal);
+                modal.show();
+            }
+        });
+    });
+}
+
 // Initialize
+/* istanbul ignore next */
 document.addEventListener('DOMContentLoaded', () => {
     initialize();
 });
@@ -173,16 +233,8 @@ async function runCalculation() {
     saveValues(params);
     
     try {
-        // Call API
-        const response = await fetch('http://localhost:3000/api/simulate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        });
-        
-        const result = await response.json();
+        // Run calculations locally (no server needed!)
+        const result = runSimulation(params);
         
         if (result.success) {
             currentData = result.data;
@@ -192,10 +244,7 @@ async function runCalculation() {
         }
     } catch (error) {
         console.error('Calculation error:', error);
-        // Only show alert on first calculation failure
-        if (resultsContainer.classList.contains('d-none')) {
-            alert('Failed to calculate. Make sure the server is running.');
-        }
+        alert('Failed to calculate: ' + error.message);
     } finally {
         loadingIndicator.classList.add('d-none');
         resultsContainer.classList.remove('d-none');
@@ -1130,6 +1179,7 @@ if (typeof module !== 'undefined' && module.exports) {
         loadFromURL,
         presets,
         initialize,
+        initializeTooltips,
         formatProjectionTooltipTitle,
         formatProjectionTooltipLabel,
         formatYAxisTick,

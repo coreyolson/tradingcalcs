@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Calculator - Copper Candle</title>
+    <meta name="description" content="Advanced Monte Carlo simulation for options and futures trading. Calculate risk metrics, position sizes, and account projections.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* Brand Variables */
+        :root {
+            --copper: #d68b45;
+            --copper-glow: rgba(214, 139, 69, 0.4);
+            --blue-accent: #00b0ff;
+            --base-dark: #0a0f1a;
+            --card-dark: #141922;
+            --text-white: #eaeaea;
+            --text-muted: #9ba1a6;
+            --green-glow: #00ff88;
+            --cyan-glow: #00d4ff;
+            --amber-glow: #fca311;
+            --red-glow: #ff4444;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--base-dark);
+            color: var(--text-white);
+            letter-spacing: 0.2px;
+        }
+        
+        /* Animated Background */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f3a 50%, #0a0f1a 100%);
+            background-size: 400% 400%;
+            animation: auroraShift 20s ease infinite;
+        }
+        
+        @keyframes auroraShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Header */
+        .calc-header {
+            padding: 2rem 0 1.5rem;
+            border-bottom: 1px solid rgba(214, 139, 69, 0.2);
+            margin-bottom: 2rem;
+        }
+        
+        .calc-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .calc-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        
+        /* Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--copper);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .back-btn:hover {
+            color: var(--amber-glow);
+            transform: translateX(-5px);
+        }
+        
+        /* Cards */
+        .calc-card {
+            background: var(--card-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calc-card h3 {
+            color: var(--text-white);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .calc-card h3 i {
+            color: var(--copper);
+        }
+        
+        /* Form Controls */
+        .form-label {
+            color: var(--text-white);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            background: rgba(10, 15, 26, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            background: rgba(10, 15, 26, 0.8);
+            border-color: var(--copper);
+            box-shadow: 0 0 0 3px rgba(214, 139, 69, 0.2);
+            color: var(--text-white);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+        
+        /* Calculate Button */
+        .calc-btn {
+            background: linear-gradient(135deg, #00d4ff, #00b0ff);
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .calc-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 212, 255, 0.6);
+        }
+        
+        /* Metric Cards */
+        .metric-card {
+            background: var(--card-dark);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--copper);
+            box-shadow: 0 8px 20px rgba(214, 139, 69, 0.2);
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-white);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+        
+        .metric-value.positive { color: var(--green-glow); }
+        .metric-value.negative { color: var(--red-glow); }
+        .metric-value.warning { color: var(--amber-glow); }
+        
+        .metric-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            background: var(--card-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-container h4 {
+            color: var(--text-white);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .chart-container h4 i {
+            color: var(--cyan-glow);
+        }
+        
+        /* Loading State */
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--cyan-glow);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calc-title {
+                font-size: 2rem;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+            
+            .calc-card {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="aurora-bg"></div>
+    
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="calc-header">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            <h1 class="calc-title">Contract Trading Calculator</h1>
+            <p class="calc-subtitle">Monte Carlo Simulation • Risk Analysis • Position Sizing</p>
+        </div>
+        
+        <div class="row">
+            <!-- Left Column: Inputs -->
+            <div class="col-lg-4">
+                <div class="calc-card">
+                    <h3>
+                        <i class="fas fa-sliders-h"></i>
+                        Trading Parameters
+                    </h3>
+                    
+                    <form id="calculatorForm">
+                        <div class="mb-3">
+                            <label class="form-label">Account Balance ($)</label>
+                            <input type="number" class="form-control" id="accountSize" value="3125" min="100" step="100">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Risk Per Trade (%)</label>
+                            <input type="number" class="form-control" id="riskPercent" value="8" min="1" max="95" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Win Rate (%)</label>
+                            <input type="number" class="form-control" id="winRate" value="80" min="1" max="100" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Average Win (%)</label>
+                            <input type="number" class="form-control" id="avgWin" value="50" min="1" max="10000" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Average Loss (%)</label>
+                            <input type="number" class="form-control" id="avgLoss" value="30" min="1" max="100" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Stop Loss (%)</label>
+                            <input type="number" class="form-control" id="stopLoss" value="50" min="1" max="100" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Contract Price ($)</label>
+                            <input type="number" class="form-control" id="contractPrice" value="1.00" min="0.01" max="100" step="0.01">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Commission per Contract ($)</label>
+                            <input type="number" class="form-control" id="commission" value="0.65" min="0" max="10" step="0.01">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Trades per Day</label>
+                            <input type="number" class="form-control" id="tradesPerDay" value="2" min="1" max="50" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Number of Days</label>
+                            <input type="number" class="form-control" id="days" value="30" min="1" max="500" step="1">
+                        </div>
+                        
+                        <button type="submit" class="calc-btn">
+                            <i class="fas fa-calculator me-2"></i>
+                            <span id="btnText">Run Monte Carlo Simulation</span>
+                            <span id="btnSpinner" class="spinner" style="display: none;"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Right Column: Results -->
+            <div class="col-lg-8">
+                <!-- Key Metrics -->
+                <div class="calc-card">
+                    <h3>
+                        <i class="fas fa-chart-bar"></i>
+                        Key Metrics
+                    </h3>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4 col-6">
+                            <div class="metric-card">
+                                <div class="metric-label">Recommended Size</div>
+                                <div class="metric-value" id="recommendedContracts">-</div>
+                                <div class="metric-subtitle">contracts</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 col-6">
+                            <div class="metric-card">
+                                <div class="metric-label">Kelly Criterion</div>
+                                <div class="metric-value" id="kellyPercent">-</div>
+                                <div class="metric-subtitle">optimal %</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 col-6">
+                            <div class="metric-card">
+                                <div class="metric-label">Expected Value</div>
+                                <div class="metric-value positive" id="expectedValue">-</div>
+                                <div class="metric-subtitle">per trade</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 col-6">
+                            <div class="metric-card">
+                                <div class="metric-label">Win Rate</div>
+                                <div class="metric-value" id="actualWinRate">-</div>
+                                <div class="metric-subtitle">simulated</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 col-6">
+                            <div class="metric-card">
+                                <div class="metric-label">Sharpe Ratio</div>
+                                <div class="metric-value" id="sharpeRatio">-</div>
+                                <div class="metric-subtitle">risk-adjusted</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 col-6">
+                            <div class="metric-card">
+                                <div class="metric-label">Risk of Ruin</div>
+                                <div class="metric-value warning" id="riskOfRuin">-</div>
+                                <div class="metric-subtitle">probability</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Account Projection -->
+                <div class="chart-container">
+                    <h4>
+                        <i class="fas fa-chart-line"></i>
+                        Account Balance Projection
+                    </h4>
+                    <canvas id="projectionChart" height="80"></canvas>
+                </div>
+                
+                <!-- Distribution Chart -->
+                <div class="chart-container">
+                    <h4>
+                        <i class="fas fa-chart-bar"></i>
+                        Outcome Distribution (10,000 Simulations)
+                    </h4>
+                    <canvas id="distributionChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="calculations.js"></script>
+    <script>
+        let projectionChart, distributionChart;
+        
+        document.getElementById('calculatorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            document.getElementById('btnText').style.display = 'none';
+            document.getElementById('btnSpinner').style.display = 'inline-block';
+            
+            // Collect parameters
+            const params = {
+                accountSize: parseFloat(document.getElementById('accountSize').value),
+                riskPercent: parseFloat(document.getElementById('riskPercent').value),
+                winRate: parseFloat(document.getElementById('winRate').value),
+                avgWin: parseFloat(document.getElementById('avgWin').value),
+                avgLoss: parseFloat(document.getElementById('avgLoss').value),
+                stopLoss: parseFloat(document.getElementById('stopLoss').value),
+                contractPrice: parseFloat(document.getElementById('contractPrice').value),
+                commission: parseFloat(document.getElementById('commission').value),
+                tradesPerDay: parseInt(document.getElementById('tradesPerDay').value),
+                days: parseInt(document.getElementById('days').value)
+            };
+            
+            // Run simulation
+            const result = runSimulation(params);
+            
+            // Update metrics
+            document.getElementById('recommendedContracts').textContent = result.recommendedContracts;
+            document.getElementById('kellyPercent').textContent = result.kellyPercent + '%';
+            document.getElementById('expectedValue').textContent = '$' + result.expectedValue.toFixed(2);
+            document.getElementById('actualWinRate').textContent = result.actualWinRate + '%';
+            document.getElementById('sharpeRatio').textContent = result.sharpeRatio.toFixed(2);
+            document.getElementById('riskOfRuin').textContent = result.riskOfRuin + '%';
+            
+            // Color code values
+            const evElement = document.getElementById('expectedValue');
+            evElement.className = 'metric-value ' + (result.expectedValue >= 0 ? 'positive' : 'negative');
+            
+            const rorElement = document.getElementById('riskOfRuin');
+            const rorValue = parseFloat(result.riskOfRuin);
+            rorElement.className = 'metric-value ' + (rorValue < 5 ? 'positive' : rorValue < 20 ? 'warning' : 'negative');
+            
+            // Update projection chart
+            updateProjectionChart(result.projectionData);
+            
+            // Update distribution chart
+            updateDistributionChart(result.histogram);
+            
+            // Hide loading state
+            document.getElementById('btnText').style.display = 'inline';
+            document.getElementById('btnSpinner').style.display = 'none';
+        });
+        
+        function updateProjectionChart(data) {
+            const ctx = document.getElementById('projectionChart').getContext('2d');
+            
+            if (projectionChart) {
+                projectionChart.destroy();
+            }
+            
+            projectionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Best Case',
+                            data: data.bestCase,
+                            borderColor: '#00ff88',
+                            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                            borderWidth: 2,
+                            fill: false
+                        },
+                        {
+                            label: 'Expected',
+                            data: data.expected,
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            borderWidth: 3,
+                            fill: false
+                        },
+                        {
+                            label: 'Worst Case',
+                            data: data.worstCase,
+                            borderColor: '#ff4444',
+                            backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#eaeaea',
+                                font: { family: 'Inter', size: 12 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#9ba1a6',
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#9ba1a6' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateDistributionChart(data) {
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            
+            if (distributionChart) {
+                distributionChart.destroy();
+            }
+            
+            distributionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: data.values,
+                        backgroundColor: 'rgba(214, 139, 69, 0.6)',
+                        borderColor: '#d68b45',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#eaeaea',
+                                font: { family: 'Inter', size: 12 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#9ba1a6' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#9ba1a6',
+                                callback: function(value, index) {
+                                    return '$' + this.getLabelForValue(value);
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

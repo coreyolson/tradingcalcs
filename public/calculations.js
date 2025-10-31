@@ -1,164 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Set EJS as view engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static('public'));
-
-// Routes
-app.get('/', (req, res) => {
-    res.render('index', {
-        title: 'Copper Candle',
-        description: 'Professional trading calculators for serious traders. Monte Carlo simulations, risk analysis, and position sizing.',
-        includeChartJs: false
-    });
-});
-
-app.get('/contract-calculator', (req, res) => {
-    res.render('contract-calculator', {
-        title: 'Contract Calculator',
-        description: 'Monte Carlo simulations, Kelly Criterion, risk metrics, and account projections for contract trading.',
-        includeChartJs: true
-    });
-});
-
-app.get('/position-sizer', (req, res) => {
-    res.render('position-sizer', {
-        title: 'Position Sizer',
-        description: 'Kelly Criterion, fixed percentage, and risk-based position sizing methods for optimal trade sizing.',
-        includeChartJs: false
-    });
-});
-
-// API endpoint for simulation
-app.post('/api/simulate', (req, res) => {
-    const {
-        accountSize, riskPercent, winRate, avgWin, avgLoss,
-        contractPrice, commission, tradesPerDay, days, stopLoss, simulations
-    } = req.body;  try {
-    // Validate required parameters
-    if (!accountSize || accountSize <= 0) {
-      throw new Error('Invalid account size');
-    }
-    if (riskPercent === undefined || riskPercent < 0 || riskPercent > 1) {
-      throw new Error('Invalid risk percent (must be between 0 and 100%)');
-    }
-    if (winRate === undefined || winRate < 0 || winRate > 1) {
-      throw new Error('Invalid win rate');
-    }
-    
-    // Calculate basic metrics
-    const riskPerTrade = accountSize * riskPercent;
-    const expectedValue = (winRate * avgWin) - ((1 - winRate) * avgLoss);
-    const expectedProfitPerTrade = riskPerTrade * expectedValue;
-    const expectedDailyProfit = expectedProfitPerTrade * tradesPerDay;
-    const dailyGrowthRate = expectedDailyProfit / accountSize;
-
-    // Calculate Kelly Fraction
-    const payoffRatio = avgWin / avgLoss;
-    const kellyFraction = winRate - ((1 - winRate) / payoffRatio);
-
-    // Calculate Profit Factor
-    const profitFactor = (winRate * avgWin) / ((1 - winRate) * avgLoss);
-    
-    // Calculate max loss with stop loss
-    const maxLossPerTrade = riskPerTrade * (stopLoss || avgLoss);
-    const maxDailyLoss = maxLossPerTrade * tradesPerDay;
-
-    // Generate compounding projection
-    const projection = [];
-    let currentBalance = accountSize;
-    for (let day = 0; day <= days; day++) {
-      projection.push({
-        day,
-        balance: Math.round(currentBalance * 100) / 100
-      });
-      currentBalance += currentBalance * dailyGrowthRate;
-    }
-
-    // Monte Carlo simulation
-    const monteCarloResults = runMonteCarloSimulation(
-      accountSize,
-      riskPercent,
-      winRate,
-      avgWin,
-      avgLoss,
-      stopLoss || avgLoss,
-      tradesPerDay * days,
-      simulations || 10000
-    );
-
-    // Calculate loss streak probabilities
-    const streakProbabilities = calculateStreakProbabilities(winRate, 15);
-
-    // Calculate drawdown scenarios with stop loss
-    const drawdownScenarios = calculateDrawdownScenarios(accountSize, riskPercent, stopLoss || avgLoss, 15);
-
-    // New features
-    const riskOfRuin = calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss || avgLoss);
-    const targetProjections = calculateTargetProjections(accountSize, dailyGrowthRate, [2, 3, 4, 5, 10, 20, 50, 100]);
-    const timeBasedAnalysis = calculateTimeBasedAnalysis(projection, tradesPerDay);
-    const recoveryCalculations = calculateRecoveryScenarios(riskPercent, avgWin, [10, 20, 30, 40, 50]);
-    const sharpeRatio = calculateSharpeRatio(monteCarloResults, accountSize, tradesPerDay * days);
-    
-    // Calculate expected max loss streak in the given number of trades
-    const totalTrades = tradesPerDay * days;
-    const expectedMaxLossStreak = calculateExpectedMaxLossStreak(1 - winRate, totalTrades);
-    
-    // Calculate win streak probabilities (for wins, not losses)
-    const winStreakProbabilities = calculateStreakProbabilities(1 - winRate, 15);
-    
-    const simulationMode = 'stopLoss'; // Will be toggled by frontend
-
-    res.json({
-      success: true,
-      data: {
-        metrics: {
-          accountSize,
-          riskPerTrade: Math.round(riskPerTrade * 100) / 100,
-          expectedValue: Math.round(expectedValue * 10000) / 100,
-          expectedProfitPerTrade: Math.round(expectedProfitPerTrade * 100) / 100,
-          expectedDailyProfit: Math.round(expectedDailyProfit * 100) / 100,
-          dailyGrowthRate: Math.round(dailyGrowthRate * 10000) / 100,
-          kellyFraction: Math.round(kellyFraction * 10000) / 100,
-          profitFactor: Math.round(profitFactor * 100) / 100,
-          payoffRatio: Math.round(payoffRatio * 100) / 100,
-          maxLossPerTrade: Math.round(maxLossPerTrade * 100) / 100,
-          maxDailyLoss: Math.round(maxDailyLoss * 100) / 100,
-          stopLoss: stopLoss || avgLoss,
-          contractPrice: contractPrice || 1.0,
-          commission: commission || 0.65,
-          sharpeRatio: sharpeRatio
-        },
-        projection,
-        monteCarlo: monteCarloResults,
-        streakProbabilities,
-        drawdownScenarios,
-        riskOfRuin,
-        targetProjections,
-        timeBasedAnalysis,
-        recoveryCalculations,
-        winStreakProbabilities,
-        expectedMaxLossStreak,
-        simulationMode
-      }
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
+/**
+ * Trading Calculator - All calculation functions
+ * Moved from server.js to run 100% client-side
+ */
 
 // Monte Carlo Simulation Function
 function runMonteCarloSimulation(accountSize, riskPercent, winRate, avgWin, avgLoss, stopLoss, totalTrades, simulations) {
@@ -348,9 +191,9 @@ function calculateDrawdownScenarios(accountSize, riskPercent, stopLoss, maxLosse
   return scenarios;
 }
 
-// 1. Calculate Risk of Ruin (probability of losing X% of account)
+// Calculate Risk of Ruin (probability of losing X% of account)
 function calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss) {
-  const ruinLevels = [10, 20, 30, 40, 50, 60, 75, 90]; // More even progression
+  const ruinLevels = [10, 20, 30, 40, 50, 60, 75, 90];
   const results = [];
   
   for (const level of ruinLevels) {
@@ -385,7 +228,7 @@ function calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss
   return results;
 }
 
-// 2. Calculate target-based projections
+// Calculate target-based projections
 function calculateTargetProjections(accountSize, dailyGrowthRate, targetMultiples) {
   const results = [];
   
@@ -393,8 +236,6 @@ function calculateTargetProjections(accountSize, dailyGrowthRate, targetMultiple
     const targetAmount = accountSize * multiple;
     
     // Calculate days needed using compounding formula
-    // targetAmount = accountSize * (1 + dailyGrowthRate)^days
-    // days = log(targetAmount / accountSize) / log(1 + dailyGrowthRate)
     let daysNeeded;
     if (dailyGrowthRate <= 0) {
       daysNeeded = 'Never';
@@ -415,7 +256,7 @@ function calculateTargetProjections(accountSize, dailyGrowthRate, targetMultiple
   return results;
 }
 
-// 3. Calculate time-based analysis (daily, weekly, monthly, quarterly)
+// Calculate time-based analysis (daily, weekly, monthly, quarterly)
 function calculateTimeBasedAnalysis(projection, tradesPerDay) {
   const analysis = {
     daily: { trades: tradesPerDay },
@@ -444,13 +285,13 @@ function calculateTimeBasedAnalysis(projection, tradesPerDay) {
   return analysis;
 }
 
-// 4. Calculate recovery scenarios after drawdowns
+// Calculate recovery scenarios after drawdowns
 function calculateRecoveryScenarios(riskPercent, avgWin, drawdownLevels) {
   const results = [];
   
   for (const drawdown of drawdownLevels) {
     const remainingCapital = 1 - (drawdown / 100);
-    const recoveryNeeded = (drawdown / 100) / remainingCapital; // % gain needed to recover
+    const recoveryNeeded = (drawdown / 100) / remainingCapital;
     const winsNeeded = Math.ceil(recoveryNeeded / (riskPercent * avgWin));
     
     results.push({
@@ -464,17 +305,16 @@ function calculateRecoveryScenarios(riskPercent, avgWin, drawdownLevels) {
   return results;
 }
 
-// 5. Calculate Sharpe Ratio from Monte Carlo results
+// Calculate Sharpe Ratio from Monte Carlo results
 function calculateSharpeRatio(monteCarloResults, accountSize, totalTrades) {
   if (!monteCarloResults || !monteCarloResults.statistics) {
     return 0;
   }
   
   const totalReturn = monteCarloResults.statistics.meanReturn / 100;
-  const stdDev = monteCarloResults.statistics.stdDev / accountSize; // Normalize by account size
+  const stdDev = monteCarloResults.statistics.stdDev / accountSize;
   
   // Assume 5% annual risk-free rate, scale to period
-  // Estimate period in years: totalTrades / (252 trading days * 2 trades/day)
   const yearsInPeriod = totalTrades / (252 * 2);
   const riskFreeRate = 0.05 * yearsInPeriod;
   
@@ -486,52 +326,131 @@ function calculateSharpeRatio(monteCarloResults, accountSize, totalTrades) {
 
 // Calculate expected maximum loss streak for given number of trades
 function calculateExpectedMaxLossStreak(lossRate, totalTrades) {
-  // Using the approximation: E[max streak] ≈ log(totalTrades) / log(1/lossRate)
   if (lossRate === 0 || lossRate >= 1) return 0;
   
   const expected = Math.log(totalTrades) / Math.log(1 / lossRate);
   return Math.round(expected);
 }
 
-// Export to CSV endpoint
-app.post('/api/export-csv', (req, res) => {
-  const { data } = req.body;
-  
-  // Create CSV content
-  let csv = 'Day,Balance\n';
-  data.projection.forEach(point => {
-    csv += `${point.day},${point.balance}\n`;
-  });
-  
-  res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', 'attachment; filename=trading-projection.csv');
-  res.send(csv);
-});
+// Main calculation function that mirrors the server's /api/simulate endpoint
+function runSimulation(params) {
+  const {
+    accountSize, riskPercent, winRate, avgWin, avgLoss,
+    contractPrice, commission, tradesPerDay, days, stopLoss, simulations
+  } = params;
 
-// Serve the main page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+  try {
+    // Validate required parameters
+    if (!accountSize || accountSize <= 0) {
+      throw new Error('Invalid account size');
+    }
+    if (riskPercent === undefined || riskPercent < 0 || riskPercent > 1) {
+      throw new Error('Invalid risk percent (must be between 0 and 100%)');
+    }
+    if (winRate === undefined || winRate < 0 || winRate > 1) {
+      throw new Error('Invalid win rate');
+    }
+    
+    // Calculate basic metrics
+    const riskPerTrade = accountSize * riskPercent;
+    const expectedValue = (winRate * avgWin) - ((1 - winRate) * avgLoss);
+    const expectedProfitPerTrade = riskPerTrade * expectedValue;
+    const expectedDailyProfit = expectedProfitPerTrade * tradesPerDay;
+    const dailyGrowthRate = expectedDailyProfit / accountSize;
 
-// Export for testing
-/* istanbul ignore if */
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`🚀 Trading Risk Calculator running on http://localhost:${PORT}`);
-    console.log(`📊 API endpoint available at http://localhost:${PORT}/api/simulate`);
-  });
+    // Calculate Kelly Fraction
+    const payoffRatio = avgWin / avgLoss;
+    const kellyFraction = winRate - ((1 - winRate) / payoffRatio);
+
+    // Calculate Profit Factor
+    const profitFactor = (winRate * avgWin) / ((1 - winRate) * avgLoss);
+    
+    // Calculate max loss with stop loss
+    const maxLossPerTrade = riskPerTrade * (stopLoss || avgLoss);
+    const maxDailyLoss = maxLossPerTrade * tradesPerDay;
+
+    // Generate compounding projection
+    const projection = [];
+    let currentBalance = accountSize;
+    for (let day = 0; day <= days; day++) {
+      projection.push({
+        day,
+        balance: Math.round(currentBalance * 100) / 100
+      });
+      currentBalance += currentBalance * dailyGrowthRate;
+    }
+
+    // Monte Carlo simulation
+    const monteCarloResults = runMonteCarloSimulation(
+      accountSize,
+      riskPercent,
+      winRate,
+      avgWin,
+      avgLoss,
+      stopLoss || avgLoss,
+      tradesPerDay * days,
+      simulations || 10000
+    );
+
+    // Calculate loss streak probabilities
+    const streakProbabilities = calculateStreakProbabilities(winRate, 15);
+
+    // Calculate drawdown scenarios with stop loss
+    const drawdownScenarios = calculateDrawdownScenarios(accountSize, riskPercent, stopLoss || avgLoss, 15);
+
+    // New features
+    const riskOfRuin = calculateRiskOfRuin(accountSize, riskPercent, winRate, avgWin, stopLoss || avgLoss);
+    const targetProjections = calculateTargetProjections(accountSize, dailyGrowthRate, [2, 3, 4, 5, 10, 20, 50, 100]);
+    const timeBasedAnalysis = calculateTimeBasedAnalysis(projection, tradesPerDay);
+    const recoveryCalculations = calculateRecoveryScenarios(riskPercent, avgWin, [10, 20, 30, 40, 50]);
+    const sharpeRatio = calculateSharpeRatio(monteCarloResults, accountSize, tradesPerDay * days);
+    
+    // Calculate expected max loss streak in the given number of trades
+    const totalTrades = tradesPerDay * days;
+    const expectedMaxLossStreak = calculateExpectedMaxLossStreak(1 - winRate, totalTrades);
+    
+    // Calculate win streak probabilities (for wins, not losses)
+    const winStreakProbabilities = calculateStreakProbabilities(1 - winRate, 15);
+    
+    const simulationMode = 'stopLoss';
+
+    return {
+      success: true,
+      data: {
+        metrics: {
+          accountSize,
+          riskPerTrade: Math.round(riskPerTrade * 100) / 100,
+          expectedValue: Math.round(expectedValue * 10000) / 100,
+          expectedProfitPerTrade: Math.round(expectedProfitPerTrade * 100) / 100,
+          expectedDailyProfit: Math.round(expectedDailyProfit * 100) / 100,
+          dailyGrowthRate: Math.round(dailyGrowthRate * 10000) / 100,
+          kellyFraction: Math.round(kellyFraction * 10000) / 100,
+          profitFactor: Math.round(profitFactor * 100) / 100,
+          payoffRatio: Math.round(payoffRatio * 100) / 100,
+          maxLossPerTrade: Math.round(maxLossPerTrade * 100) / 100,
+          maxDailyLoss: Math.round(maxDailyLoss * 100) / 100,
+          stopLoss: stopLoss || avgLoss,
+          contractPrice: contractPrice || 1.0,
+          commission: commission || 0.65,
+          sharpeRatio: sharpeRatio
+        },
+        projection,
+        monteCarlo: monteCarloResults,
+        streakProbabilities,
+        drawdownScenarios,
+        riskOfRuin,
+        targetProjections,
+        timeBasedAnalysis,
+        recoveryCalculations,
+        winStreakProbabilities,
+        expectedMaxLossStreak,
+        simulationMode
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
 }
-
-module.exports = { 
-  app, 
-  runMonteCarloSimulation, 
-  createHistogram, 
-  calculateStreakProbabilities, 
-  calculateDrawdownScenarios,
-  calculateRiskOfRuin,
-  calculateTargetProjections,
-  calculateTimeBasedAnalysis,
-  calculateRecoveryScenarios,
-  calculateSharpeRatio,
-  calculateExpectedMaxLossStreak
-};

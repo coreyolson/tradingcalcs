@@ -1,52 +1,65 @@
 # Trading Risk Calculator
 
-A comprehensive Node.js application for calculating and visualizing trading risk, expectancy, and business model analysis for SPY 0DTE options trading.
+🎉 **Now 100% Client-Side - No Server Required!**
 
-## Features
+A comprehensive trading calculator for analyzing risk, expectancy, and business model analysis for SPY 0DTE options trading. Runs entirely in your browser with instant Monte Carlo simulations.
+
+## ✨ Features
 
 - **Risk Analysis**: Calculate risk per trade, expected value, and profit expectations
-- **Business Metrics**: Profit factor, Kelly Fraction, Payoff Ratio, and more
-- **Monte Carlo Simulation**: Run 10,000 simulations to analyze potential outcomes
+- **Business Metrics**: Profit factor, Kelly Fraction, Payoff Ratio, Sharpe Ratio
+- **Monte Carlo Simulation**: Run 10,000 simulations instantly in your browser
 - **Visual Analytics**: Interactive charts showing account growth and probability distributions
 - **Loss Streak Analysis**: Calculate probabilities of consecutive losses
 - **Drawdown Scenarios**: Analyze account survivability under various loss scenarios
 - **Position Sizing Guide**: Automatic scaling recommendations based on account size
-- **Data Export**: Export projections to CSV for further analysis
+- **Interactive Help**: Click question marks for detailed explanations of each metric
+- **Preset Management**: Save and load your favorite trading strategies
+- **100% Offline**: Works completely offline once loaded
 
-## Tech Stack
+## 🚀 Quick Start
 
-- **Backend**: Node.js, Express.js
-- **Frontend**: HTML5, Bootstrap 5, Chart.js
-- **Styling**: Custom dark mode CSS
-- **Icons**: Font Awesome
-
-## Installation
-
-1. Navigate to the project directory:
+### Option 1: Open Directly (Easiest)
 ```bash
-cd /Users/coreyolson/Code/Trading
+open public/index.html
 ```
 
-2. Install dependencies:
+That's it! No installation needed.
+
+### Option 2: Local Server
+```bash
+cd public
+python3 -m http.server 8000
+# Visit http://localhost:8000
+```
+
+### Option 3: For Development
 ```bash
 npm install
-```
-
-## Running the Application
-
-### Production Mode
-```bash
-npm start
-```
-
-### Development Mode (with auto-reload)
-```bash
 npm run dev
+# Visit http://localhost:3000
 ```
 
-The application will be available at: **http://localhost:3000**
+## 📦 Tech Stack
 
-## Usage
+- **Frontend**: HTML5, Bootstrap 5, Chart.js, Font Awesome
+- **Calculations**: Pure JavaScript (Monte Carlo, Kelly Criterion, Risk of Ruin, etc.)
+- **Styling**: Custom dark theme with gradient accents
+- **No Backend**: Everything runs client-side!
+
+## 🌐 Deployment
+
+Deploy to **free** static hosting in minutes:
+
+**Cloudflare Pages** (Recommended):
+1. Push to GitHub
+2. Connect repo to Cloudflare Pages
+3. Set output directory: `public`
+4. Deploy! ✅
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions for Cloudflare Pages, Netlify, GitHub Pages, and Vercel.
+
+## 📖 Usage
 
 1. **Configure Parameters**: Enter your trading parameters in the left panel:
    - Account Size

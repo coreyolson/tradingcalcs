@@ -1,0 +1,263 @@
+<%- include('partials/header') %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-bullseye"></i>
+                Position Sizer Calculator
+            </h1>
+            <p class="page-subtitle">Kelly Criterion • Fixed Percentage • Risk-Based Sizing</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <!-- Left Column: Input Controls -->
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Parameters
+                        </div>
+                        <div class="card-body compact-form">
+                            <form id="calculatorForm">
+                                <div class="input-row">
+                                    <label><i class="fas fa-wallet"></i> Account Balance</label>
+                                    <input type="number" class="form-control form-control-sm" id="accountBalance" value="10000" min="100" step="100">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-percentage"></i> Win Rate</label>
+                                    <input type="number" class="form-control form-control-sm" id="winRate" value="55" min="0" max="100" step="0.1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-arrow-up text-success"></i> Average Win</label>
+                                    <input type="number" class="form-control form-control-sm" id="avgWin" value="150" min="1" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-arrow-down text-danger"></i> Average Loss</label>
+                                    <input type="number" class="form-control form-control-sm" id="avgLoss" value="100" min="1" step="1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-stop-circle"></i> Stop Loss %</label>
+                                    <input type="number" class="form-control form-control-sm" id="stopLoss" value="2" min="0.1" max="100" step="0.1">
+                                </div>
+
+                                <div class="input-row">
+                                    <label><i class="fas fa-shield-alt"></i> Risk Per Trade %</label>
+                                    <input type="number" class="form-control form-control-sm" id="riskPercent" value="2" min="0.1" max="100" step="0.1">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mt-3">
+                                    <i class="fas fa-calculator"></i> Calculate Positions
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-xl-9 col-lg-8">
+                    <div class="row g-3">
+                        <!-- Kelly Criterion Card -->
+                        <div class="col-lg-4">
+                            <div class="card metric-card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fas fa-chart-line"></i> Kelly Criterion
+                                    <small class="d-block opacity-75">Optimal Growth</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="metric-value text-success">
+                                        <span id="kellySize">--</span>
+                                        <small>contracts</small>
+                                    </div>
+                                    <div class="metric-details">
+                                        <div class="detail-row">
+                                            <span>Portfolio %:</span>
+                                            <strong id="kellyPercent">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Dollar Amount:</span>
+                                            <strong id="kellyDollar">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Risk Amount:</span>
+                                            <strong id="kellyRisk">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fixed Percentage Card -->
+                        <div class="col-lg-4">
+                            <div class="card metric-card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-percentage"></i> Fixed Percentage
+                                    <small class="d-block opacity-75">Conservative</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="metric-value text-info">
+                                        <span id="fixedSize">--</span>
+                                        <small>contracts</small>
+                                    </div>
+                                    <div class="metric-details">
+                                        <div class="detail-row">
+                                            <span>Portfolio %:</span>
+                                            <strong id="fixedPercent">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Dollar Amount:</span>
+                                            <strong id="fixedDollar">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Risk Amount:</span>
+                                            <strong id="fixedRisk">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Risk-Based Card -->
+                        <div class="col-lg-4">
+                            <div class="card metric-card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <i class="fas fa-shield-alt"></i> Risk-Based
+                                    <small class="d-block opacity-75">Stop Loss Adjusted</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="metric-value text-warning">
+                                        <span id="riskSize">--</span>
+                                        <small>contracts</small>
+                                    </div>
+                                    <div class="metric-details">
+                                        <div class="detail-row">
+                                            <span>Portfolio %:</span>
+                                            <strong id="riskPercent2">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Dollar Amount:</span>
+                                            <strong id="riskDollar">--</strong>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span>Risk Amount:</span>
+                                            <strong id="riskRisk">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comparison Table -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-table"></i> Method Comparison
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-dark table-sm table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Method</th>
+                                                <th class="text-end">Position Size</th>
+                                                <th class="text-end">Risk ($)</th>
+                                                <th class="text-end">Portfolio %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><i class="fas fa-chart-line text-success"></i> Kelly Criterion</td>
+                                                <td class="text-end" id="compKellySize">--</td>
+                                                <td class="text-end" id="compKellyRisk">--</td>
+                                                <td class="text-end" id="compKellyPercent">--</td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fas fa-percentage text-info"></i> Fixed Percentage</td>
+                                                <td class="text-end" id="compFixedSize">--</td>
+                                                <td class="text-end" id="compFixedRisk">--</td>
+                                                <td class="text-end" id="compFixedPercent">--</td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="fas fa-shield-alt text-warning"></i> Risk-Based</td>
+                                                <td class="text-end" id="compRiskSize">--</td>
+                                                <td class="text-end" id="compRiskRisk">--</td>
+                                                <td class="text-end" id="compRiskPercent">--</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<script>
+    document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get inputs
+        const accountBalance = parseFloat(document.getElementById('accountBalance').value);
+        const winRate = parseFloat(document.getElementById('winRate').value) / 100;
+        const avgWin = parseFloat(document.getElementById('avgWin').value);
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value);
+        const stopLoss = parseFloat(document.getElementById('stopLoss').value) / 100;
+        const riskPercent = parseFloat(document.getElementById('riskPercent').value) / 100;
+        
+        // Kelly Criterion: f* = (bp - q) / b
+        const winLossRatio = avgWin / avgLoss;
+        const lossRate = 1 - winRate;
+        const kellyFraction = (winLossRatio * winRate - lossRate) / winLossRatio;
+        const kellyPercentSafe = Math.max(0, Math.min(kellyFraction * 0.5, 0.25));
+        const kellyAmount = accountBalance * kellyPercentSafe;
+        
+        // Fixed Percentage Method
+        const fixedAmount = accountBalance * riskPercent;
+        
+        // Risk-Based Method
+        const riskAmount = accountBalance * riskPercent;
+        const riskBasedAmount = riskAmount / stopLoss;
+        
+        const pricePerUnit = 100;
+        
+        const kellySize = Math.floor(kellyAmount / pricePerUnit);
+        const fixedSize = Math.floor(fixedAmount / pricePerUnit);
+        const riskSize = Math.floor(riskBasedAmount / pricePerUnit);
+        
+        // Update Kelly Results
+        document.getElementById('kellySize').textContent = kellySize.toLocaleString();
+        document.getElementById('kellyPercent').textContent = (kellyPercentSafe * 100).toFixed(2) + '%';
+        document.getElementById('kellyDollar').textContent = '$' + kellyAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('kellyRisk').textContent = '$' + (kellyAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
+        // Update Fixed Results
+        document.getElementById('fixedSize').textContent = fixedSize.toLocaleString();
+        document.getElementById('fixedPercent').textContent = (riskPercent * 100).toFixed(2) + '%';
+        document.getElementById('fixedDollar').textContent = '$' + fixedAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('fixedRisk').textContent = '$' + (fixedAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
+        // Update Risk-Based Results
+        document.getElementById('riskSize').textContent = riskSize.toLocaleString();
+        document.getElementById('riskPercent2').textContent = ((riskBasedAmount / accountBalance) * 100).toFixed(2) + '%';
+        document.getElementById('riskDollar').textContent = '$' + riskBasedAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('riskRisk').textContent = '$' + riskAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
+        // Update Comparison Table
+        document.getElementById('compKellySize').textContent = kellySize.toLocaleString();
+        document.getElementById('compKellyRisk').textContent = '$' + (kellyAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('compKellyPercent').textContent = (kellyPercentSafe * 100).toFixed(2) + '%';
+        
+        document.getElementById('compFixedSize').textContent = fixedSize.toLocaleString();
+        document.getElementById('compFixedRisk').textContent = '$' + (fixedAmount * stopLoss).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('compFixedPercent').textContent = (riskPercent * 100).toFixed(2) + '%';
+        
+        document.getElementById('compRiskSize').textContent = riskSize.toLocaleString();
+        document.getElementById('compRiskRisk').textContent = '$' + riskAmount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        document.getElementById('compRiskPercent').textContent = ((riskBasedAmount / accountBalance) * 100).toFixed(2) + '%';
+    });
+</script>
