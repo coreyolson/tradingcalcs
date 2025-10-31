@@ -1,80 +1,157 @@
-# Trading Risk Calculator
+# Copper Candle Trading Calculators# Trading Risk Calculator
 
-🎉 **Now 100% Client-Side - No Server Required!**
 
-A comprehensive trading calculator for analyzing risk, expectancy, and business model analysis for SPY 0DTE options trading. Runs entirely in your browser with instant Monte Carlo simulations.
 
-## ✨ Features
+Professional trading calculators for serious traders. All calculations run client-side in your browser for complete privacy.🎉 **Now 100% Client-Side - No Server Required!**
 
-- **Risk Analysis**: Calculate risk per trade, expected value, and profit expectations
-- **Business Metrics**: Profit factor, Kelly Fraction, Payoff Ratio, Sharpe Ratio
+
+
+## 🎯 FeaturesA comprehensive trading calculator for analyzing risk, expectancy, and business model analysis for SPY 0DTE options trading. Runs entirely in your browser with instant Monte Carlo simulations.
+
+
+
+- **Position Sizer** - Kelly Criterion, Fixed %, and Risk-Based sizing## ✨ Features
+
+- **Contract Calculator** - Monte Carlo simulations with risk metrics
+
+- **Privacy First** - No registration, no tracking, 100% client-side- **Risk Analysis**: Calculate risk per trade, expected value, and profit expectations
+
+- **Professional Design** - Clean Copper Candle brand aesthetic- **Business Metrics**: Profit factor, Kelly Fraction, Payoff Ratio, Sharpe Ratio
+
 - **Monte Carlo Simulation**: Run 10,000 simulations instantly in your browser
-- **Visual Analytics**: Interactive charts showing account growth and probability distributions
+
+## 🚀 Quick Start- **Visual Analytics**: Interactive charts showing account growth and probability distributions
+
 - **Loss Streak Analysis**: Calculate probabilities of consecutive losses
-- **Drawdown Scenarios**: Analyze account survivability under various loss scenarios
-- **Position Sizing Guide**: Automatic scaling recommendations based on account size
-- **Interactive Help**: Click question marks for detailed explanations of each metric
-- **Preset Management**: Save and load your favorite trading strategies
+
+```bash- **Drawdown Scenarios**: Analyze account survivability under various loss scenarios
+
+npm install- **Position Sizing Guide**: Automatic scaling recommendations based on account size
+
+npm start- **Interactive Help**: Click question marks for detailed explanations of each metric
+
+```- **Preset Management**: Save and load your favorite trading strategies
+
 - **100% Offline**: Works completely offline once loaded
+
+Visit `http://localhost:3000`
 
 ## 🚀 Quick Start
 
-### Option 1: Open Directly (Easiest)
-```bash
-open public/index.html
-```
-
-That's it! No installation needed.
-
-### Option 2: Local Server
-```bash
-cd public
-python3 -m http.server 8000
-# Visit http://localhost:8000
-```
-
-### Option 3: For Development
-```bash
-npm install
-npm run dev
-# Visit http://localhost:3000
-```
-
 ## 📦 Tech Stack
 
-- **Frontend**: HTML5, Bootstrap 5, Chart.js, Font Awesome
+### Option 1: Open Directly (Easiest)
+
+- **Backend**: Express.js + EJS templating```bash
+
+- **Frontend**: Bootstrap 5, Chart.js, Font Awesomeopen public/index.html
+
+- **Architecture**: Server-side rendering with reusable partials```
+
+
+
+## 🧮 Available CalculatorsThat's it! No installation needed.
+
+
+
+### Live Now### Option 2: Local Server
+
+- ✅ **Contract Calculator** - Monte Carlo simulations, Kelly Criterion, account projections```bash
+
+- ✅ **Position Sizer** - Multiple position sizing methodologiescd public
+
+python3 -m http.server 8000
+
+### Coming Soon# Visit http://localhost:8000
+
+- Portfolio Heat Calculator```
+
+- Risk/Reward Analyzer
+
+- Leverage Calculator### Option 3: For Development
+
+- Trade Expectancy Calculator```bash
+
+- Breakeven Calculatornpm install
+
+- Win Rate Impact Analyzernpm run dev
+
+- Sharpe Ratio Calculator# Visit http://localhost:3000
+
+- Compound Growth Calculator```
+
+- Drawdown Recovery Calculator
+
+- Goal Achievement Calculator## 📦 Tech Stack
+
+- Monte Carlo Suite
+
+- Edge Validator- **Frontend**: HTML5, Bootstrap 5, Chart.js, Font Awesome
+
 - **Calculations**: Pure JavaScript (Monte Carlo, Kelly Criterion, Risk of Ruin, etc.)
-- **Styling**: Custom dark theme with gradient accents
+
+## 📁 Project Structure- **Styling**: Custom dark theme with gradient accents
+
 - **No Backend**: Everything runs client-side!
 
-## 🌐 Deployment
+```
 
-Deploy to **free** static hosting in minutes:
+/## 🌐 Deployment
 
-**Cloudflare Pages** (Recommended):
-1. Push to GitHub
-2. Connect repo to Cloudflare Pages
-3. Set output directory: `public`
-4. Deploy! ✅
+├── server.js              # Express server with EJS routes
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions for Cloudflare Pages, Netlify, GitHub Pages, and Vercel.
+├── package.json           # DependenciesDeploy to **free** static hosting in minutes:
 
-## 📖 Usage
+├── views/                 # EJS templates
 
-1. **Configure Parameters**: Enter your trading parameters in the left panel:
+│   ├── partials/**Cloudflare Pages** (Recommended):
+
+│   │   ├── header.ejs    # Shared header with Copper Candle branding1. Push to GitHub
+
+│   │   └── footer.ejs    # Comprehensive footer with all calculators2. Connect repo to Cloudflare Pages
+
+│   ├── index.ejs         # Homepage3. Set output directory: `public`
+
+│   ├── position-sizer.ejs4. Deploy! ✅
+
+│   └── contract-calculator.ejs
+
+└── public/                # Static assetsSee [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions for Cloudflare Pages, Netlify, GitHub Pages, and Vercel.
+
+    ├── style.css         # Custom styles
+
+    ├── app.js           # Frontend logic## 📖 Usage
+
+    └── calculations.js   # Monte Carlo & Kelly functions
+
+```1. **Configure Parameters**: Enter your trading parameters in the left panel:
+
    - Account Size
-   - Risk Per Trade (%)
+
+## 🎨 Brand   - Risk Per Trade (%)
+
    - Win Rate (%)
-   - Average Win (%)
+
+**Copper Candle** - Light your edge   - Average Win (%)
+
    - Average Loss (%)
-   - Trades Per Day
-   - Projection Period (days)
 
-2. **Calculate**: Click "Calculate Risk" to run the analysis
+Colors:   - Trades Per Day
 
-3. **View Results**: Review the comprehensive metrics, charts, and tables
+- Copper: `#d68b45`   - Projection Period (days)
 
-4. **Export Data**: Click "Export CSV" to download projection data
+- Blue Accent: `#00b0ff`
+
+- Dark Base: `#0a0f1a`2. **Calculate**: Click "Calculate Risk" to run the analysis
+
+
+
+## 📄 License3. **View Results**: Review the comprehensive metrics, charts, and tables
+
+
+
+MIT © Corey Olson4. **Export Data**: Click "Export CSV" to download projection data
+
 
 ## API Endpoints
 
