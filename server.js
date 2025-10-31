@@ -75,6 +75,15 @@ app.get('/trade-expectancy', (req, res) => {
     });
 });
 
+// Route for Breakeven Calculator
+app.get('/breakeven-calculator', (req, res) => {
+    res.render('breakeven-calculator', { 
+        title: 'Breakeven Calculator - Copper Candle Calculators',
+        description: 'Calculate required win rate to breakeven given win/loss ratio',
+        includeChartJs: true
+    });
+});
+
 // API endpoint for simulation
 
 // API endpoint for simulation

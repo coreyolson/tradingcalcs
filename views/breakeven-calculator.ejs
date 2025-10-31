@@ -1,0 +1,400 @@
+<%- include('partials/header') %>
+
+        <!-- Page Header -->
+        <div class="container-fluid px-4 mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-equals"></i>
+                Breakeven Calculator
+            </h1>
+            <p class="page-subtitle">Calculate Required Win Rate • Optimize Risk/Reward • Validate Trading Edge</p>
+        </div>
+
+        <div class="container-fluid px-4">
+            <div class="row g-3 justify-content-center">
+                <!-- Left Column: Input Controls -->
+                <div class="col-lg-5">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <i class="fas fa-sliders-h"></i> Trade Parameters
+                        </div>
+                        <div class="card-body">
+                            <form id="breakevenForm">
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-arrow-up text-success"></i> Average Win ($)
+                                    </label>
+                                    <input type="number" class="form-control form-control-lg" id="avgWin" value="300" min="1" step="1" required>
+                                    <small class="text-muted">Expected profit per winning trade</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-arrow-down text-danger"></i> Average Loss ($)
+                                    </label>
+                                    <input type="number" class="form-control form-control-lg" id="avgLoss" value="100" min="1" step="1" required>
+                                    <small class="text-muted">Expected loss per losing trade</small>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Win/Loss Ratio:</strong> <span id="wlRatioDisplay">3.00:1</span>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                    <i class="fas fa-calculator"></i> Calculate Breakeven
+                                </button>
+                            </form>
+
+                            <!-- Formula Explanation -->
+                            <div class="mt-4 p-3" style="background: rgba(0,176,255,0.05); border-radius: 8px; border: 1px solid rgba(0,176,255,0.2);">
+                                <h6 class="mb-2" style="color: #00b0ff;">
+                                    <i class="fas fa-function me-2"></i>Breakeven Formula
+                                </h6>
+                                <code style="color: #9ba1a6; font-size: 0.9rem;">
+                                    Win Rate = Avg Loss / (Avg Win + Avg Loss)
+                                </code>
+                                <p class="text-muted small mb-0 mt-2">
+                                    This is the minimum win rate needed to break even, not including commissions or slippage.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="col-lg-7">
+                    <!-- Breakeven Win Rate Display -->
+                    <div class="card mb-3" style="background: linear-gradient(135deg, rgba(0,176,255,0.1), rgba(214,139,69,0.1)); border: 2px solid rgba(0,176,255,0.3);">
+                        <div class="card-body text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-bullseye fa-3x" style="color: #00b0ff;"></i>
+                            </div>
+                            <h2 class="mb-2" style="color: #9ba1a6; font-size: 1rem; font-weight: 600; letter-spacing: 1px;">
+                                BREAKEVEN WIN RATE
+                            </h2>
+                            <div class="display-1 fw-bold mb-3" id="breakevenRate" style="background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                25.0%
+                            </div>
+                            <p class="text-muted mb-0">
+                                You need to win <strong><span id="breakevenRateText">25.0%</span></strong> of trades to break even
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Win Rate Scenarios -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line"></i> Win Rate Scenarios
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-dark table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Win Rate</th>
+                                        <th class="text-end">Expected Value</th>
+                                        <th class="text-end">Per 100 Trades</th>
+                                        <th class="text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scenariosTableBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">Enter parameters to see scenarios</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Visual Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-area"></i> Profitability vs Win Rate
+                        </div>
+                        <div class="card-body">
+                            <canvas id="breakevenChart" height="80"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Insights -->
+            <div class="row g-3 mt-3">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-lightbulb fa-2x mb-3" style="color: #fca311;"></i>
+                            <h6 class="mb-2">Better R:R = Lower Breakeven</h6>
+                            <p class="text-muted small mb-0">
+                                A 3:1 risk/reward ratio means you only need to win 25% of trades to break even. Higher R:R ratios are more forgiving.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-3" style="color: #ff4444;"></i>
+                            <h6 class="mb-2">Account for Costs</h6>
+                            <p class="text-muted small mb-0">
+                                Remember to factor in commissions, slippage, and fees. Your actual breakeven rate will be slightly higher.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-crosshairs fa-2x mb-3" style="color: #00ff88;"></i>
+                            <h6 class="mb-2">Target Higher Win Rates</h6>
+                            <p class="text-muted small mb-0">
+                                Aim for a win rate at least 10-15% above your breakeven to maintain a healthy edge and absorb variance.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<%- include('partials/footer') %>
+
+<script>
+    let breakevenChart = null;
+    
+    const form = document.getElementById('breakevenForm');
+    
+    // Real-time updates
+    ['avgWin', 'avgLoss'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', calculateBreakeven);
+        }
+    });
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculateBreakeven();
+    });
+    
+    function calculateBreakeven() {
+        try {
+            const avgWin = parseFloat(document.getElementById('avgWin').value);
+            const avgLoss = parseFloat(document.getElementById('avgLoss').value);
+            
+            // Input validation
+            if (!avgWin || !avgLoss || avgWin <= 0 || avgLoss <= 0) {
+                console.warn('Invalid input values');
+                return;
+            }
+            
+            // Calculate win/loss ratio
+            const wlRatio = avgWin / avgLoss;
+            document.getElementById('wlRatioDisplay').textContent = wlRatio.toFixed(2) + ':1';
+            
+            // Calculate breakeven win rate
+            const breakevenWinRate = (avgLoss / (avgWin + avgLoss)) * 100;
+            
+            // Update display
+            const breakevenRateEl = document.getElementById('breakevenRate');
+            const breakevenRateTextEl = document.getElementById('breakevenRateText');
+            
+            breakevenRateEl.textContent = breakevenWinRate.toFixed(1) + '%';
+            breakevenRateTextEl.textContent = breakevenWinRate.toFixed(1) + '%';
+            
+            // Generate scenarios table
+            updateScenariosTable(avgWin, avgLoss, breakevenWinRate);
+            
+            // Update chart
+            updateChart(avgWin, avgLoss, breakevenWinRate);
+            
+        } catch (error) {
+            console.error('Error calculating breakeven:', error);
+        }
+    }
+    
+    function updateScenariosTable(avgWin, avgLoss, breakevenWinRate) {
+        const tbody = document.getElementById('scenariosTableBody');
+        if (!tbody) return;
+        
+        const winRates = [20, 30, 40, 50, 60, 70, 80];
+        let rows = '';
+        
+        winRates.forEach(winRate => {
+            const expectedValue = (winRate / 100 * avgWin) - ((100 - winRate) / 100 * avgLoss);
+            const per100Trades = expectedValue * 100;
+            
+            const isBreakeven = Math.abs(winRate - breakevenWinRate) < 1;
+            const isProfitable = winRate > breakevenWinRate;
+            
+            let statusBadge = '';
+            let rowClass = '';
+            
+            if (isBreakeven) {
+                statusBadge = '<span class="badge bg-warning"><i class="fas fa-equals"></i> Breakeven</span>';
+                rowClass = 'table-warning';
+            } else if (isProfitable) {
+                statusBadge = '<span class="badge bg-success"><i class="fas fa-arrow-up"></i> Profitable</span>';
+            } else {
+                statusBadge = '<span class="badge bg-danger"><i class="fas fa-arrow-down"></i> Losing</span>';
+            }
+            
+            const evClass = expectedValue >= 0 ? 'text-success' : 'text-danger';
+            
+            rows += `
+                <tr ${rowClass ? 'class="' + rowClass + '"' : ''}>
+                    <td><strong>${winRate}%</strong></td>
+                    <td class="text-end ${evClass}"><strong>${expectedValue >= 0 ? '+' : ''}$${expectedValue.toFixed(2)}</strong></td>
+                    <td class="text-end ${evClass}">${per100Trades >= 0 ? '+' : ''}$${per100Trades.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td class="text-end">${statusBadge}</td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = rows;
+    }
+    
+    function updateChart(avgWin, avgLoss, breakevenWinRate) {
+        const canvas = document.getElementById('breakevenChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Generate data points
+        const dataPoints = [];
+        for (let winRate = 0; winRate <= 100; winRate += 2) {
+            const expectedValue = (winRate / 100 * avgWin) - ((100 - winRate) / 100 * avgLoss);
+            dataPoints.push({ x: winRate, y: expectedValue });
+        }
+        
+        // Destroy existing chart
+        if (breakevenChart) {
+            breakevenChart.destroy();
+        }
+        
+        // Create new chart
+        breakevenChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'Expected Value per Trade',
+                        data: dataPoints,
+                        borderColor: '#00b0ff',
+                        backgroundColor: 'rgba(0, 176, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Breakeven Line',
+                        data: [
+                            { x: 0, y: 0 },
+                            { x: 100, y: 0 }
+                        ],
+                        borderColor: '#fca311',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    },
+                    {
+                        label: 'Breakeven Win Rate',
+                        data: [
+                            { x: breakevenWinRate, y: Math.min(...dataPoints.map(p => p.y)) },
+                            { x: breakevenWinRate, y: Math.max(...dataPoints.map(p => p.y)) }
+                        ],
+                        borderColor: '#d68b45',
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#9ba1a6',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 25, 34, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#9ba1a6',
+                        borderColor: '#00b0ff',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return 'Expected Value: $' + context.parsed.y.toFixed(2);
+                                }
+                                return context.dataset.label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Win Rate (%)',
+                            color: '#9ba1a6',
+                            font: {
+                                size: 13,
+                                weight: '600'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#9ba1a6',
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Expected Value ($)',
+                            color: '#9ba1a6',
+                            font: {
+                                size: 13,
+                                weight: '600'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#9ba1a6',
+                            callback: function(value) {
+                                return '$' + value.toFixed(0);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Initial calculation
+    calculateBreakeven();
+</script>
