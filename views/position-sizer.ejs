@@ -524,26 +524,33 @@
     function autoFillFromProfile() {
         if (typeof PersonalizationEngine !== 'undefined') {
             const profile = PersonalizationEngine.loadProfile();
+            const autoFilledFields = [];
             
             if (profile.accountSize) {
                 document.getElementById('accountBalance').value = profile.accountSize;
+                autoFilledFields.push('accountBalance');
             }
             if (profile.winRate) {
                 document.getElementById('winRate').value = profile.winRate;
+                autoFilledFields.push('winRate');
             }
             if (profile.avgWin) {
                 document.getElementById('avgWin').value = profile.avgWin;
+                autoFilledFields.push('avgWin');
             }
             if (profile.avgLoss) {
                 document.getElementById('avgLoss').value = profile.avgLoss;
+                autoFilledFields.push('avgLoss');
             }
             if (profile.riskPercentPerTrade) {
                 document.getElementById('riskPercent').value = profile.riskPercentPerTrade;
+                autoFilledFields.push('riskPercent');
             }
             
-            // Show notification that profile was loaded
-            if (PersonalizationEngine.isProfileComplete()) {
-                showProfileLoadedNotification();
+            // Show enhanced notification and visual feedback
+            if (PersonalizationEngine.isProfileComplete() && autoFilledFields.length > 0) {
+                showEnhancedProfileLoadedNotification(autoFilledFields.length);
+                highlightAutoFilledFields(autoFilledFields);
             }
             
             // Track calculator usage
@@ -551,25 +558,41 @@
         }
     }
     
-    function showProfileLoadedNotification() {
+    function showEnhancedProfileLoadedNotification(fieldCount) {
         const notification = document.createElement('div');
-        notification.className = 'alert alert-success';
-        notification.style.cssText = 'position: fixed; top: 80px; right: 20px; z-index: 1050; max-width: 350px; animation: slideInRight 0.3s ease;';
+        notification.className = 'profile-loaded-toast';
         notification.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
-                <div>
-                    <strong>Profile Loaded</strong><br>
-                    <small>Your metrics have been auto-filled</small>
+            <button class="toast-dismiss" onclick="this.parentElement.remove()">&times;</button>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="toast-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="toast-content">
+                    <strong><i class="fas fa-user-circle me-1"></i>Profile Loaded</strong>
+                    <small>${fieldCount} field${fieldCount > 1 ? 's' : ''} auto-filled from your trading profile</small>
                 </div>
             </div>
         `;
         document.body.appendChild(notification);
         
         setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.3s ease';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
+            notification.style.animation = 'slideOutRight 0.4s cubic-bezier(0.4, 0, 1, 1)';
+            setTimeout(() => notification.remove(), 400);
+        }, 4500);
+    }
+    
+    function highlightAutoFilledFields(fieldIds) {
+        fieldIds.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.classList.add('profile-autofilled');
+                
+                // Remove animation class after it completes
+                setTimeout(() => {
+                    field.classList.remove('profile-autofilled');
+                }, 2000);
+            }
+        });
     }
     
     // Listen for profile updates
