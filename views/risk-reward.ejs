@@ -306,12 +306,43 @@
         const accountBalance = parseFloat(document.getElementById('accountBalance').value);
         const isShort = document.getElementById('isShort').checked;
         
+        // Validation
+        const errors = [];
+        if (!entry || entry <= 0) errors.push('Entry price must be greater than $0');
+        if (!stop || stop <= 0) errors.push('Stop loss must be greater than $0');
+        if (!target1 || target1 <= 0) errors.push('Target 1 must be greater than $0');
+        if (!size || size <= 0) errors.push('Position size must be greater than 0');
+        if (!accountBalance || accountBalance <= 0) errors.push('Account balance must be greater than $0');
+        
+        // Check for division by zero scenarios
+        if (entry === stop) errors.push('Stop loss cannot equal entry price (0 risk)');
+        if (entry === target1) errors.push('Target 1 cannot equal entry price (0 reward)');
+        
+        // Validate short position logic
+        if (isShort && stop <= entry) errors.push('For short positions, stop loss must be ABOVE entry');
+        if (isShort && target1 >= entry) errors.push('For short positions, target must be BELOW entry');
+        if (!isShort && stop >= entry) errors.push('For long positions, stop loss must be BELOW entry');
+        if (!isShort && target1 <= entry) errors.push('For long positions, target must be ABOVE entry');
+        
+        if (errors.length > 0) {
+            showError(errors);
+            return;
+        }
+        
+        clearError();
+        
         if (!entry || !stop || !target1 || !size || !accountBalance) return;
         
         // Calculate risk
         const riskPerShare = Math.abs(entry - stop);
         const riskDollar = riskPerShare * size;
         const riskPercent = (riskDollar / accountBalance) * 100;
+        
+        // Validate calculations
+        if (!isFinite(riskPerShare) || isNaN(riskPerShare) || riskPerShare === 0) {
+            showError(['Invalid risk calculation']);
+            return;
+        }
         
         // Update inline risk display in form
         document.getElementById('riskAmount').textContent = '$' + riskPerShare.toFixed(2);
@@ -445,6 +476,11 @@
     function updateWinRateAnalysis(targets, entry, stop) {
         const riskPerShare = Math.abs(entry - stop);
         
+        // Validate risk calculation
+        if (!isFinite(riskPerShare) || isNaN(riskPerShare) || riskPerShare === 0) {
+            return; // Skip win rate analysis if risk is invalid
+        }
+        
         const boxes = targets.map(target => {
             const rewardPerShare = Math.abs(target.price - entry);
             const rrRatio = rewardPerShare / riskPerShare;
@@ -462,6 +498,37 @@
         }).join('');
         
         winRateAnalysis.innerHTML = boxes;
+    }
+    
+    // Error handling functions
+    function showError(errors) {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid Input</strong>
+                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+    }
+    
+    function clearError() {
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+        }
+    }
+    
+    function createErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'errorContainer';
+        container.style.display = 'none';
+        const form = document.getElementById('calculatorForm');
+        form.parentElement.insertBefore(container, form.nextSibling);
+        return container;
     }
     
     // Initial analysis
