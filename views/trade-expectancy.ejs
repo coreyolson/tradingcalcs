@@ -289,6 +289,9 @@
         
         clearError();
         
+        // Sample size warning
+        showSampleSizeWarning(totalTrades);
+        
         const lossRate = 1 - winRate;
         
         // Calculate expectancy
@@ -415,11 +418,40 @@
         }
     }
     
+    // Sample size warning function
+    function showSampleSizeWarning(totalTrades) {
+        const warningContainer = document.getElementById('sampleSizeWarning') || createSampleSizeWarningContainer();
+        
+        if (totalTrades < 30) {
+            warningContainer.innerHTML = `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Small Sample Size:</strong> ${totalTrades} trades may not be statistically significant. 
+                    Results become more reliable with 30+ trades.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            warningContainer.style.display = 'block';
+        } else {
+            warningContainer.style.display = 'none';
+        }
+    }
+    
+    function createSampleSizeWarningContainer() {
+        const container = document.createElement('div');
+        container.id = 'sampleSizeWarning';
+        container.style.display = 'none';
+        const mainContainer = document.querySelector('.container');
+        const firstCard = mainContainer.querySelector('.row');
+        mainContainer.insertBefore(container, firstCard);
+        return container;
+    }
+    
     // Error handling functions
     function showError(errors) {
         const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
         errorContainer.innerHTML = `
-            <div class="alert alert-danger">
+            <div class="alert alert-danger">`
                 <i class="fas fa-exclamation-triangle"></i>
                 <strong>Invalid Input</strong>
                 <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">

@@ -422,6 +422,9 @@
         
         clearError();
         
+        // Sample size warning
+        showSampleSizeWarning(returns.length);
+        
         // Update display
         updateMetricsDisplay(metrics);
         updateInterpretation(metrics, benchmarkMetrics);
@@ -813,6 +816,35 @@
         ];
         
         document.getElementById('returnsData').value = sampleReturns.join(', ');
+    }
+    
+    // Sample size warning function
+    function showSampleSizeWarning(dataPoints) {
+        const warningContainer = document.getElementById('sampleSizeWarning') || createSampleSizeWarningContainer();
+        
+        if (dataPoints < 30) {
+            warningContainer.innerHTML = `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Small Sample Size:</strong> ${dataPoints} data points may not be statistically significant. 
+                    Results become more reliable with 30+ data points.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            warningContainer.style.display = 'block';
+        } else {
+            warningContainer.style.display = 'none';
+        }
+    }
+    
+    function createSampleSizeWarningContainer() {
+        const container = document.createElement('div');
+        container.id = 'sampleSizeWarning';
+        container.style.display = 'none';
+        const mainContainer = document.querySelector('.container');
+        const firstCard = mainContainer.querySelector('.row');
+        mainContainer.insertBefore(container, firstCard);
+        return container;
     }
     
     // Error handling helpers
