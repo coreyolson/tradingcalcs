@@ -75,7 +75,6 @@
 
 - **ROBUSTNESS_IMPROVEMENTS.md** - Comprehensive audit document with all edge cases and fixes
 - **ERROR_HANDLING_TEMPLATE.js** - Reusable validation patterns and helper functions (297 lines)
-- **BATCH_FIX_PLAN.sh** - Implementation guide (now archived, all fixes applied)
 
 ---
 
@@ -121,7 +120,7 @@
 
 **Files Modified:**
 - 11 calculator view files (*.ejs)
-- 3 documentation files (ROBUSTNESS_IMPROVEMENTS.md, ERROR_HANDLING_TEMPLATE.js, BATCH_FIX_PLAN.sh)
+- 2 documentation files (ROBUSTNESS_IMPROVEMENTS.md, ERROR_HANDLING_TEMPLATE.js)
 - All changes tracked and pushed to GitHub
 
 **Code Additions:**
