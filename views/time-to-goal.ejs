@@ -207,32 +207,86 @@
     
     // Real-time calculation function
     function calculate() {
-        const currentBalance = parseFloat(document.getElementById('currentBalance').value) || 0;
-        const goalBalance = parseFloat(document.getElementById('goalBalance').value) || 0;
-        const winRate = parseFloat(document.getElementById('winRate').value) / 100 || 0;
-        const avgWin = parseFloat(document.getElementById('avgWin').value) / 100 || 0;
-        const avgLoss = parseFloat(document.getElementById('avgLoss').value) / 100 || 0;
-        const tradesPerDay = parseInt(document.getElementById('tradesPerDay').value) || 1;
+        const currentBalance = parseFloat(document.getElementById('currentBalance').value);
+        const goalBalance = parseFloat(document.getElementById('goalBalance').value);
+        const winRate = parseFloat(document.getElementById('winRate').value) / 100;
+        const avgWin = parseFloat(document.getElementById('avgWin').value) / 100;
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value) / 100;
+        const tradesPerDay = parseInt(document.getElementById('tradesPerDay').value);
         const monthlyDeposit = parseFloat(document.getElementById('monthlyDeposit').value) || 0;
+        
+        // Validation
+        const errors = [];
+        if (!currentBalance || currentBalance <= 0) errors.push('Current balance must be greater than $0');
+        if (!goalBalance || goalBalance <= 0) errors.push('Goal balance must be greater than $0');
+        if (isNaN(winRate) || winRate < 0 || winRate > 1) errors.push('Win rate must be between 0% and 100%');
+        if (!avgWin || avgWin <= 0 || avgWin > 1) errors.push('Average win must be between 0% and 100%');
+        if (!avgLoss || avgLoss <= 0 || avgLoss > 1) errors.push('Average loss must be between 0% and 100%');
+        if (!tradesPerDay || tradesPerDay <= 0) errors.push('Trades per day must be greater than 0');
+        if (monthlyDeposit < 0) errors.push('Monthly deposit cannot be negative');
+        
+        if (errors.length > 0) {
+            showError(errors);
+            return;
+        }
+        
+        // Check if goal is already met
+        if (currentBalance >= goalBalance) {
+            showGoalMet();
+            return;
+        }
+        
+        clearError();
         
         if (!currentBalance || !goalBalance) return;
         
         // Calculate gain needed
         const gainNeededPercent = ((goalBalance - currentBalance) / currentBalance) * 100;
+        
+        // Validate calculation
+        if (!isFinite(gainNeededPercent) || isNaN(gainNeededPercent)) {
+            showError(['Invalid gain calculation']);
+            return;
+        }
+        
         document.getElementById('gainNeeded').textContent = '+' + gainNeededPercent.toFixed(0) + '%';
         
         // Calculate expected return per trade
         const lossRate = 1 - winRate;
         const expectedReturnPerTrade = (winRate * avgWin) - (lossRate * avgLoss);
+        
+        // Check if goal is reachable
+        if (expectedReturnPerTrade <= 0 && monthlyDeposit === 0) {
+            showImpossibleGoal('Negative expected return with no deposits - goal unreachable');
+            return;
+        }
+        
+        // Validate return calculation
+        if (!isFinite(expectedReturnPerTrade) || isNaN(expectedReturnPerTrade)) {
+            showError(['Invalid return calculation']);
+            return;
+        }
+        
         const dailyReturn = expectedReturnPerTrade * tradesPerDay;
-        const monthlyReturnApprox = Math.pow(1 + expectedReturnPerTrade, tradesPerDay * 20) - 1; // ~20 trading days/month
+        
+        // Prevent logarithm errors
+        if (expectedReturnPerTrade <= 0) {
+            const monthlyReturnApprox = 0;
+            document.getElementById('monthlyReturn').textContent = '0%';
+        } else {
+            const monthlyReturnApprox = Math.pow(1 + expectedReturnPerTrade, tradesPerDay * 20) - 1;
+            if (!isFinite(monthlyReturnApprox) || isNaN(monthlyReturnApprox)) {
+                showError(['Invalid monthly return calculation']);
+                return;
+            }
+            document.getElementById('monthlyReturn').textContent = '~' + (monthlyReturnApprox * 100).toFixed(0) + '%';
+        }
         
         document.getElementById('expectedReturn').textContent = (expectedReturnPerTrade >= 0 ? '+' : '') + 
             (expectedReturnPerTrade * 100).toFixed(2) + '%';
         document.getElementById('expectedReturn').className = expectedReturnPerTrade >= 0 ? 'text-success' : 'text-danger';
         document.getElementById('dailyReturn').textContent = (dailyReturn >= 0 ? '+' : '') + 
             (dailyReturn * 100).toFixed(1) + '%';
-        document.getElementById('monthlyReturn').textContent = '~' + (monthlyReturnApprox * 100).toFixed(0) + '%';
         
         // Simulate trading to goal
         let balance = currentBalance;
@@ -267,6 +321,13 @@
         
         const tradingDays = Math.ceil(totalTrades / tradesPerDay);
         const monthsNeeded = tradingDays / 20; // ~20 trading days per month
+        
+        // Warn about unrealistic timeframes
+        if (monthsNeeded > 600) { // 50 years
+            showWarning('Timeframe exceeds 50 years - goal may be unrealistic with current parameters');
+        } else if (monthsNeeded > 360) { // 30 years
+            showWarning('Timeframe exceeds 30 years - consider increasing deposits or improving edge');
+        }
         
         // Calculate target date
         const today = new Date();
@@ -496,6 +557,95 @@
     window.addEventListener('profileUpdated', autoFillFromProfile);
     
     autoFillFromProfile();
+    
+    // Error handling functions
+    function showError(errors) {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid Input</strong>
+                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+        clearResults();
+    }
+    
+    function showGoalMet() {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <strong>Goal Already Achieved!</strong>
+                <p style="margin: 0.5rem 0 0 0;">Your current balance meets or exceeds your goal. Congratulations!</p>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+        clearResults();
+    }
+    
+    function showImpossibleGoal(message) {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-ban"></i>
+                <strong>Goal Unreachable</strong>
+                <p style="margin: 0.5rem 0 0 0;">${message}</p>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+        clearResults();
+    }
+    
+    function showWarning(message) {
+        const warningContainer = document.getElementById('warningContainer') || createWarningContainer();
+        warningContainer.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>Warning:</strong> ${message}
+            </div>
+        `;
+        warningContainer.style.display = 'block';
+    }
+    
+    function clearError() {
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer) errorContainer.style.display = 'none';
+        const warningContainer = document.getElementById('warningContainer');
+        if (warningContainer) warningContainer.style.display = 'none';
+    }
+    
+    function clearResults() {
+        document.getElementById('gainNeeded').textContent = '--';
+        document.getElementById('expectedReturn').textContent = '--';
+        document.getElementById('dailyReturn').textContent = '--';
+        document.getElementById('monthlyReturn').textContent = '--';
+        document.getElementById('timeToGoal').textContent = '--';
+        document.getElementById('tradesNeeded').textContent = '--';
+        document.getElementById('tradingDays').textContent = '--';
+        document.getElementById('targetDate').textContent = '--';
+    }
+    
+    function createErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'errorContainer';
+        container.style.display = 'none';
+        const form = document.getElementById('goalForm');
+        form.parentElement.insertBefore(container, form.nextSibling);
+        return container;
+    }
+    
+    function createWarningContainer() {
+        const container = document.createElement('div');
+        container.id = 'warningContainer';
+        container.style.display = 'none';
+        const results = document.querySelector('.row.g-3');
+        results.parentElement.insertBefore(container, results);
+        return container;
+    }
     
     // Initial calculation
     calculate();
