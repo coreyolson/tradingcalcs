@@ -271,11 +271,32 @@
         const totalTrades = parseInt(document.getElementById('totalTrades').value);
         const currentWinRate = parseInt(winRateSlider.value);
         
-        if (!avgWin || !avgLoss || !totalTrades) return;
+        // Input validation
+        const errors = [];
+        if (!avgWin || avgWin <= 0) errors.push('Average win must be greater than $0');
+        if (!avgLoss || avgLoss <= 0) errors.push('Average loss must be greater than $0');
+        if (!totalTrades || totalTrades < 1) errors.push('Total trades must be at least 1');
+        
+        if (errors.length > 0) {
+            showError(errors);
+            return;
+        }
+        
+        clearError();
         
         // Calculate metrics
         const wlRatio = avgWin / avgLoss;
         const breakevenWinRate = (avgLoss / (avgWin + avgLoss)) * 100;
+        
+        // Validate calculations
+        if (!isFinite(wlRatio) || isNaN(wlRatio)) {
+            showError(['Invalid win/loss ratio calculation']);
+            return;
+        }
+        if (!isFinite(breakevenWinRate) || isNaN(breakevenWinRate)) {
+            showError(['Invalid breakeven win rate calculation']);
+            return;
+        }
         
         // Update current metrics
         document.getElementById('currentWLRatio').textContent = wlRatio.toFixed(2) + ':1';
@@ -288,6 +309,20 @@
         const currentEV = (currentWinRate / 100 * avgWin) - ((100 - currentWinRate) / 100 * avgLoss);
         const currentTotalProfit = currentEV * totalTrades;
         const currentROI = totalTrades > 0 ? (currentTotalProfit / (avgLoss * totalTrades)) * 100 : 0;
+        
+        // Validate EV calculations
+        if (!isFinite(currentEV) || isNaN(currentEV)) {
+            showError(['Invalid expected value calculation']);
+            return;
+        }
+        if (!isFinite(currentTotalProfit) || isNaN(currentTotalProfit)) {
+            showError(['Invalid total profit calculation']);
+            return;
+        }
+        if (!isFinite(currentROI) || isNaN(currentROI)) {
+            showError(['Invalid ROI calculation']);
+            return;
+        }
         
         // Update current metrics
         document.getElementById('currentEV').textContent = '$' + currentEV.toFixed(2);
@@ -527,6 +562,41 @@
         });
         
         tbody.innerHTML = rows;
+    }
+    
+    // Error handling helpers
+    function showError(messages) {
+        const errorDiv = document.getElementById('error-message');
+        if (!errorDiv) {
+            const container = document.querySelector('.container');
+            const errorEl = document.createElement('div');
+            errorEl.id = 'error-message';
+            errorEl.className = 'alert alert-danger mt-3';
+            errorEl.role = 'alert';
+            container.insertBefore(errorEl, container.firstChild);
+        }
+        
+        const errorDisplay = document.getElementById('error-message');
+        if (Array.isArray(messages)) {
+            errorDisplay.innerHTML = '<strong>Please correct the following:</strong><ul class="mb-0 mt-2">' + 
+                messages.map(msg => '<li>' + msg + '</li>').join('') + '</ul>';
+        } else {
+            errorDisplay.innerHTML = '<strong>Error:</strong> ' + messages;
+        }
+        errorDisplay.style.display = 'block';
+        
+        // Hide results
+        const resultsSection = document.getElementById('results');
+        if (resultsSection) resultsSection.style.display = 'none';
+    }
+    
+    function clearError() {
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+        const resultsSection = document.getElementById('results');
+        if (resultsSection) resultsSection.style.display = 'block';
     }
     
         // Auto-fill from profile
