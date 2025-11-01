@@ -282,10 +282,17 @@ const PersonalizationEngine = (() => {
     /**
      * Reset profile to defaults
      */
-    function resetProfile() {
-        if (confirm('Are you sure you want to reset your profile? This will clear all your saved metrics.')) {
+    async function resetProfile() {
+        const confirmed = await UIUtils.showConfirm(
+            'Are you sure you want to reset your profile? This will clear all your saved metrics.',
+            'Reset Profile',
+            { confirmText: 'Reset', confirmClass: 'btn-danger' }
+        );
+        
+        if (confirmed) {
             localStorage.removeItem(STORAGE_KEY);
             window.dispatchEvent(new CustomEvent('profileReset'));
+            UIUtils.showSuccess('Profile reset successfully');
             return true;
         }
         return false;
@@ -711,9 +718,16 @@ const PersonalizationEngine = (() => {
     /**
      * Reset analytics data
      */
-    function resetAnalytics() {
-        if (confirm('Are you sure you want to reset all analytics data? This cannot be undone.')) {
+    async function resetAnalytics() {
+        const confirmed = await UIUtils.showConfirm(
+            'Are you sure you want to reset all analytics data? This cannot be undone.',
+            'Reset Analytics',
+            { confirmText: 'Reset', confirmClass: 'btn-danger' }
+        );
+        
+        if (confirmed) {
             localStorage.removeItem(ANALYTICS_KEY);
+            UIUtils.showSuccess('Analytics data reset successfully');
             return true;
         }
         return false;

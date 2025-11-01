@@ -247,11 +247,11 @@ async function runCalculation() {
             currentData = result.data;
             displayResults(result.data);
         } else {
-            alert('Error: ' + result.error);
+            UIUtils.showError('Error: ' + result.error);
         }
     } catch (error) {
         console.error('Calculation error:', error);
-        alert('Failed to calculate: ' + error.message);
+        UIUtils.showError('Failed to calculate: ' + error.message);
     } finally {
         loadingIndicator.classList.add('d-none');
         resultsContainer.classList.remove('d-none');
@@ -1040,12 +1040,12 @@ function saveCustomPreset() {
     const presetName = document.getElementById('presetName').value.trim();
     
     if (!presetName) {
-        alert('Please enter a preset name');
+        UIUtils.showWarning('Please enter a preset name');
         return;
     }
     
     if (presets[presetName.toLowerCase()]) {
-        alert('This name is reserved. Please choose a different name.');
+        UIUtils.showWarning('This name is reserved. Please choose a different name.');
         return;
     }
     
@@ -1113,11 +1113,18 @@ function renderCustomPresets() {
 }
 
 // Delete custom preset
-function deleteCustomPreset(name) {
-    if (confirm(`Delete preset "${name}"?`)) {
+async function deleteCustomPreset(name) {
+    const confirmed = await UIUtils.showConfirm(
+        `Delete preset "${name}"?`,
+        'Delete Preset',
+        { confirmText: 'Delete', confirmClass: 'btn-danger' }
+    );
+    
+    if (confirmed) {
         delete customPresets[name];
         localStorage.setItem('customPresets', JSON.stringify(customPresets));
         renderCustomPresets();
+        UIUtils.showSuccess(`Preset "${name}" deleted`);
     }
 }
 
