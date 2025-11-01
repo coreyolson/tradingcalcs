@@ -37,6 +37,13 @@
 - **Commit:** 7a5d0a2
 - **Completed:** October 31, 2025
 
+### ✅ 9. **Most Used Calculators Widget**
+- **Status:** COMPLETED
+- **Location:** Homepage Quick Access section
+- **Features:** Shows top 3 most-used calculators, usage count badges, hidden when no usage data
+- **Commit:** 1b76b8c
+- **Completed:** October 31, 2025
+
 ---
 
 ## 🎯 PROFILE ENHANCEMENTS (High Value)
@@ -88,18 +95,6 @@
 ---
 
 ## 📊 CALCULATOR IMPROVEMENTS
-
-### 9. **Most Used Calculators Widget**
-- **Problem:** Usage tracking exists but not displayed
-- **Solution:**
-  - Add "Quick Access" widget on homepage
-  - Show 3 most-used calculators from PersonalizationEngine
-  - One-click access
-  - Show usage count badge
-- **Files to modify:**
-  - `views/index.ejs` (homepage dashboard)
-  - Use `PersonalizationEngine.getMostUsedCalculators()`
-- **Priority:** 🟢 LOW-MEDIUM
 
 ### 10. **Real Discord Invite Link**
 - **Problem:** Discord links are placeholder "#"
