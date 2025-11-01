@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const path = require('path');
 
 const app = express();
@@ -10,9 +11,26 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Middleware
+app.use(compression()); // Gzip compression
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+
+// Static files with caching
+app.use(express.static('public', {
+    maxAge: '1d', // Cache for 1 day
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+        // Cache CSS and JS for 1 day
+        if (path.endsWith('.css') || path.endsWith('.js')) {
+            res.setHeader('Cache-Control', 'public, max-age=86400'); // 1 day
+        }
+        // Cache images for 7 days
+        if (path.match(/\.(jpg|jpeg|png|gif|svg|ico|webp)$/)) {
+            res.setHeader('Cache-Control', 'public, max-age=604800'); // 7 days
+        }
+    }
+}));
 
 // Routes
 app.get('/', (req, res) => {
