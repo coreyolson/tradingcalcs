@@ -1,0 +1,233 @@
+<%- include('partials/header', { 
+    title: '404 - Page Not Found | Copper Candle',
+    description: 'This page doesn\'t exist. Check out our trading calculators instead.',
+    includeChartJs: false
+}) %>
+
+<div class="container-fluid px-4" style="max-width: 1000px; margin: 0 auto;">
+    <!-- 404 Hero Section -->
+    <div class="text-center my-5" style="padding: 3rem 0;">
+        <div style="font-size: 8rem; font-weight: 800; background: linear-gradient(135deg, #ff6b6b 0%, #fca311 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 1rem;">
+            404
+        </div>
+        <h1 style="color: #eaeaea; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">
+            Page Not Found
+        </h1>
+        <p style="color: #9ba1a6; font-size: 1.1rem; max-width: 600px; margin: 0 auto 2rem;">
+            This page doesn't exist. Maybe it's been moved, deleted, or you mistyped the URL. 
+            Either way, let's get you back on track.
+        </p>
+        
+        <!-- Quick Navigation -->
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem;">
+            <a href="/" class="btn" style="background: linear-gradient(135deg, #00b0ff, #0077ff); border: none; color: #fff; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; transition: all 0.3s ease;">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
+            <a href="/position-sizer" class="btn" style="background: linear-gradient(135deg, #00ff88, #00d4ff); border: none; color: #000; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; transition: all 0.3s ease;">
+                <i class="fas fa-calculator me-2"></i>Open Calculator
+            </a>
+        </div>
+    </div>
+
+    <!-- All Calculators Grid -->
+    <div class="mb-5">
+        <h2 class="text-center mb-4" style="color: #d68b45; font-size: 1.75rem; font-weight: 700;">
+            <i class="fas fa-th me-2"></i>All Calculators
+        </h2>
+        <p class="text-center mb-4" style="color: #9ba1a6;">
+            Looking for something specific? Here's everything we offer:
+        </p>
+        
+        <div class="row g-3">
+            <!-- Risk & Position Management -->
+            <div class="col-12 mb-3">
+                <h3 class="h6 mb-2" style="color: #00b0ff; font-weight: 600;">
+                    <i class="fas fa-shield-alt me-2"></i>Risk & Position Management
+                </h3>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/contract-calculator" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-chart-line mb-2" style="color: var(--success-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Contract Calculator</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Monte Carlo simulations & Kelly Criterion</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/position-sizer" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-bullseye mb-2" style="color: var(--success-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Position Sizer</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Kelly Criterion position sizing</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/portfolio-heat" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-fire mb-2" style="color: var(--success-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Portfolio Heat</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Total portfolio risk tracking</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/risk-reward" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-balance-scale mb-2" style="color: var(--success-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Risk/Reward</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Trade setup analyzer</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Performance Analytics -->
+            <div class="col-12 mb-3 mt-4">
+                <h3 class="h6 mb-2" style="color: #00b0ff; font-weight: 600;">
+                    <i class="fas fa-chart-bar me-2"></i>Performance Analytics
+                </h3>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/trade-expectancy" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-calculator mb-2" style="color: var(--info-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Trade Expectancy</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Calculate your edge</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/win-rate-impact" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-percentage mb-2" style="color: var(--info-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Win Rate Impact</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Scenario modeling</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/drawdown-recovery" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-chart-area mb-2" style="color: var(--info-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Drawdown Recovery</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Loss recovery calculator</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/sharpe-ratio" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-chart-bar mb-2" style="color: var(--info-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Sharpe Ratio</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Risk-adjusted returns</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Goal Planning -->
+            <div class="col-12 mb-3 mt-4">
+                <h3 class="h6 mb-2" style="color: #00b0ff; font-weight: 600;">
+                    <i class="fas fa-bullseye me-2"></i>Goal Planning
+                </h3>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/compound-growth" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-seedling mb-2" style="color: var(--warning-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Compound Growth</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Future account projections</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/time-to-goal" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-clock mb-2" style="color: var(--warning-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Time to Goal</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Timeline calculator</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/breakeven-calculator" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-arrows-alt-h mb-2" style="color: var(--warning-color); font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Breakeven</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Win rate requirements</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/leverage-calculator" class="text-decoration-none">
+                    <div class="card h-100" style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        <div class="card-body">
+                            <i class="fas fa-layer-group mb-2" style="color: #a855f7; font-size: 1.5rem;"></i>
+                            <h5 class="card-title" style="color: #eaeaea; font-size: 0.95rem; font-weight: 600;">Leverage</h5>
+                            <p class="card-text" style="color: #9ba1a6; font-size: 0.8rem;">Margin & leverage calculator</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Help Section -->
+    <div class="text-center mb-5 pb-5">
+        <p style="color: #9ba1a6; font-size: 0.9rem; margin-bottom: 1rem;">
+            Still can't find what you're looking for?
+        </p>
+        <a href="/about" style="color: #00b0ff; text-decoration: none; font-weight: 600;">
+            <i class="fas fa-info-circle me-1"></i>Learn More About Copper Candle
+        </a>
+    </div>
+</div>
+
+<style>
+    .card:hover {
+        transform: translateY(-3px);
+        border-color: #00b0ff !important;
+        box-shadow: 0 8px 20px rgba(0, 176, 255, 0.2);
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 176, 255, 0.4);
+    }
+</style>
+
+<%- include('partials/footer') %>

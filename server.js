@@ -627,9 +627,13 @@ app.get('/terms', (req, res) => {
     });
 });
 
-// Serve the main page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// 404 Error Handler - Must be LAST route
+app.use((req, res) => {
+    res.status(404).render('404', {
+        title: '404 - Page Not Found',
+        description: 'This page doesn\'t exist. Check out our trading calculators instead.',
+        includeChartJs: false
+    });
 });
 
 // Export for testing
