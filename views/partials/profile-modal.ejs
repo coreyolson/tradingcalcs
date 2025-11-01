@@ -324,6 +324,12 @@
                         </a>
                     </li>
                     <li>
+                        <a class="dropdown-item" href="#" id="importProfileBtn" style="color: #9ba1a6; font-size: 0.85rem;">
+                            <i class="fas fa-upload me-2" style="width: 20px;"></i>Import Data
+                        </a>
+                        <input type="file" id="importProfileInput" accept=".json,.csv" style="display: none;">
+                    </li>
+                    <li>
                         <a class="dropdown-item" href="#" id="clearProfileBtn" style="color: #ff6b6b; font-size: 0.85rem;">
                             <i class="fas fa-trash me-2" style="width: 20px;"></i>Clear Profile
                         </a>
@@ -344,6 +350,57 @@
             e.preventDefault();
             PersonalizationEngine.exportProfile();
             showToast('Profile Exported!', 'Your profile has been downloaded as JSON.', 'success');
+        });
+        
+        document.getElementById('importProfileBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('importProfileInput').click();
+        });
+        
+        document.getElementById('importProfileInput')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const content = event.target.result;
+                    let profileData;
+                    
+                    // Handle JSON files
+                    if (file.name.endsWith('.json')) {
+                        profileData = JSON.parse(content);
+                    } 
+                    // Handle CSV files (basic support)
+                    else if (file.name.endsWith('.csv')) {
+                        showToast('CSV Import', 'CSV import is not yet supported. Please use JSON format.', 'warning');
+                        e.target.value = '';
+                        return;
+                    }
+                    
+                    // Validate profile data
+                    if (!profileData || typeof profileData !== 'object') {
+                        throw new Error('Invalid profile format');
+                    }
+                    
+                    // Show confirmation dialog with preview
+                    showImportConfirmation(profileData, file.name);
+                    
+                } catch (error) {
+                    console.error('Import error:', error);
+                    showToast('Import Failed', 'Invalid file format. Please upload a valid JSON profile file.', 'danger');
+                }
+                
+                // Reset file input
+                e.target.value = '';
+            };
+            
+            reader.onerror = function() {
+                showToast('Import Failed', 'Could not read file. Please try again.', 'danger');
+                e.target.value = '';
+            };
+            
+            reader.readAsText(file);
         });
         
         document.getElementById('clearProfileBtn')?.addEventListener('click', function(e) {
@@ -474,6 +531,97 @@
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 5000);
     }
+    
+    function showImportConfirmation(profileData, filename) {
+        // Create confirmation modal
+        const confirmModal = document.createElement('div');
+        confirmModal.className = 'modal fade';
+        confirmModal.id = 'importConfirmModal';
+        confirmModal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="background: var(--bg-card); border: 1px solid rgba(214, 139, 69, 0.3);">
+                    <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <h5 class="modal-title" style="color: #d68b45;">
+                            <i class="fas fa-upload me-2"></i>Confirm Profile Import
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="color: #eaeaea;">
+                        <div class="alert alert-warning" style="background: rgba(252, 163, 17, 0.1); border: 1px solid rgba(252, 163, 17, 0.3); color: #fca311;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Warning:</strong> This will replace your current profile data.
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <strong style="color: #00b0ff;">File:</strong> 
+                            <span style="color: #9ba1a6;">${filename}</span>
+                        </div>
+                        
+                        <div style="background: rgba(0, 176, 255, 0.05); border: 1px solid rgba(0, 176, 255, 0.2); border-radius: 6px; padding: 1rem;">
+                            <strong style="color: #00b0ff; margin-bottom: 0.5rem; display: block;">Profile Preview:</strong>
+                            <div style="font-size: 0.85rem; color: #9ba1a6; font-family: monospace;">
+                                ${generateProfilePreview(profileData)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" id="confirmImportBtn" style="background: linear-gradient(135deg, #00b0ff, #0077ff); border: none;">
+                            <i class="fas fa-check me-2"></i>Import Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(confirmModal);
+        const bsModal = new bootstrap.Modal(confirmModal);
+        bsModal.show();
+        
+        // Handle import confirmation
+        document.getElementById('confirmImportBtn').addEventListener('click', function() {
+            try {
+                PersonalizationEngine.saveProfile(profileData);
+                bsModal.hide();
+                
+                // Reload to reflect new profile
+                showToast('Profile Imported!', 'Your profile has been successfully imported.', 'success');
+                setTimeout(() => location.reload(), 1500);
+                
+            } catch (error) {
+                console.error('Import error:', error);
+                showToast('Import Failed', 'Could not import profile. Please try again.', 'danger');
+            }
+        });
+        
+        // Cleanup modal after hiding
+        confirmModal.addEventListener('hidden.bs.modal', function() {
+            confirmModal.remove();
+        });
+    }
+    
+    function generateProfilePreview(profile) {
+        const fields = [];
+        
+        if (profile.accountSize) fields.push(`Account Size: $${profile.accountSize.toLocaleString()}`);
+        if (profile.winRate) fields.push(`Win Rate: ${profile.winRate}%`);
+        if (profile.avgWin) fields.push(`Avg Win: $${profile.avgWin}`);
+        if (profile.avgLoss) fields.push(`Avg Loss: $${profile.avgLoss}`);
+        if (profile.riskPercentPerTrade) fields.push(`Risk Per Trade: ${profile.riskPercentPerTrade}%`);
+        if (profile.totalTrades) fields.push(`Total Trades: ${profile.totalTrades}`);
+        if (profile.riskProfile) fields.push(`Risk Profile: ${profile.riskProfile}`);
+        if (profile.tradingStyle) fields.push(`Trading Style: ${profile.tradingStyle}`);
+        
+        if (fields.length === 0) {
+            return '<span style="color: #ff6b6b;">⚠ No profile data found</span>';
+        }
+        
+        return fields.map(f => `• ${f}`).join('<br>');
+    }
+    
+    // Listen for form inputs to update progress
     
     // Listen for form inputs to update progress
     form?.querySelectorAll('input, select').forEach(input => {
