@@ -57,6 +57,12 @@
 - **Commit:** c06596a
 - **Completed:** October 31, 2025
 
+### ✅ 7. **Profile Backup Reminder**
+- **Status:** COMPLETED
+- **Features:** Tracks lastBackupDate, shows banner after 30 days, dismissible (7 or 30 days), backup button with success toast
+- **Commit:** c1eddf0
+- **Completed:** October 31, 2025
+
 ---
 
 ## 🎯 PROFILE ENHANCEMENTS (High Value)
@@ -74,14 +80,7 @@
   - `public/personalization.js` (add importProfile validation)
 - **Priority:** 🟡 MEDIUM
 
-### 7. **Profile Backup Reminder**
-- **Problem:** Users might lose profile if browser data cleared
-- **Solution:**
-  - Track `lastBackupDate` in profile metadata
-  - Show banner if not backed up in 30 days
-  - Add "Backup Now" button
-  - Store reminder dismissal in localStorage
-- **Files to modify:**
+---
   - `public/personalization.js`
   - `views/partials/header.ejs` (banner location)
 - **Priority:** 🟢 LOW-MEDIUM
