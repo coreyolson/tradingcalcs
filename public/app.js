@@ -82,10 +82,8 @@ function initialize() {
                 const riskWarning = document.getElementById('riskWarning');
                 if (riskValue > 95) {
                     input.value = 95;
-                    /* istanbul ignore next */
                     if (riskWarning) {
                         riskWarning.style.display = 'block';
-                        /* istanbul ignore next */
                         setTimeout(() => {
                             riskWarning.style.display = 'none';
                         }, 3000);
@@ -177,7 +175,6 @@ function initializeTooltips() {
 }
 
 // Initialize
-/* istanbul ignore next */
 document.addEventListener('DOMContentLoaded', () => {
     initialize();
 });
