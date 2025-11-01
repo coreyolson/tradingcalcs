@@ -504,6 +504,221 @@ const PersonalizationEngine = (() => {
         localStorage.setItem(dismissedKey, Date.now().toString());
     }
     
+    // ==========================================
+    // ANONYMOUS USAGE ANALYTICS (100% Local)
+    // ==========================================
+    
+    const ANALYTICS_KEY = 'copperCandle_analytics';
+    
+    /**
+     * Track calculator view
+     */
+    function trackCalculatorView(calculatorName) {
+        const analytics = getAnalytics();
+        
+        if (!analytics.calculatorViews[calculatorName]) {
+            analytics.calculatorViews[calculatorName] = {
+                count: 0,
+                firstView: new Date().toISOString(),
+                lastView: null
+            };
+        }
+        
+        analytics.calculatorViews[calculatorName].count++;
+        analytics.calculatorViews[calculatorName].lastView = new Date().toISOString();
+        analytics.totalPageViews++;
+        
+        saveAnalytics(analytics);
+    }
+    
+    /**
+     * Track time spent on calculator
+     */
+    function trackTimeSpent(calculatorName, seconds) {
+        const analytics = getAnalytics();
+        
+        if (!analytics.timeSpent[calculatorName]) {
+            analytics.timeSpent[calculatorName] = 0;
+        }
+        
+        analytics.timeSpent[calculatorName] += seconds;
+        analytics.totalTimeSpent += seconds;
+        
+        saveAnalytics(analytics);
+    }
+    
+    /**
+     * Track calculation performed
+     */
+    function trackCalculation(calculatorName) {
+        const analytics = getAnalytics();
+        
+        if (!analytics.calculations[calculatorName]) {
+            analytics.calculations[calculatorName] = 0;
+        }
+        
+        analytics.calculations[calculatorName]++;
+        analytics.totalCalculations++;
+        
+        saveAnalytics(analytics);
+    }
+    
+    /**
+     * Track error occurrence
+     */
+    function trackError(calculatorName, errorType) {
+        const analytics = getAnalytics();
+        
+        if (!analytics.errors[calculatorName]) {
+            analytics.errors[calculatorName] = {};
+        }
+        
+        if (!analytics.errors[calculatorName][errorType]) {
+            analytics.errors[calculatorName][errorType] = 0;
+        }
+        
+        analytics.errors[calculatorName][errorType]++;
+        analytics.totalErrors++;
+        
+        saveAnalytics(analytics);
+    }
+    
+    /**
+     * Get analytics data
+     */
+    function getAnalytics() {
+        try {
+            const stored = localStorage.getItem(ANALYTICS_KEY);
+            if (!stored) {
+                return createDefaultAnalytics();
+            }
+            return JSON.parse(stored);
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+            return createDefaultAnalytics();
+        }
+    }
+    
+    /**
+     * Save analytics data
+     */
+    function saveAnalytics(analytics) {
+        try {
+            analytics.lastUpdated = new Date().toISOString();
+            localStorage.setItem(ANALYTICS_KEY, JSON.stringify(analytics));
+        } catch (error) {
+            console.error('Error saving analytics:', error);
+        }
+    }
+    
+    /**
+     * Create default analytics structure
+     */
+    function createDefaultAnalytics() {
+        return {
+            version: '1.0',
+            createdAt: new Date().toISOString(),
+            lastUpdated: null,
+            totalPageViews: 0,
+            totalCalculations: 0,
+            totalTimeSpent: 0,
+            totalErrors: 0,
+            calculatorViews: {},
+            calculations: {},
+            timeSpent: {},
+            errors: {}
+        };
+    }
+    
+    /**
+     * Get analytics summary
+     */
+    function getAnalyticsSummary() {
+        const analytics = getAnalytics();
+        
+        // Calculate most popular calculators by views
+        const popularByViews = Object.entries(analytics.calculatorViews)
+            .sort(([, a], [, b]) => b.count - a.count)
+            .slice(0, 10)
+            .map(([name, data]) => ({ name, views: data.count, lastView: data.lastView }));
+        
+        // Calculate most used calculators by calculations
+        const popularByCalcs = Object.entries(analytics.calculations)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 10)
+            .map(([name, count]) => ({ name, calculations: count }));
+        
+        // Calculate average time spent
+        const timeSpentData = Object.entries(analytics.timeSpent)
+            .map(([name, seconds]) => ({
+                name,
+                totalSeconds: seconds,
+                averageSeconds: Math.round(seconds / (analytics.calculatorViews[name]?.count || 1))
+            }))
+            .sort((a, b) => b.totalSeconds - a.totalSeconds)
+            .slice(0, 10);
+        
+        // Calculate error rates
+        const errorData = Object.entries(analytics.errors)
+            .map(([name, errors]) => ({
+                name,
+                totalErrors: Object.values(errors).reduce((sum, count) => sum + count, 0),
+                errorTypes: errors
+            }))
+            .sort((a, b) => b.totalErrors - a.totalErrors);
+        
+        return {
+            overview: {
+                totalPageViews: analytics.totalPageViews,
+                totalCalculations: analytics.totalCalculations,
+                totalTimeSpent: analytics.totalTimeSpent,
+                totalErrors: analytics.totalErrors,
+                averageTimePerVisit: analytics.totalPageViews > 0 
+                    ? Math.round(analytics.totalTimeSpent / analytics.totalPageViews) 
+                    : 0
+            },
+            popularByViews,
+            popularByCalcs,
+            timeSpentData,
+            errorData,
+            createdAt: analytics.createdAt,
+            lastUpdated: analytics.lastUpdated
+        };
+    }
+    
+    /**
+     * Export analytics as JSON
+     */
+    function exportAnalytics() {
+        const analytics = getAnalytics();
+        const summary = getAnalyticsSummary();
+        
+        const exportData = {
+            analytics,
+            summary,
+            exportedAt: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `copper-candle-analytics-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    /**
+     * Reset analytics data
+     */
+    function resetAnalytics() {
+        if (confirm('Are you sure you want to reset all analytics data? This cannot be undone.')) {
+            localStorage.removeItem(ANALYTICS_KEY);
+            return true;
+        }
+        return false;
+    }
+    
     // Public API
     return {
         loadProfile,
@@ -525,6 +740,15 @@ const PersonalizationEngine = (() => {
         getTradingStyleDescription,
         showCalculatorRecommendations,
         dismissRecommendation,
+        // Analytics functions
+        trackCalculatorView,
+        trackTimeSpent,
+        trackCalculation,
+        trackError,
+        getAnalytics,
+        getAnalyticsSummary,
+        exportAnalytics,
+        resetAnalytics,
         DEFAULT_PROFILE
     };
 })();

@@ -1,0 +1,304 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="page-header text-center mb-4">
+                    <h1 class="page-title">
+                        <i class="fas fa-chart-line"></i> Usage Analytics
+                    </h1>
+                    <p class="page-subtitle">Your local usage statistics • 100% Private • No External Tracking</p>
+                </div>
+
+                <!-- Privacy Notice -->
+                <div class="alert" style="background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); color: #00d4ff; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-shield-alt" style="font-size: 2rem;"></i>
+                        <div>
+                            <h6 style="margin: 0; color: #00d4ff; font-weight: 700;">100% Private Analytics</h6>
+                            <p style="margin: 0; font-size: 0.9rem;">All data is stored only in your browser's localStorage. Nothing is sent to any server. You can export or delete your data at any time.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overview Cards -->
+                <div class="row g-3 mb-4" id="overviewCards">
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-eye" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);" id="totalViews">0</div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem;">Total Page Views</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-calculator" style="font-size: 2rem; color: var(--success-color); margin-bottom: 0.5rem;"></i>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);" id="totalCalcs">0</div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem;">Total Calculations</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-clock" style="font-size: 2rem; color: var(--warning-color); margin-bottom: 0.5rem;"></i>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);" id="avgTime">0</div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem;">Avg. Time/Visit (sec)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: var(--danger-color); margin-bottom: 0.5rem;"></i>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);" id="totalErrors">0</div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem;">Total Errors</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row g-4 mb-4">
+                    <!-- Most Popular Calculators -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-trophy"></i> Most Popular by Views
+                            </div>
+                            <div class="card-body">
+                                <canvas id="popularViewsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Most Used by Calculations -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-fire"></i> Most Used by Calculations
+                            </div>
+                            <div class="card-body">
+                                <canvas id="popularCalcsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Spent Table -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-stopwatch"></i> Time Spent Analysis
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table" id="timeSpentTable">
+                                <thead>
+                                    <tr>
+                                        <th>Calculator</th>
+                                        <th class="text-end">Total Time</th>
+                                        <th class="text-end">Average Time/Visit</th>
+                                        <th class="text-end">Views</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="timeSpentBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No data yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cog"></i> Analytics Actions
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex gap-3 flex-wrap">
+                            <button class="btn btn-primary" onclick="exportAnalytics()">
+                                <i class="fas fa-download"></i> Export Analytics Data
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="resetAnalytics()">
+                                <i class="fas fa-trash"></i> Reset All Analytics
+                            </button>
+                            <a href="/" class="btn btn-outline-secondary">
+                                <i class="fas fa-home"></i> Back to Home
+                            </a>
+                        </div>
+                        <small class="d-block mt-3 text-muted">
+                            <i class="fas fa-info-circle"></i> First tracked: <span id="createdAt">N/A</span> | Last updated: <span id="lastUpdated">N/A</span>
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let viewsChart = null;
+        let calcsChart = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnalytics();
+        });
+
+        function loadAnalytics() {
+            const summary = PersonalizationEngine.getAnalyticsSummary();
+            
+            // Update overview cards
+            document.getElementById('totalViews').textContent = summary.overview.totalPageViews.toLocaleString();
+            document.getElementById('totalCalcs').textContent = summary.overview.totalCalculations.toLocaleString();
+            document.getElementById('avgTime').textContent = summary.overview.averageTimePerVisit;
+            document.getElementById('totalErrors').textContent = summary.overview.totalErrors.toLocaleString();
+            
+            // Update timestamps
+            document.getElementById('createdAt').textContent = summary.createdAt 
+                ? new Date(summary.createdAt).toLocaleDateString() 
+                : 'N/A';
+            document.getElementById('lastUpdated').textContent = summary.lastUpdated 
+                ? new Date(summary.lastUpdated).toLocaleString() 
+                : 'N/A';
+            
+            // Render charts
+            renderViewsChart(summary.popularByViews);
+            renderCalcsChart(summary.popularByCalcs);
+            renderTimeSpentTable(summary.timeSpentData);
+        }
+
+        function renderViewsChart(data) {
+            const ctx = document.getElementById('popularViewsChart').getContext('2d');
+            
+            if (viewsChart) viewsChart.destroy();
+            
+            viewsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.name.replace(' Calculator', '').replace(' - Copper Candle Calculators', '')),
+                    datasets: [{
+                        label: 'Page Views',
+                        data: data.map(d => d.views),
+                        backgroundColor: 'rgba(0, 212, 255, 0.6)',
+                        borderColor: 'rgba(0, 212, 255, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(20, 25, 34, 0.95)',
+                            titleColor: '#fff',
+                            bodyColor: '#9ba1a6',
+                            borderColor: '#00d4ff',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#9ba1a6' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#9ba1a6' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderCalcsChart(data) {
+            const ctx = document.getElementById('popularCalcsChart').getContext('2d');
+            
+            if (calcsChart) calcsChart.destroy();
+            
+            calcsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.name.replace(' Calculator', '').replace(' - Copper Candle Calculators', '')),
+                    datasets: [{
+                        label: 'Calculations',
+                        data: data.map(d => d.calculations),
+                        backgroundColor: 'rgba(0, 255, 136, 0.6)',
+                        borderColor: 'rgba(0, 255, 136, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(20, 25, 34, 0.95)',
+                            titleColor: '#fff',
+                            bodyColor: '#9ba1a6',
+                            borderColor: '#00ff88',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#9ba1a6' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#9ba1a6' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTimeSpentTable(data) {
+            const tbody = document.getElementById('timeSpentBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No data yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.name.replace(' Calculator', '').replace(' - Copper Candle Calculators', '')}</td>
+                    <td class="text-end">${formatTime(item.totalSeconds)}</td>
+                    <td class="text-end">${item.averageSeconds}s</td>
+                    <td class="text-end">${item.totalSeconds > 0 ? Math.round(item.totalSeconds / item.averageSeconds) : 0}</td>
+                </tr>
+            `).join('');
+        }
+
+        function formatTime(seconds) {
+            if (seconds < 60) return `${seconds}s`;
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            if (minutes < 60) return `${minutes}m ${secs}s`;
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours}h ${mins}m`;
+        }
+
+        function exportAnalytics() {
+            PersonalizationEngine.exportAnalytics();
+        }
+
+        function resetAnalytics() {
+            if (PersonalizationEngine.resetAnalytics()) {
+                location.reload();
+            }
+        }
+    </script>
+
+<%- include('partials/footer') %>

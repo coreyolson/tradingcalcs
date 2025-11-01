@@ -645,6 +645,15 @@ app.get('/terms', (req, res) => {
     });
 });
 
+// Analytics Dashboard (Local only - no data sent to server)
+app.get('/analytics', (req, res) => {
+    res.render('analytics', {
+        title: 'Usage Analytics Dashboard',
+        description: 'View your local usage statistics and calculator preferences',
+        includeChartJs: true
+    });
+});
+
 // 404 Error Handler - Must be LAST route
 app.use((req, res) => {
     res.status(404).render('404', {

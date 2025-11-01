@@ -233,14 +233,50 @@
         </style>
         
         <script>
-            // Check and show backup reminder on page load
+            // Anonymous Analytics Tracking (100% local, no external calls)
+            let pageLoadTime = Date.now();
+            let calculatorName = null;
+            
+            // Detect calculator name from page title or URL
             document.addEventListener('DOMContentLoaded', function() {
+                // Get calculator name from title or URL
+                const title = document.title;
+                if (title && title !== 'Copper Candle') {
+                    calculatorName = title.split('|')[0].trim();
+                    if (calculatorName !== 'Copper Candle') {
+                        PersonalizationEngine.trackCalculatorView(calculatorName);
+                    }
+                }
+                
+                // Check and show backup reminder
                 if (typeof PersonalizationEngine !== 'undefined') {
                     if (PersonalizationEngine.shouldShowBackupReminder()) {
                         showBackupReminder();
                     }
                 }
             });
+            
+            // Track time spent when leaving page
+            window.addEventListener('beforeunload', function() {
+                if (calculatorName) {
+                    const timeSpent = Math.round((Date.now() - pageLoadTime) / 1000);
+                    PersonalizationEngine.trackTimeSpent(calculatorName, timeSpent);
+                }
+            });
+            
+            // Track calculations (call this from calculator calculate functions)
+            function trackCalculation() {
+                if (calculatorName) {
+                    PersonalizationEngine.trackCalculation(calculatorName);
+                }
+            }
+            
+            // Track errors (call this from calculator error handlers)
+            function trackError(errorType) {
+                if (calculatorName) {
+                    PersonalizationEngine.trackError(calculatorName, errorType);
+                }
+            }
             
             function showBackupReminder() {
                 const banner = document.getElementById('backupReminderBanner');
