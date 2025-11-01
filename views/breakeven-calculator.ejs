@@ -184,18 +184,37 @@
             const avgWin = parseFloat(document.getElementById('avgWin').value);
             const avgLoss = parseFloat(document.getElementById('avgLoss').value);
             
-            // Input validation
-            if (!avgWin || !avgLoss || avgWin <= 0 || avgLoss <= 0) {
-                console.warn('Invalid input values');
+            // Enhanced input validation
+            const errors = [];
+            if (!avgWin || avgWin <= 0) errors.push('Average win must be greater than $0');
+            if (!avgLoss || avgLoss <= 0) errors.push('Average loss must be greater than $0');
+            
+            if (errors.length > 0) {
+                showError(errors);
                 return;
             }
             
+            clearError();
+            
             // Calculate win/loss ratio
             const wlRatio = avgWin / avgLoss;
+            
+            // Validate calculation
+            if (!isFinite(wlRatio) || isNaN(wlRatio)) {
+                showError(['Invalid win/loss ratio calculation']);
+                return;
+            }
+            
             document.getElementById('wlRatioDisplay').textContent = wlRatio.toFixed(2) + ':1';
             
             // Calculate breakeven win rate
             const breakevenWinRate = (avgLoss / (avgWin + avgLoss)) * 100;
+            
+            // Validate breakeven rate
+            if (!isFinite(breakevenWinRate) || isNaN(breakevenWinRate) || breakevenWinRate < 0 || breakevenWinRate > 100) {
+                showError(['Invalid breakeven calculation']);
+                return;
+            }
             
             // Update display
             const breakevenRateEl = document.getElementById('breakevenRate');
@@ -397,6 +416,35 @@
                 }
             }
         });
+    }
+    
+    // Error handling functions
+    function showError(errors) {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid Input</strong>
+                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+    }
+    
+    function clearError() {
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer) errorContainer.style.display = 'none';
+    }
+    
+    function createErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'errorContainer';
+        container.style.display = 'none';
+        const form = document.querySelector('.compact-form');
+        form.parentElement.insertBefore(container, form.nextSibling);
+        return container;
     }
     
     // Auto-fill from profile

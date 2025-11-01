@@ -220,12 +220,28 @@
     
     // Real-time calculation function
     function calculate() {
-        const startingBalance = parseFloat(document.getElementById('startingBalance').value) || 0;
-        const monthlyReturnPercent = parseFloat(document.getElementById('monthlyReturn').value) / 100 || 0;
+        const startingBalance = parseFloat(document.getElementById('startingBalance').value);
+        const monthlyReturnPercent = parseFloat(document.getElementById('monthlyReturn').value) / 100;
         const monthlyDeposit = parseFloat(document.getElementById('monthlyDeposit').value) || 0;
-        const timePeriod = parseInt(document.getElementById('timePeriod').value) || 1;
+        const timePeriod = parseInt(document.getElementById('timePeriod').value);
         const depositTiming = document.getElementById('depositTiming').value;
         const compoundingFrequency = document.getElementById('compoundingFrequency').value;
+        
+        // Validation
+        const errors = [];
+        if (!startingBalance || startingBalance <= 0) errors.push('Starting balance must be greater than $0');
+        if (isNaN(monthlyReturnPercent)) errors.push('Monthly return is required');
+        if (monthlyReturnPercent < -1) errors.push('Monthly return cannot be less than -100% (account death)');
+        if (monthlyDeposit < 0) errors.push('Monthly deposit cannot be negative');
+        if (!timePeriod || timePeriod <= 0) errors.push('Time period must be greater than 0');
+        if (timePeriod > 1200) errors.push('Time period exceeds 100 years - unrealistic timeframe');
+        
+        if (errors.length > 0) {
+            showError(errors);
+            return;
+        }
+        
+        clearError();
         
         // Update derived values
         const annualReturnPercent = (Math.pow(1 + monthlyReturnPercent, 12) - 1) * 100;
@@ -238,11 +254,21 @@
         const warningDiv = document.getElementById('returnWarning');
         const warningText = document.getElementById('returnWarningText');
         
-        if (monthlyReturnValue > 3) {
+        if (monthlyReturnValue < -50) {
             warningDiv.style.display = 'block';
+            warningDiv.className = 'alert alert-danger';
+            warningText.textContent = `${monthlyReturnValue}% monthly is unsustainable drawdown. Account would be destroyed.`;
+        } else if (monthlyReturnValue > 10) {
+            warningDiv.style.display = 'block';
+            warningDiv.className = 'alert alert-danger';
+            warningText.textContent = `${monthlyReturnValue}% monthly (${annualReturnPercent.toFixed(0)}% annually) is unrealistic. Verify your calculations.`;
+        } else if (monthlyReturnValue > 3) {
+            warningDiv.style.display = 'block';
+            warningDiv.className = 'alert alert-warning';
             warningText.textContent = `${monthlyReturnValue}% monthly (${annualReturnPercent.toFixed(0)}% annually) is extremely difficult. Most pros average 1-2% monthly.`;
         } else if (monthlyReturnValue > 2) {
             warningDiv.style.display = 'block';
+            warningDiv.className = 'alert alert-warning';
             warningText.textContent = `${monthlyReturnValue}% monthly is aggressive. This requires consistent edge and discipline.`;
         } else {
             warningDiv.style.display = 'none';
@@ -294,6 +320,19 @@
         // Calculate CAGR
         const years = timePeriod / 12;
         const cagr = years > 0 ? (Math.pow(finalBalance / startingBalance, 1 / years) - 1) * 100 : 0;
+        
+        // Validate calculations
+        if (!isFinite(finalBalance) || isNaN(finalBalance) || finalBalance < 0) {
+            showError(['Invalid calculation result - check your inputs']);
+            return;
+        }
+        
+        // Prevent display of astronomically large numbers
+        const maxReasonableBalance = startingBalance * 1000000; // 1M times starting balance
+        if (finalBalance > maxReasonableBalance) {
+            showError(['Result exceeds reasonable limits. Reduce time period or return rate.']);
+            return;
+        }
         
         // Update metrics
         document.getElementById('finalBalance').textContent = '$' + finalBalance.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -432,6 +471,46 @@
         }
         
         tbody.innerHTML = rows;
+    }
+    
+    // Error handling functions
+    function showError(errors) {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid Input</strong>
+                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+        clearResults();
+    }
+    
+    function clearError() {
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer) errorContainer.style.display = 'none';
+    }
+    
+    function clearResults() {
+        document.getElementById('finalBalance').textContent = '--';
+        document.getElementById('totalGains').textContent = '--';
+        document.getElementById('totalROI').textContent = '--';
+        document.getElementById('cagr').textContent = '--';
+        document.getElementById('finalBalanceQuick').textContent = '--';
+        document.getElementById('totalDepositsQuick').textContent = '--';
+        document.getElementById('totalGainsQuick').textContent = '--';
+    }
+    
+    function createErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'errorContainer';
+        container.style.display = 'none';
+        const form = document.querySelector('.compact-form');
+        form.parentElement.insertBefore(container, form.nextSibling);
+        return container;
     }
     
     // Add real-time updates to all inputs
