@@ -1541,39 +1541,39 @@ footer {
     right: 20px;
     z-index: 1050;
     max-width: 420px;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 212, 255, 0.15));
-    border: 2px solid var(--success-color);
-    border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3), 0 0 60px rgba(0, 255, 136, 0.2);
+    background: rgba(26, 29, 35, 0.95);
+    border: 1px solid rgba(0, 176, 255, 0.3);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(10px);
 }
 
 .profile-loaded-toast .toast-icon {
-    width: 48px;
-    height: 48px;
-    background: var(--success-color);
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 176, 255, 0.15);
+    border: 1px solid rgba(0, 176, 255, 0.3);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #000;
-    font-size: 1.75rem;
-    animation: iconPulse 1s ease infinite;
+    color: var(--cyan-glow);
+    font-size: 1.25rem;
 }
 
 .profile-loaded-toast .toast-content strong {
-    font-size: 1.1rem;
-    color: var(--success-color);
-    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
     display: block;
     margin-bottom: 0.25rem;
 }
 
 .profile-loaded-toast .toast-content small {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     display: block;
 }
 
@@ -1594,18 +1594,17 @@ footer {
     color: var(--text-primary);
 }
 
-/* Auto-filled field border pulse */
+/* Auto-filled field subtle indicator */
 .form-control.profile-autofilled,
 .form-select.profile-autofilled {
-    border-color: var(--success-color);
-    animation: borderPulse 2s ease-in-out;
+    border-color: rgba(0, 176, 255, 0.4);
     position: relative;
 }
 
 .form-control.profile-autofilled:focus,
 .form-select.profile-autofilled:focus {
-    border-color: var(--success-color);
-    box-shadow: 0 0 0 0.25rem rgba(0, 255, 136, 0.25);
+    border-color: var(--cyan-glow);
+    box-shadow: 0 0 0 0.25rem rgba(0, 176, 255, 0.15);
 }
 
 /* Profile-loaded icon next to labels */
@@ -1649,26 +1648,6 @@ footer {
     100% {
         transform: translateX(100%);
         opacity: 0;
-    }
-}
-
-@keyframes borderPulse {
-    0%, 100% {
-        border-color: var(--success-color);
-        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.5);
-    }
-    50% {
-        border-color: var(--success-color);
-        box-shadow: 0 0 0 6px rgba(0, 255, 136, 0);
-    }
-}
-
-@keyframes iconPulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.08);
     }
 }
 
