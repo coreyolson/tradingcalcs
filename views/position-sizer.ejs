@@ -275,13 +275,32 @@
     // Real-time calculation function
     function calculate() {
         // Get inputs
-        const accountBalance = parseFloat(document.getElementById('accountBalance').value) || 0;
-        const winRate = parseFloat(document.getElementById('winRate').value) / 100 || 0;
-        const avgWin = parseFloat(document.getElementById('avgWin').value) || 0;
-        const avgLoss = parseFloat(document.getElementById('avgLoss').value) || 1;
-        const stopLoss = parseFloat(document.getElementById('stopLoss').value) / 100 || 0.01;
-        const riskPercent = parseFloat(document.getElementById('riskPercent').value) / 100 || 0.01;
-        const pricePerUnit = parseFloat(document.getElementById('pricePerUnit').value) || 1;
+        const accountBalance = parseFloat(document.getElementById('accountBalance').value);
+        const winRate = parseFloat(document.getElementById('winRate').value) / 100;
+        const avgWin = parseFloat(document.getElementById('avgWin').value);
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value);
+        const stopLoss = parseFloat(document.getElementById('stopLoss').value) / 100;
+        const riskPercent = parseFloat(document.getElementById('riskPercent').value) / 100;
+        const pricePerUnit = parseFloat(document.getElementById('pricePerUnit').value);
+        
+        // Validation: Check for invalid inputs
+        const errors = [];
+        if (!accountBalance || accountBalance <= 0) errors.push('Account balance must be greater than $0');
+        if (isNaN(winRate) || winRate < 0 || winRate > 1) errors.push('Win rate must be between 0% and 100%');
+        if (!avgWin || avgWin <= 0) errors.push('Average win must be greater than $0');
+        if (!avgLoss || avgLoss <= 0) errors.push('Average loss must be greater than $0');
+        if (!stopLoss || stopLoss <= 0 || stopLoss > 1) errors.push('Stop loss must be between 0% and 100%');
+        if (!riskPercent || riskPercent <= 0 || riskPercent > 1) errors.push('Risk per trade must be between 0% and 100%');
+        if (!pricePerUnit || pricePerUnit <= 0) errors.push('Price per unit must be greater than $0');
+        
+        // Display errors if any
+        if (errors.length > 0) {
+            showErrorState(errors);
+            return;
+        }
+        
+        // Clear any previous errors
+        clearErrorState();
         
         // Update win rate display
         document.getElementById('winRateDisplay').textContent = (winRate * 100).toFixed(1) + '%';
@@ -297,12 +316,27 @@
         document.getElementById('expectedValue').className = expectedValue >= 0 ? 'text-success' : 'text-danger';
         
         // Kelly Criterion: f* = (bp - q) / b where b = win/loss ratio, p = win rate, q = loss rate
-        const kellyFraction = (winLossRatio * winRate - lossRate) / winLossRatio;
-        const kellyPercentFull = Math.max(0, kellyFraction);
+        let kellyFraction = (winLossRatio * winRate - lossRate) / winLossRatio;
+        
+        // Handle negative Kelly (no edge)
+        if (kellyFraction < 0) kellyFraction = 0;
+        
+        // Validate Kelly isn't producing extreme values
+        if (!isFinite(kellyFraction) || isNaN(kellyFraction)) kellyFraction = 0;
+        // Validate Kelly isn't producing extreme values
+        if (!isFinite(kellyFraction) || isNaN(kellyFraction)) kellyFraction = 0;
+        
+        const kellyPercentFull = kellyFraction;
         const kellyPercentHalf = kellyPercentFull * 0.5; // Half Kelly for safety
         const kellyPercentSafe = Math.min(kellyPercentHalf, 0.25); // Cap at 25%
         const kellyAmount = accountBalance * kellyPercentSafe;
         const kellySize = Math.floor(kellyAmount / pricePerUnit);
+        
+        // Validate position sizes are reasonable
+        const maxPositionValue = accountBalance * 10; // No position should exceed 10x account
+        if (kellySize * pricePerUnit > maxPositionValue) {
+            showWarning('Position size exceeds reasonable limits (10x account). Consider smaller position or higher price.');
+        }
         
         document.getElementById('kellyPercentRaw').textContent = (kellyPercentFull * 100).toFixed(2) + '%';
         document.getElementById('kellyPercentRaw').className = kellyPercentFull > 0.25 ? 'text-warning' : '';
@@ -323,6 +357,20 @@
         const riskAmount = accountBalance * riskPercent;
         const riskBasedAmount = riskAmount / stopLoss;
         const riskSize = Math.floor(riskBasedAmount / pricePerUnit);
+        
+        // Validate all calculations are finite
+        const results = {
+            kellySize, kellyAmount, kellyPercentSafe,
+            fixedSize, fixedAmount,
+            riskSize, riskBasedAmount, riskAmount
+        };
+        
+        for (const [key, value] of Object.entries(results)) {
+            if (!isFinite(value) || isNaN(value)) {
+                showErrorState(['Calculation error: Invalid result for ' + key]);
+                return;
+            }
+        }
         
         // Update Kelly Results
         document.getElementById('kellySize').textContent = kellySize.toLocaleString();
@@ -397,6 +445,68 @@
             bestCard.style.transform = 'scale(1.02)';
             bestCard.style.transition = 'all 0.3s ease';
         }
+    }
+    
+    // Error handling functions
+    function showErrorState(errors) {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger" style="margin: 1rem 0;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid Input</strong>
+                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+        
+        // Set all results to "--"
+        document.querySelectorAll('.metric-value span, .detail-row strong, tbody td').forEach(el => {
+            if (!el.classList.contains('text-muted')) {
+                el.textContent = '--';
+            }
+        });
+    }
+    
+    function clearErrorState() {
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+        }
+        const warningContainer = document.getElementById('warningContainer');
+        if (warningContainer) {
+            warningContainer.style.display = 'none';
+        }
+    }
+    
+    function showWarning(message) {
+        const warningContainer = document.getElementById('warningContainer') || createWarningContainer();
+        warningContainer.innerHTML = `
+            <div class="alert alert-warning" style="margin: 1rem 0;">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>Warning:</strong> ${message}
+            </div>
+        `;
+        warningContainer.style.display = 'block';
+    }
+    
+    function createErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'errorContainer';
+        container.style.display = 'none';
+        const form = document.getElementById('calculatorForm');
+        form.parentElement.insertBefore(container, form.nextSibling);
+        return container;
+    }
+    
+    function createWarningContainer() {
+        const container = document.createElement('div');
+        container.id = 'warningContainer';
+        container.style.display = 'none';
+        const resultsSection = document.querySelector('.row.g-3');
+        resultsSection.insertBefore(container, resultsSection.firstChild);
+        return container;
     }
     
     // Add real-time updates to all inputs
