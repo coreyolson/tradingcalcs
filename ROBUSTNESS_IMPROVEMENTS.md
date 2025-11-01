@@ -1,6 +1,84 @@
 # Calculator Robustness Improvements
 
-## Completed (with full error handling)
+## ✅ COMPLETED (7 of 11 calculators)
+
+### ✅ Position Sizer Calculator
+**Status:** FULLY PROTECTED
+- Input validation for all fields (positive values, valid ranges 0-100%)
+- Kelly Criterion edge validation (negative edge = 0)
+- Division by zero protection (avgLoss cannot be 0)
+- Position size sanity checks (max 10x account warning)
+- NaN/Infinity protection for all calculations
+- User-friendly error messages with specific issues list
+- **Commit:** b67af45
+
+### ✅ Portfolio Heat Calculator
+**Status:** FULLY PROTECTED
+- Input validation for all position fields
+- Prevent adding positions with zero/negative values
+- Stop loss cannot equal entry price check
+- Position risk cannot exceed account balance validation
+- Account balance and max heat percentage validation
+- Chart rendering validation (skip rendering if invalid data)
+- NaN/Infinity protection for heat calculations
+- **Commit:** 308ba91
+
+### ✅ Risk/Reward Calculator
+**Status:** FULLY PROTECTED
+- Validate all inputs (entry, stop, target, size, account > 0)
+- Check for zero-risk scenarios (stop = entry)
+- Check for zero-reward scenarios (target = entry)
+- Validate long/short position logic (stop must be below entry for longs, above for shorts)
+- Division by zero protection in R:R calculations
+- NaN/Infinity guards in all calculations
+- Breakeven win rate calculations protected
+- **Commit:** 8cd8a28
+
+### ✅ Trade Expectancy Calculator
+**Status:** FULLY PROTECTED
+- Input validation (win rate 0-100%, avg win/loss > 0, trades > 0)
+- NaN/Infinity protection in expectancy calculation
+- User-friendly error messages with specific issues
+- Handles negative expectancy with clear messaging
+- **Commit:** 7e3375b
+
+### ✅ Drawdown Recovery Calculator
+**Status:** FULLY PROTECTED - CRITICAL EDGE CASES
+- 100% drawdown special handling ('Account is at $0 - unrecoverable')
+- Severe drawdown warnings:
+  - >99%: "practically unrecoverable"
+  - >75%: "extremely difficult"
+  - >50%: "very challenging"
+- Current balance cannot exceed peak validation
+- Division by zero protection (currentBalance = 0)
+- All calculations validated for NaN/Infinity
+- Clear results display on error state
+- **Commit:** 7e3375b
+
+### ✅ Compound Growth Calculator
+**Status:** FULLY PROTECTED - CRITICAL EDGE CASES
+- Starting balance > 0 validation
+- Monthly return cannot be <-100% (account death)
+- Time period max 100 years validation
+- Severe return warnings with danger/warning levels:
+  - <-50%: "unsustainable drawdown - account would be destroyed" (danger)
+  - >10%: "unrealistic - verify calculations" (danger)
+  - >3%: "extremely difficult" (warning)
+  - >2%: "aggressive" (warning)
+- Prevent chart explosion (max 1M x starting balance)
+- NaN/Infinity protection in CAGR calculations
+- **Commit:** 5b68499
+
+### ✅ Breakeven Calculator
+**Status:** FULLY PROTECTED
+- Enhanced input validation (avg win/loss > 0)
+- Win/loss ratio calculation validation
+- Breakeven rate must be 0-100%
+- NaN/Infinity protection
+- User-friendly error messages
+- **Commit:** 5b68499
+
+## 🔄 Remaining Calculators (4 of 11)
 
 ### ✅ Position Sizer Calculator
 - Input validation for all fields (positive values, valid ranges 0-100%)
