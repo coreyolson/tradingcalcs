@@ -221,9 +221,19 @@ async function handleSubmit(e) {
 
 // Run the calculation
 async function runCalculation() {
-    // Show loading indicator only on first load
+    const calculateBtn = document.getElementById('calculateBtn');
+    
+    // Show loading indicator and disable button
     if (resultsContainer.classList.contains('d-none')) {
         loadingIndicator.classList.remove('d-none');
+    }
+    
+    // Add calculating state to button
+    if (calculateBtn) {
+        calculateBtn.disabled = true;
+        calculateBtn.classList.add('calculating');
+        const originalText = calculateBtn.innerHTML;
+        calculateBtn.setAttribute('data-original-text', originalText);
     }
     
     // Get form values
@@ -248,6 +258,16 @@ async function runCalculation() {
     } finally {
         loadingIndicator.classList.add('d-none');
         resultsContainer.classList.remove('d-none');
+        
+        // Restore button state
+        if (calculateBtn) {
+            calculateBtn.disabled = false;
+            calculateBtn.classList.remove('calculating');
+            const originalText = calculateBtn.getAttribute('data-original-text');
+            if (originalText) {
+                calculateBtn.innerHTML = originalText;
+            }
+        }
     }
 }
 

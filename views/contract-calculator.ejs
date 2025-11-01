@@ -119,7 +119,7 @@
                                 </div>
 
                                 <div class="d-grid gap-2 mt-3">
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="btn btn-primary" id="calculateBtn">
                                         <i class="fas fa-calculator"></i> Calculate
                                     </button>
                                     <button type="button" class="btn btn-outline-secondary btn-sm" id="resetBtn">
@@ -133,13 +133,16 @@
                 </div>
 
                 <!-- Right Column: Results & Visualizations -->
-                <div class="col-xl-9 col-lg-8">
-                    <!-- Loading Indicator -->
-                    <div id="loadingIndicator" class="text-center py-4 d-none">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Calculating...</span>
+                <div class="col-xl-9 col-lg-8" style="position: relative; min-height: 400px;">
+                    <!-- Enhanced Loading Overlay -->
+                    <div id="loadingIndicator" class="loading-overlay d-none">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">
+                            <i class="fas fa-dice"></i> Running Monte Carlo Simulation...
                         </div>
-                        <p class="mt-2 text-muted">Running Monte Carlo...</p>
+                        <small style="color: var(--text-secondary); margin-top: 0.5rem; opacity: 0.7;">
+                            Analyzing 10,000 scenarios
+                        </small>
                     </div>
 
                     <!-- Results Container -->
