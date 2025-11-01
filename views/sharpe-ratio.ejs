@@ -351,7 +351,7 @@
         if (inputMethod === 'manual') {
             const returnsText = document.getElementById('returnsData').value;
             if (!returnsText.trim()) {
-                alert('Please enter returns data');
+                showError(['Please enter returns data']);
                 return;
             }
             
@@ -364,8 +364,15 @@
             const stdDev = parseFloat(document.getElementById('stdDev').value);
             const numPeriods = parseInt(document.getElementById('numPeriods').value);
             
-            if (!avgReturn || !stdDev || !numPeriods) {
-                alert('Please fill in all statistical inputs');
+            // Validate statistical inputs
+            const errors = [];
+            if (!avgReturn && avgReturn !== 0) errors.push('Average return is required');
+            if (!stdDev || stdDev <= 0) errors.push('Standard deviation must be greater than 0');
+            if (!numPeriods || numPeriods < 2) errors.push('Number of periods must be at least 2');
+            if (numPeriods > 10000) errors.push('Number of periods cannot exceed 10,000 (performance limitation)');
+            
+            if (errors.length > 0) {
+                showError(errors);
                 return;
             }
             
@@ -374,11 +381,22 @@
         }
         
         if (returns.length < 2) {
-            alert('Please provide at least 2 data points');
+            showError(['Please provide at least 2 data points']);
             return;
         }
         
         const riskFreeRate = parseFloat(document.getElementById('riskFreeRate').value) || 0;
+        
+        // Validate risk-free rate
+        if (!isFinite(riskFreeRate) || isNaN(riskFreeRate)) {
+            showError(['Invalid risk-free rate']);
+            return;
+        }
+        if (riskFreeRate < -50 || riskFreeRate > 50) {
+            showError(['Risk-free rate must be between -50% and 50%']);
+            return;
+        }
+        
         const periodType = document.getElementById('periodType').value;
         const benchmarkText = document.getElementById('benchmarkData').value;
         
@@ -392,8 +410,17 @@
         
         // Calculate metrics
         const metrics = calculatePerformanceMetrics(returns, riskFreeRate, periodType);
+        
+        // Validate metrics calculation
+        if (!metrics || metrics.error) {
+            showError([metrics?.error || 'Failed to calculate performance metrics']);
+            return;
+        }
+        
         const benchmarkMetrics = benchmarkReturns.length > 0 ? 
             calculatePerformanceMetrics(benchmarkReturns, riskFreeRate, periodType) : null;
+        
+        clearError();
         
         // Update display
         updateMetricsDisplay(metrics);
@@ -417,6 +444,11 @@
     function calculatePerformanceMetrics(returns, riskFreeRate, periodType) {
         const n = returns.length;
         
+        // Validate inputs
+        if (!returns || n < 2) {
+            return { error: 'Need at least 2 data points for calculation' };
+        }
+        
         // Annualization factors
         const annualizationFactors = {
             daily: 252,
@@ -433,14 +465,38 @@
         const variance = returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / (n - 1);
         const stdDev = Math.sqrt(variance);
         
+        // Validate basic calculations
+        if (!isFinite(meanReturn) || isNaN(meanReturn)) {
+            return { error: 'Invalid mean return calculation' };
+        }
+        if (!isFinite(variance) || isNaN(variance) || variance < 0) {
+            return { error: 'Invalid variance calculation' };
+        }
+        if (!isFinite(stdDev) || isNaN(stdDev)) {
+            return { error: 'Invalid standard deviation calculation' };
+        }
+        
         // Annualized metrics
         const annualReturn = meanReturn * annualFactor;
         const annualVolatility = stdDev * Math.sqrt(annualFactor);
         const annualRiskFreeRate = riskFreeRate;
         
+        // Validate annualized metrics
+        if (!isFinite(annualReturn) || isNaN(annualReturn)) {
+            return { error: 'Invalid annualized return calculation' };
+        }
+        if (!isFinite(annualVolatility) || isNaN(annualVolatility)) {
+            return { error: 'Invalid annualized volatility calculation' };
+        }
+        
         // Risk-adjusted metrics
         const excessReturn = annualReturn - annualRiskFreeRate;
         const sharpeRatio = annualVolatility !== 0 ? excessReturn / annualVolatility : 0;
+        
+        // Validate Sharpe ratio
+        if (!isFinite(sharpeRatio) || isNaN(sharpeRatio)) {
+            return { error: 'Invalid Sharpe ratio calculation' };
+        }
         
         // Downside deviation for Sortino ratio
         const downsideReturns = returns.filter(r => r < riskFreeRate / annualFactor);
@@ -448,6 +504,11 @@
             downsideReturns.reduce((sum, r) => sum + Math.pow(r - riskFreeRate / annualFactor, 2), 0) / downsideReturns.length : 0;
         const downsideDeviation = Math.sqrt(downsideVariance) * Math.sqrt(annualFactor);
         const sortinoRatio = downsideDeviation !== 0 ? excessReturn / downsideDeviation : 0;
+        
+        // Validate Sortino ratio
+        if (!isFinite(sortinoRatio) || isNaN(sortinoRatio)) {
+            return { error: 'Invalid Sortino ratio calculation' };
+        }
         
         return {
             sharpeRatio,
@@ -752,6 +813,41 @@
         ];
         
         document.getElementById('returnsData').value = sampleReturns.join(', ');
+    }
+    
+    // Error handling helpers
+    function showError(messages) {
+        const errorDiv = document.getElementById('error-message');
+        if (!errorDiv) {
+            const container = document.querySelector('.container');
+            const errorEl = document.createElement('div');
+            errorEl.id = 'error-message';
+            errorEl.className = 'alert alert-danger mt-3';
+            errorEl.role = 'alert';
+            container.insertBefore(errorEl, container.firstChild);
+        }
+        
+        const errorDisplay = document.getElementById('error-message');
+        if (Array.isArray(messages)) {
+            errorDisplay.innerHTML = '<strong>Please correct the following:</strong><ul class="mb-0 mt-2">' + 
+                messages.map(msg => '<li>' + msg + '</li>').join('') + '</ul>';
+        } else {
+            errorDisplay.innerHTML = '<strong>Error:</strong> ' + messages;
+        }
+        errorDisplay.style.display = 'block';
+        
+        // Hide results
+        const resultsSection = document.getElementById('results');
+        if (resultsSection) resultsSection.style.display = 'none';
+    }
+    
+    function clearError() {
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+        const resultsSection = document.getElementById('results');
+        if (resultsSection) resultsSection.style.display = 'block';
     }
     
     // Load sample data on page load
