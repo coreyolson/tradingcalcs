@@ -534,53 +534,10 @@
                 document.getElementById('accountBalance').value = profile.accountSize;
                 autoFilledFields.push('accountBalance');
                 
-                // Show enhanced notification and visual feedback
-                if (autoFilledFields.length > 0) {
-                    showEnhancedProfileLoadedNotification(autoFilledFields.length);
-                    highlightAutoFilledFields(autoFilledFields);
-                }
-                
                 calculateLeverage();
                 PersonalizationEngine.trackCalculatorUsage('Leverage Calculator');
             }
         }
-    }
-    
-    function showEnhancedProfileLoadedNotification(fieldCount) {
-        const notification = document.createElement('div');
-        notification.className = 'profile-loaded-toast';
-        notification.innerHTML = `
-            <button class="toast-dismiss" onclick="this.parentElement.remove()">&times;</button>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div class="toast-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="toast-content">
-                    <strong><i class="fas fa-user-circle me-1"></i>Profile Loaded</strong>
-                    <small>${fieldCount} field${fieldCount > 1 ? 's' : ''} auto-filled from your trading profile</small>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.4s cubic-bezier(0.4, 0, 1, 1)';
-            setTimeout(() => notification.remove(), 400);
-        }, 4500);
-    }
-    
-    function highlightAutoFilledFields(fieldIds) {
-        fieldIds.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (field) {
-                field.classList.add('profile-autofilled');
-                
-                // Remove animation class after it completes
-                setTimeout(() => {
-                    field.classList.remove('profile-autofilled');
-                }, 2000);
-            }
-        });
     }
     
     window.addEventListener('profileLoaded', autoFillFromProfile);
