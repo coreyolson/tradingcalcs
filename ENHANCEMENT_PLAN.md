@@ -4,50 +4,42 @@
 
 ---
 
-## 🚨 CRITICAL FIXES (Do Now)
+## ✅ COMPLETED FEATURES
 
-### 1. **Fix Scrolling Issues on All Calculators**
-- **Problem:** Header with `position: sticky` causing visual glitches on scroll
-- **Solution:** 
-  - Remove `position: sticky` from header in style.css (line 58)
-  - Keep header static but ensure it stays at top
-  - Test all 12 calculators for smooth scrolling
-  - Check modal overlays don't get stuck behind elements
-- **Files to modify:**
-  - `public/style.css` (header styles)
-  - Test each calculator page for z-index conflicts
-- **Priority:** 🔴 URGENT
+### ✅ 1. **Fix Scrolling Issues on All Calculators**
+- **Status:** INVESTIGATED - No issues found
+- **Resolution:** Header already uses `position: relative`. `.compact-info` sticky positioning is intentional.
+- **Completed:** October 31, 2025
 
-### 2. **Make Leverage Calculator Real-Time**
-- **Problem:** Still has submit button (inconsistent with other calculators)
-- **Solution:**
-  - Remove submit button
-  - Add `addEventListener('input', calculateLeverage)` to all inputs
-  - Add `addEventListener('change', calculateLeverage)` to all selects
-  - Match UX of Position Sizer, Portfolio Heat
-- **Files to modify:**
-  - `views/leverage-calculator.ejs`
-- **Priority:** 🟠 HIGH
+### ✅ 2. **Make Leverage Calculator Real-Time**
+- **Status:** ALREADY IMPLEMENTED
+- **Resolution:** Leverage calculator already has real-time event listeners on all inputs.
+- **Completed:** Previously implemented
 
-### 3. **Add Prominent Sample Size Warnings**
-- **Problem:** Sample size warnings not visible enough in calculators
-- **Solution:**
-  - Add warning banner at top of results when totalTrades < 30
-  - Use Bootstrap alert with warning icon
-  - Make it dismissible but re-appears on page load
-  - Show on: Trade Expectancy, Breakeven, Win Rate Impact, Sharpe Ratio
-- **Files to modify:**
-  - `views/trade-expectancy.ejs`
-  - `views/win-rate-impact.ejs`
-  - `views/sharpe-ratio.ejs`
-  - `views/breakeven-calculator.ejs`
-- **Priority:** 🟠 HIGH
+### ✅ 3. **Add Prominent Sample Size Warnings**
+- **Status:** COMPLETED
+- **Implemented in:** Trade Expectancy, Win Rate Impact, Sharpe Ratio
+- **Features:** Bootstrap alert-warning, dismissible, auto-shows when < 30 data points
+- **Commit:** fc55d92
+- **Completed:** October 31, 2025
+
+### ✅ 4. **Show Recommendations IN Calculators**
+- **Status:** COMPLETED
+- **Implemented in:** Position Sizer, Trade Expectancy, Portfolio Heat, Risk/Reward
+- **Features:** CRITICAL and HIGH priority warnings, 24-hour dismissal, localStorage tracking
+- **Commit:** 22fbce7
+- **Completed:** October 31, 2025
+
+### ✅ 8. **Sticky Table Headers in Long Tables**
+- **Status:** COMPLETED
+- **Implemented in:** Win Rate Impact, Time to Goal, Breakeven (Compound Growth already had it)
+- **Features:** position: sticky, z-index: 10, box-shadow separation
+- **Commit:** 7a5d0a2
+- **Completed:** October 31, 2025
 
 ---
 
 ## 🎯 PROFILE ENHANCEMENTS (High Value)
-
-### 4. **Show Recommendations IN Calculators**
 - **Problem:** Recommendations hidden in dropdown, users miss critical warnings
 - **Solution:**
   - Add recommendation banner at top of each calculator page
@@ -55,13 +47,6 @@
   - Make it collapsible with localStorage to remember state
   - Example: "⚠️ Negative Edge Detected - Your strategy has negative expectancy"
 - **Implementation:**
-  - Create `showCalculatorRecommendations()` function
-  - Call on page load in each calculator
-  - Filter recommendations relevant to that calculator
-- **Files to modify:**
-  - All 12 calculator .ejs files
-  - Add to `public/personalization.js`
-- **Priority:** 🟡 MEDIUM-HIGH
 
 ### 5. **Enhanced Profile Loaded Notification**
 - **Problem:** Toast notification is subtle, users might not notice auto-fill happened
@@ -103,17 +88,6 @@
 ---
 
 ## 📊 CALCULATOR IMPROVEMENTS
-
-### 8. **Sticky Table Headers in Long Tables**
-- **Problem:** Scrolling through large result tables loses context
-- **Solution:**
-  - Add `position: sticky; top: 0;` to table headers in scrollable containers
-  - Ensure z-index is correct
-  - Test in: Compound Growth, Time to Goal, Win Rate Impact
-- **Files to modify:**
-  - Calculator pages with long tables
-  - Add proper `overflow-y: auto` containers
-- **Priority:** 🟡 MEDIUM
 
 ### 9. **Most Used Calculators Widget**
 - **Problem:** Usage tracking exists but not displayed

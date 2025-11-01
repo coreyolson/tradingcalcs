@@ -216,7 +216,6 @@
     function initializeProfile() {
         // Wait for Bootstrap to be available
         if (typeof bootstrap === 'undefined') {
-            console.log('Waiting for Bootstrap to load...');
             setTimeout(initializeProfile, 100);
             return;
         }
@@ -228,11 +227,6 @@
         }
         
         const profile = PersonalizationEngine.loadProfile();
-        
-        console.log('Personalization Engine initialized', {
-            isComplete: PersonalizationEngine.isProfileComplete(),
-            profile: profile
-        });
         
         // Show profile widget if profile exists
         if (PersonalizationEngine.isProfileComplete()) {
