@@ -63,27 +63,11 @@
 - **Commit:** c1eddf0
 - **Completed:** October 31, 2025
 
----
-
-## 🎯 PROFILE ENHANCEMENTS (High Value)
-
-### 6. **Profile Import from CSV/JSON**
-- **Problem:** Users can export but not import
-- **Solution:**
-  - Add "Import Profile" button in profile modal
-  - File input accepts .json and .csv
-  - Parse and validate data
-  - Show preview before importing
-  - Support common trading journal formats (TradeZella, Edgewonk)
-- **Files to modify:**
-  - `views/partials/profile-modal.ejs`
-  - `public/personalization.js` (add importProfile validation)
-- **Priority:** 🟡 MEDIUM
-
----
-  - `public/personalization.js`
-  - `views/partials/header.ejs` (banner location)
-- **Priority:** 🟢 LOW-MEDIUM
+### ✅ 6. **Profile Import from CSV/JSON**
+- **Status:** COMPLETED
+- **Features:** Import button in dropdown, JSON validation, confirmation modal with preview, error handling, auto-reload
+- **Commit:** 01ac794
+- **Completed:** October 31, 2025
 
 ---
 
