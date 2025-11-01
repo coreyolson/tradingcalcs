@@ -737,13 +737,17 @@ footer {
         font-size: 0.6rem;
     }
     
+    /* Touch-friendly buttons */
     .btn {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.7rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.75rem;
+        min-height: 44px; /* iOS touch target minimum */
     }
     
+    /* Chart optimizations for mobile */
     canvas {
-        max-height: 200px !important;
+        max-height: 250px !important;
+        touch-action: pan-y; /* Allow vertical scrolling */
     }
     
     .card-header {
@@ -755,23 +759,70 @@ footer {
         font-size: 0.7rem;
     }
     
+    /* Stack input rows vertically on medium-small screens */
+    .compact-form .input-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+    
     .compact-form .input-row label {
         font-size: 0.7rem;
-        min-width: 70px;
+        min-width: 100%;
+        white-space: normal;
+    }
+    
+    .compact-form .input-row input,
+    .compact-form .input-row select {
+        width: 100%;
+        min-height: 44px; /* Touch-friendly */
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+    
+    /* Modal optimizations */
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+    
+    .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Touch-friendly form controls */
+    .form-control,
+    .form-select {
+        min-height: 44px;
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+    
+    /* Improve navbar dropdowns */
+    .nav-item .dropdown-menu {
+        position: absolute;
+        width: auto;
+        min-width: 250px;
     }
 }
 
 @media (max-width: 576px) {
+    /* Very small screens (phones in portrait) */
     .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
     
     header h1 {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
     
     .metric-value {
-        font-size: 0.9rem;
+        font-size: 1.1rem;
+    }
+    
+    .metric-label {
+        font-size: 0.65rem;
     }
     
     .table {
@@ -780,7 +831,151 @@ footer {
     
     .table thead th,
     .table tbody td {
-        padding: 0.4rem;
+        padding: 0.4rem 0.2rem;
+    }
+    
+    /* Full-width cards on very small screens */
+    .input-card,
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    /* Simplify navigation */
+    .navbar-brand {
+        font-size: 0.9rem;
+    }
+    
+    .nav-link {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+    
+    /* Compact calculator grid */
+    .calculator-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    /* Stack action buttons */
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Improve profile modal on tiny screens */
+    .modal-dialog {
+        margin: 0.25rem;
+        max-width: calc(100% - 0.5rem);
+    }
+    
+    .modal-header {
+        padding: 0.75rem;
+    }
+    
+    .modal-body {
+        padding: 0.75rem;
+        max-height: 70vh;
+    }
+    
+    .modal-footer {
+        padding: 0.75rem;
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        margin: 0.25rem 0;
+    }
+    
+    /* Improve alerts and toasts */
+    .alert {
+        font-size: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .toast {
+        max-width: 100% !important;
+        width: calc(100% - 1rem);
+        font-size: 0.8rem;
+    }
+}
+
+/* Landscape phone optimization */
+@media (max-width: 896px) and (max-height: 414px) and (orientation: landscape) {
+    /* Compact header for landscape */
+    header {
+        padding: 0.5rem 0;
+    }
+    
+    header h1 {
+        font-size: 0.9rem;
+    }
+    
+    .nav-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    /* Reduce chart height in landscape */
+    canvas {
+        max-height: 180px !important;
+    }
+    
+    /* Reduce spacing */
+    .card {
+        margin-bottom: 0.5rem;
+    }
+    
+    .input-row {
+        margin-bottom: 0.4rem;
+    }
+    
+    /* Make modal scrollable with less height */
+    .modal-body {
+        max-height: 50vh;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Better touch targets */
+    .btn,
+    .form-control,
+    .form-select,
+    .nav-link,
+    a {
+        min-height: 44px;
+    }
+    
+    /* Larger tap areas for icons */
+    .fa-info-circle,
+    .fa-times,
+    .btn-close {
+        padding: 0.5rem;
+        min-width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .card:hover,
+    .btn:hover,
+    .form-control:hover {
+        transform: none;
+    }
+    
+    /* Improve scrolling on touch */
+    .modal-body,
+    .input-card,
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
     }
 }
 
