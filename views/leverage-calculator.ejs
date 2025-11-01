@@ -314,10 +314,39 @@
         const isShort = document.getElementById('isShort').checked;
         const positionType = document.getElementById('positionType').value;
         
+        // Validation
+        const errors = [];
+        if (!accountBalance || accountBalance <= 0) errors.push('Account balance must be greater than $0');
+        if (!entryPrice || entryPrice <= 0) errors.push('Entry price must be greater than $0');
+        if (!positionSize || positionSize <= 0) errors.push('Position size must be greater than 0');
+        if (!leverage || leverage <= 0) errors.push('Leverage must be greater than 0');
+        if (isNaN(maintenanceMarginPct) || maintenanceMarginPct <= 0 || maintenanceMarginPct >= 1) {
+            errors.push('Maintenance margin must be between 0% and 100%');
+        }
+        
+        if (errors.length > 0) {
+            showError(errors);
+            return;
+        }
+        
+        clearError();
+        
         if (!accountBalance || !entryPrice || !positionSize) return;
         
         // Position value
         const positionValue = entryPrice * positionSize;
+        
+        // Validate position value vs account
+        if (positionValue > accountBalance * 1000) {
+            showWarning('Position value (' + formatCurrency(positionValue) + ') is extremely large compared to account. Verify inputs.', 'danger');
+        }
+        
+        // Validate calculations
+        if (!isFinite(positionValue) || isNaN(positionValue)) {
+            showError(['Invalid position value calculation']);
+            return;
+        }
+        
         document.getElementById('positionValue').textContent = '$' + positionValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
         // Buying power
@@ -327,6 +356,19 @@
         // Required margin (initial)
         const initialMarginPct = positionType === 'spot' ? 1 : (1 / leverage);
         const requiredMargin = positionValue * initialMarginPct;
+        
+        // Validate margin calculations
+        if (!isFinite(requiredMargin) || isNaN(requiredMargin) || requiredMargin <= 0) {
+            showError(['Invalid margin calculation']);
+            return;
+        }
+        
+        // Check if margin exceeds account balance
+        if (requiredMargin > accountBalance) {
+            showError(['Required margin ($' + formatCurrency(requiredMargin) + ') exceeds account balance ($' + formatCurrency(accountBalance) + ')']);
+            return;
+        }
+        
         document.getElementById('requiredMargin').textContent = '$' + requiredMargin.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('marginPercent').textContent = (requiredMargin / accountBalance * 100).toFixed(1) + '% of account';
         document.getElementById('initialMargin').textContent = '$' + requiredMargin.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -355,6 +397,13 @@
             } else {
                 liquidationPrice = entryPrice * (1 - (initialMarginPct - maintenanceMarginPct));
             }
+            
+            // Validate liquidation price
+            if (!isFinite(liquidationPrice) || isNaN(liquidationPrice) || liquidationPrice < 0) {
+                showError(['Invalid liquidation price calculation']);
+                return;
+            }
+            
             document.getElementById('liquidationPrice').textContent = '$' + liquidationPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             const liqDistance = Math.abs((liquidationPrice - entryPrice) / entryPrice * 100);
             document.getElementById('liquidationDistance').textContent = liqDistance.toFixed(2) + '% away';
@@ -437,6 +486,39 @@
         } else {
             warningCard.style.display = 'none';
         }
+    }
+    
+    // Error handling helpers
+    function showError(messages) {
+        const errorDiv = document.getElementById('error-message');
+        if (!errorDiv) {
+            const container = document.querySelector('.container');
+            const errorEl = document.createElement('div');
+            errorEl.id = 'error-message';
+            errorEl.className = 'alert alert-danger mt-3';
+            errorEl.role = 'alert';
+            container.insertBefore(errorEl, container.firstChild);
+        }
+        
+        const errorDisplay = document.getElementById('error-message');
+        if (Array.isArray(messages)) {
+            errorDisplay.innerHTML = '<strong>Please correct the following:</strong><ul class="mb-0 mt-2">' + 
+                messages.map(msg => '<li>' + msg + '</li>').join('') + '</ul>';
+        } else {
+            errorDisplay.innerHTML = '<strong>Error:</strong> ' + messages;
+        }
+        errorDisplay.style.display = 'block';
+        
+        // Hide results
+        document.getElementById('results').style.display = 'none';
+    }
+    
+    function clearError() {
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+        document.getElementById('results').style.display = 'block';
     }
     
     // Initial calculation
