@@ -10,7 +10,17 @@
                 <i class="fas fa-chart-line"></i>
                 Compound Growth Calculator
             </h1>
-            <p class="page-subtitle">Long-Term Projections • Monthly Contributions • Growth Visualization</p>
+            <p class="page-subtitle">Project Account Growth • Realistic Scenarios • Risk-Adjusted Returns</p>
+            
+            <!-- Reality Check Warning -->
+            <div class="alert alert-warning d-flex align-items-start gap-2" style="font-size: 0.9rem; margin-top: 1rem; border-left: 4px solid #fca311;">
+                <i class="fas fa-exclamation-triangle" style="margin-top: 2px; color: #fca311;"></i>
+                <div>
+                    <strong>Reality Check:</strong> Consistent monthly gains are extremely difficult. 
+                    Most professional traders average 1-2% monthly (15-30% annually). 
+                    This calculator doesn't account for drawdowns, losing months, or changing market conditions.
+                </div>
+            </div>
         </div>
 
         <div class="container-fluid px-4">
@@ -40,10 +50,14 @@
                                            title="Expected average monthly return"></i>
                                     </label>
                                     <input type="number" class="form-control form-control-sm" id="monthlyReturn" 
-                                           value="5" min="-50" max="100" step="0.1" required>
+                                           value="2" min="-50" max="100" step="0.1" required>
                                     <small class="text-muted" style="font-size: 0.7rem;">
-                                        Annual: <span id="annualReturn">79.6%</span>
+                                        Annual: <span id="annualReturn">26.8%</span>
                                     </small>
+                                    <div id="returnWarning" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: rgba(252, 163, 17, 0.1); border-left: 3px solid #fca311; font-size: 0.75rem; color: #fca311;">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        <span id="returnWarningText"></span>
+                                    </div>
                                 </div>
 
                                 <div class="input-row">
@@ -218,6 +232,21 @@
         document.getElementById('annualReturn').textContent = annualReturnPercent.toFixed(1) + '%';
         document.getElementById('annualDeposit').textContent = '$' + (monthlyDeposit * 12).toLocaleString();
         document.getElementById('timeYears').textContent = (timePeriod / 12).toFixed(1) + ' years';
+        
+        // Reality check warnings
+        const monthlyReturnValue = parseFloat(document.getElementById('monthlyReturn').value);
+        const warningDiv = document.getElementById('returnWarning');
+        const warningText = document.getElementById('returnWarningText');
+        
+        if (monthlyReturnValue > 3) {
+            warningDiv.style.display = 'block';
+            warningText.textContent = `${monthlyReturnValue}% monthly (${annualReturnPercent.toFixed(0)}% annually) is extremely difficult. Most pros average 1-2% monthly.`;
+        } else if (monthlyReturnValue > 2) {
+            warningDiv.style.display = 'block';
+            warningText.textContent = `${monthlyReturnValue}% monthly is aggressive. This requires consistent edge and discipline.`;
+        } else {
+            warningDiv.style.display = 'none';
+        }
         
         // Calculate month by month
         const monthlyData = [];

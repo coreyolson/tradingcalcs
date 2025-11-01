@@ -10,7 +10,18 @@
                 <i class="fas fa-bullseye"></i>
                 Position Sizing Calculator
             </h1>
-            <p class="page-subtitle">Optimal Position Sizing • Three Professional Methods • Real-Time Analysis</p>
+            <p class="page-subtitle">Three Position Sizing Methods • Risk Management • Optimal Sizing</p>
+            
+            <!-- Method Explanation -->
+            <div class="alert alert-info d-flex align-items-start gap-2" style="font-size: 0.85rem; margin-top: 1rem;">
+                <i class="fas fa-lightbulb" style="margin-top: 2px; color: #00b0ff;"></i>
+                <div>
+                    <strong>Which method to use?</strong><br>
+                    <strong>Fixed %:</strong> Simple, consistent risk per trade (recommended for most traders)<br>
+                    <strong>Kelly:</strong> Optimizes for growth but can be aggressive (most pros use 25-50% of Kelly)<br>
+                    <strong>Risk-Based:</strong> Size based on your stop loss distance
+                </div>
+            </div>
         </div>
 
         <div class="container-fluid px-4">
@@ -124,7 +135,7 @@
                             <div class="card metric-card border-success">
                                 <div class="card-header bg-success text-white">
                                     <i class="fas fa-chart-line"></i> Kelly Criterion
-                                    <small class="d-block opacity-75">Optimal Growth</small>
+                                    <small class="d-block opacity-75">Optimal Growth (Aggressive)</small>
                                 </div>
                                 <div class="card-body">
                                     <div class="metric-value text-success">
@@ -144,6 +155,10 @@
                                             <span>Risk Amount:</span>
                                             <strong id="kellyRisk">--</strong>
                                         </div>
+                                    </div>
+                                    <div id="kellyWarning" style="display: none; margin-top: 0.75rem; padding: 0.5rem; background: rgba(252, 163, 17, 0.1); border-left: 3px solid #fca311; font-size: 0.75rem; color: #fca311;">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        <strong>Warning:</strong> Kelly can suggest very large positions. Most pros use 25-50% of Kelly.
                                     </div>
                                 </div>
                             </div>
@@ -291,6 +306,14 @@
         
         document.getElementById('kellyPercentRaw').textContent = (kellyPercentFull * 100).toFixed(2) + '%';
         document.getElementById('kellyPercentRaw').className = kellyPercentFull > 0.25 ? 'text-warning' : '';
+        
+        // Show Kelly warning if it's aggressive
+        const kellyWarning = document.getElementById('kellyWarning');
+        if (kellyPercentFull > 0.10) {
+            kellyWarning.style.display = 'block';
+        } else {
+            kellyWarning.style.display = 'none';
+        }
         
         // Fixed Percentage Method
         const fixedAmount = accountBalance * riskPercent;

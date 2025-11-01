@@ -609,11 +609,20 @@ app.get('/about', (req, res) => {
     });
 });
 
-// Methodology page (coming soon)
+// Methodology page
 app.get('/methodology', (req, res) => {
     res.render('methodology', {
-        title: 'Methodology - Copper Candle Calculators',
-        description: 'Detailed explanations of all formulas and calculations used in our trading tools',
+        pageTitle: 'Methodology',
+        pageDescription: 'Detailed explanations of all formulas and calculations used in our trading tools',
+        includeChartJs: false
+    });
+});
+
+// Terms & Disclaimer page
+app.get('/terms', (req, res) => {
+    res.render('terms', {
+        title: 'Terms & Disclaimer',
+        description: 'Important legal information and risk disclaimers for Copper Candle trading calculators',
         includeChartJs: false
     });
 });
@@ -628,7 +637,6 @@ app.get('/', (req, res) => {
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 Trading Risk Calculator running on http://localhost:${PORT}`);
-    console.log(`📊 API endpoint available at http://localhost:${PORT}/api/simulate`);
   });
 }
 

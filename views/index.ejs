@@ -56,9 +56,9 @@
         
         /* Copper Candle Icon */
         .candle-icon {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 3rem;
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1.5rem;
             position: relative;
             animation: float 4s ease-in-out infinite;
         }
@@ -76,23 +76,23 @@
         
         /* Hero Title */
         .hero-title {
-            font-size: 4rem;
+            font-size: 2.5rem;
             font-weight: 800;
             background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -2px;
+            letter-spacing: -1px;
             line-height: 1.1;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.75rem;
         }
         
         .hero-subtitle {
-            font-size: 1.8rem;
+            font-size: 1.1rem;
             color: var(--text-muted);
             font-weight: 300;
-            margin-bottom: 3rem;
-            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.3px;
         }
         
         /* CTA Button */
@@ -101,10 +101,10 @@
             border: none;
             color: #000;
             font-weight: 700;
-            font-size: 1.2rem;
-            padding: 1.2rem 3rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(252, 163, 17, 0.4);
+            font-size: 0.95rem;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(252, 163, 17, 0.4);
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
@@ -112,8 +112,8 @@
         }
         
         .cta-main:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(252, 163, 17, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(252, 163, 17, 0.6);
             color: #000;
         }
         
@@ -137,18 +137,18 @@
         
         .cta-tagline {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 1.25rem;
+            font-size: 0.8rem;
+            margin-top: 0.75rem;
             font-weight: 400;
         }
         
-        /* Feature Cards */
+        /* Feature Cards - Golden Ratio Design */
         .feature-card {
             background: var(--card-dark);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 3rem 2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 1.236rem 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             height: 100%;
@@ -163,7 +163,7 @@
             height: 2px;
             background: var(--accent-color);
             transform: scaleX(0);
-            transition: transform 0.4s ease;
+            transition: transform 0.3s ease;
         }
         
         .feature-card:hover::before {
@@ -171,16 +171,16 @@
         }
         
         .feature-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-3px);
             border-color: var(--accent-color);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
         
         .feature-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.618rem;
+            margin-bottom: 0.618rem;
             display: inline-block;
-            filter: drop-shadow(0 0 15px var(--accent-glow));
+            filter: drop-shadow(0 0 6px var(--accent-glow));
         }
         
         .feature-card[data-accent="green"] {
@@ -213,37 +213,37 @@
         }
         
         .feature-number {
-            font-size: 3rem;
+            font-size: 1.618rem;
             font-weight: 800;
             color: var(--accent-color);
             line-height: 1;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.382rem;
         }
         
         .feature-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1.2px;
             color: var(--text-muted);
             font-weight: 600;
         }
         
         .feature-subtext {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
-            margin-top: 0.5rem;
+            margin-top: 0.382rem;
         }
         
-        /* Hero Calculator Card */
+        /* Hero Calculator Card - Golden Ratio */
         .hero-calc-card {
             background: linear-gradient(135deg, rgba(20, 25, 34, 0.95), rgba(26, 31, 58, 0.95));
             border: 2px solid var(--copper);
-            border-radius: 20px;
-            padding: 3.5rem;
+            border-radius: 10px;
+            padding: 1.618rem;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: 0 20px 80px rgba(214, 139, 69, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(214, 139, 69, 0.2);
             margin: 0 auto;
         }
         
@@ -263,79 +263,79 @@
         }
         
         .hero-calc-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 100px rgba(214, 139, 69, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(214, 139, 69, 0.3);
             border-color: #ffb86c;
         }
         
         .live-badge {
             background: linear-gradient(135deg, #00ff88, #00d4ff);
             color: #000;
-            padding: 0.5rem 1.2rem;
-            border-radius: 20px;
+            padding: 0.3rem 0.8rem;
+            border-radius: 16px;
             font-weight: 700;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            font-size: 0.65rem;
+            letter-spacing: 0.4px;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
             animation: pulse 2s infinite;
         }
         
-        /* Coming Soon Cards */
+        /* Coming Soon Cards - Reduced Size */
         .coming-soon-card {
             background: var(--card-dark);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 2rem;
+            border-radius: 8px;
+            padding: 1.236rem;
             transition: all 0.3s ease;
-            opacity: 0.8;
+            opacity: 0.75;
             height: 100%;
         }
         
         .coming-soon-card:hover {
             opacity: 1;
-            transform: translateY(-5px);
+            transform: translateY(-2px);
             border-color: var(--copper);
-            box-shadow: 0 10px 30px rgba(214, 139, 69, 0.2);
+            box-shadow: 0 6px 16px rgba(214, 139, 69, 0.15);
         }
         
         .eta-badge {
-            background: rgba(214, 139, 69, 0.15);
+            background: rgba(214, 139, 69, 0.12);
             color: var(--copper);
             border: 1px solid var(--copper);
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.6rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
         }
         
-        /* Copper Divider */
+        /* Copper Divider - Golden Ratio */
         .copper-divider {
             width: 100%;
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--copper), transparent);
-            margin: 6rem 0;
-            opacity: 0.3;
+            margin: 2.618rem 0;
+            opacity: 0.25;
         }
         
-        /* Spacing Improvements */
+        /* Spacing - Golden Ratio Principles */
         .container > .text-center.mb-5:first-child {
-            padding-top: 6rem;
-            margin-bottom: 6rem !important;
+            padding-top: 2.618rem;
+            margin-bottom: 2.618rem !important;
         }
         
         .row.g-4.mb-5 {
-            margin-bottom: 6rem !important;
+            margin-bottom: 2.618rem !important;
         }
         
         .text-center.mb-5.fade-in-up h2 {
-            margin-bottom: 3rem;
+            margin-bottom: 1.618rem;
         }
         
         /* Footer */
         .brand-footer {
-            margin-top: 8rem;
-            padding: 4rem 0 3rem;
+            margin-top: 6rem;
+            padding: 4rem 0 2.5rem;
             background: linear-gradient(180deg, transparent 0%, rgba(10, 15, 26, 0.6) 50%, rgba(10, 15, 26, 0.9) 100%);
             border-top: 0;
         }
@@ -345,11 +345,12 @@
             max-width: 600px;
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--copper), transparent);
-            margin: 0 auto 4rem;
+            margin: 0 auto 3rem;
         }
         
         .footer-content {
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
+            padding: 0 2rem;
         }
         
         .footer-logo {
@@ -360,6 +361,7 @@
         
         .footer-candle-icon svg {
             filter: drop-shadow(0 0 8px var(--copper-glow));
+            flex-shrink: 0;
         }
         
         .footer-brand-name {
@@ -368,6 +370,7 @@
             color: var(--text-white);
             letter-spacing: 0.3px;
             line-height: 1.2;
+            white-space: nowrap;
         }
         
         .footer-tagline {
@@ -500,19 +503,23 @@
                 padding: 1rem 2rem; 
             }
             .candle-icon { 
-                width: 80px; 
-                height: 80px; 
-                margin-bottom: 2rem;
+                width: 70px; 
+                height: 70px; 
+                margin-bottom: 1.5rem;
             }
             
             .brand-footer {
-                margin-top: 5rem;
+                margin-top: 4rem;
                 padding: 3rem 0 2rem;
+            }
+            
+            .footer-content {
+                padding: 0 1rem;
             }
             
             .footer-logo {
                 justify-content: center;
-                margin-bottom: 1.5rem;
+                margin-bottom: 1rem;
             }
             
             .footer-description {
@@ -520,7 +527,7 @@
             }
             
             .footer-heading {
-                margin-top: 2rem;
+                margin-top: 1.5rem;
                 text-align: center;
             }
             
@@ -534,22 +541,22 @@
             }
             
             .copper-divider {
-                margin: 4rem 0;
+                margin: 3rem 0;
             }
             
             .hero-calc-card {
-                padding: 2rem;
+                padding: 1.5rem;
             }
             
             .coming-soon-card {
-                padding: 1.5rem;
+                padding: 1.25rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="aurora-bg"></div>
-        <div class="container py-5">
+        <div class="container py-4">
         <!-- Hero Section -->
         <div class="text-center mb-5 fade-in-up">
             <!-- Copper Candle Icon -->
@@ -569,17 +576,17 @@
             </div>
             
             <h1 class="hero-title fade-in-up delay-1">
-                Professional Trading Calculators
+                Trading Calculators That Actually Work
             </h1>
             <p class="hero-subtitle fade-in-up delay-2">
-                Measure your edge. Master your risk.
+                Calculate position size, risk metrics, and account projections. No sign-up. No BS.
             </p>
             <div class="fade-in-up delay-3">
                 <button type="button" class="cta-main" id="setupProfileBtnHero" style="border: none; cursor: pointer;">
-                    🎯 Setup Private Profile
+                    ⚡ Save Your Profile
                 </button>
                 <p class="cta-tagline">
-                    Save your metrics once • Auto-fill all calculators • 100% private (localStorage)
+                    Auto-fill all calculators with your metrics • Saved locally, never uploaded
                 </p>
             </div>
         </div>
@@ -592,7 +599,7 @@
         </style>
 
         <!-- Personalized Dashboard (shown when profile exists) -->
-        <div id="personalizedDashboard" style="display: none;" class="mb-5 fade-in-up">
+        <div id="personalizedDashboard" style="display: none;" class="mb-4 fade-in-up">
             <div class="card" style="background: linear-gradient(135deg, rgba(214, 139, 69, 0.05) 0%, rgba(0, 176, 255, 0.05) 100%); border: 1px solid rgba(214, 139, 69, 0.3); border-radius: 16px; overflow: hidden;">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
@@ -663,7 +670,7 @@
         </div>
 
         <!-- Feature Grid -->
-        <div class="row g-4 mb-5">
+        <div class="row g-5 mb-5">
             <!-- Monte Carlo -->
             <div class="col-md-6 col-lg-3 fade-in-up delay-1">
                 <div class="feature-card text-center" data-accent="green">
@@ -671,8 +678,8 @@
                         <i class="fas fa-dice"></i>
                     </div>
                     <div class="feature-number">10,000</div>
-                    <div class="feature-label">Simulations</div>
-                    <div class="feature-subtext">per calculation</div>
+                    <div class="feature-label">Monte Carlo Runs</div>
+                    <div class="feature-subtext">see all possible outcomes</div>
                 </div>
             </div>
             
@@ -680,11 +687,11 @@
             <div class="col-md-6 col-lg-3 fade-in-up delay-2">
                 <div class="feature-card text-center" data-accent="cyan">
                     <div class="feature-icon" style="color: var(--cyan-glow);">
-                        <i class="fas fa-tachometer-alt"></i>
+                        <i class="fas fa-bolt"></i>
                     </div>
-                    <div class="feature-number">~100ms</div>
-                    <div class="feature-label">Calculation Speed</div>
-                    <div class="feature-subtext">instant results</div>
+                    <div class="feature-number">&lt;100ms</div>
+                    <div class="feature-label">Lightning Fast</div>
+                    <div class="feature-subtext">no waiting around</div>
                 </div>
             </div>
             
@@ -692,11 +699,11 @@
             <div class="col-md-6 col-lg-3 fade-in-up delay-3">
                 <div class="feature-card text-center" data-accent="amber">
                     <div class="feature-icon" style="color: var(--amber-glow);">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="fas fa-lock"></i>
                     </div>
-                    <div class="feature-number">100%</div>
-                    <div class="feature-label">Private & Secure</div>
-                    <div class="feature-subtext">runs in your browser</div>
+                    <div class="feature-number">0</div>
+                    <div class="feature-label">Data Collected</div>
+                    <div class="feature-subtext">your data stays yours</div>
                 </div>
             </div>
             
@@ -707,8 +714,8 @@
                         <i class="fas fa-calculator"></i>
                     </div>
                     <div class="feature-number">12</div>
-                    <div class="feature-label">Live Calculators</div>
-                    <div class="feature-subtext">professional tools</div>
+                    <div class="feature-label">Calculators</div>
+                    <div class="feature-subtext">free forever</div>
                 </div>
             </div>
         </div>
@@ -716,9 +723,9 @@
         <div class="copper-divider"></div>
 
         <!-- Featured Calculator Hero Card -->
-        <div class="text-center mb-5 fade-in-up">
-            <h2 class="h2 fw-bold mb-4" style="color: var(--text-white);">
-                Featured Calculator
+        <div class="text-center mb-4 fade-in-up">
+            <h2 class="h2 fw-bold mb-3" style="color: var(--text-white); font-size: 1.75rem;">
+                Start Here
             </h2>
         </div>
 
@@ -729,43 +736,43 @@
                         <div class="row align-items-center">
                             <!-- Icon Section -->
                             <div class="col-md-2 text-center mb-4 mb-md-0">
-                                <div class="p-4 rounded-3" style="background: linear-gradient(135deg, rgba(214,139,69,0.2), rgba(0,176,255,0.2)); border: 2px solid var(--copper); display: inline-block;">
-                                    <i class="fas fa-chart-line" style="font-size: 3.5rem; color: var(--copper);"></i>
+                                <div class="p-3 rounded-3" style="background: linear-gradient(135deg, rgba(214,139,69,0.2), rgba(0,176,255,0.2)); border: 2px solid var(--copper); display: inline-block;">
+                                    <i class="fas fa-chart-line" style="font-size: 2rem; color: var(--copper);"></i>
                                 </div>
                             </div>
                             
                             <!-- Content Section -->
                             <div class="col-md-7">
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                    <h3 class="h3 mb-0" style="color: var(--text-white); font-weight: 700;">
-                                        Contract Trading Calculator
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <h3 class="h3 mb-0" style="color: var(--text-white); font-weight: 700; font-size: 1.25rem;">
+                                        Contract Calculator
                                     </h3>
                                     <span class="live-badge">
-                                        LIVE NOW
+                                        LIVE
                                     </span>
                                 </div>
-                                <p class="mb-3" style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.7;">
-                                    Advanced Monte Carlo + Position Sizing
+                                <p class="mb-2" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                                    Monte Carlo simulation + Position sizing for options/futures
                                 </p>
-                                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
-                                    The ultimate risk analysis tool for options and futures traders. Run sophisticated Monte Carlo simulations, 
-                                    calculate optimal position sizes, and visualize your trading edge in real-time.
+                                <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">
+                                    See what could actually happen to your account. Run 10,000 simulations using your real win rate and avg win/loss. 
+                                    Calculate Kelly %, Sharpe ratio, and risk of ruin.
                                 </p>
                                 <div class="row g-2">
                                     <div class="col-sm-6">
                                         <small class="d-block mb-2" style="color: var(--text-muted);">
                                             <i class="fas fa-check-circle me-2" style="color: var(--green-glow);"></i>
-                                            <strong>Monte Carlo Analysis</strong> (10,000 trials)
+                                            10,000 Monte Carlo trials
                                         </small>
                                         <small class="d-block mb-2" style="color: var(--text-muted);">
                                             <i class="fas fa-check-circle me-2" style="color: var(--green-glow);"></i>
-                                            <strong>Kelly Criterion</strong> position sizing
+                                            Kelly Criterion sizing
                                         </small>
                                     </div>
                                     <div class="col-sm-6">
                                         <small class="d-block mb-2" style="color: var(--text-muted);">
                                             <i class="fas fa-check-circle me-2" style="color: var(--green-glow);"></i>
-                                            <strong>Sharpe Ratio</strong> & risk metrics
+                                            Risk metrics & Sharpe
                                         </small>
                                         <small class="d-block mb-2" style="color: var(--text-muted);">
                                             <i class="fas fa-check-circle me-2" style="color: var(--green-glow);"></i>
@@ -795,40 +802,38 @@
 
         <div class="copper-divider"></div>
 
-        <div class="copper-divider"></div>
-
         <!-- All Calculators Section -->
-        <div class="text-center mb-5 fade-in-up">
-            <h2 class="h2 fw-bold mb-2" style="color: var(--text-white);">
-                Complete Calculator Suite
+        <div class="text-center mb-4 fade-in-up">
+            <h2 class="h2 fw-bold mb-2" style="color: var(--text-white); font-size: 1.75rem;">
+                All 12 Calculators
             </h2>
-            <p style="color: var(--text-muted); font-size: 1.1rem;">
-                Professional tools for every aspect of trading
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                Everything you need to trade with discipline
             </p>
         </div>
         
         <!-- Calculator Categories -->
         
         <!-- Risk & Position Management -->
-        <div class="mb-5">
-            <h3 class="h4 mb-4" style="color: var(--copper); font-weight: 700;">
+        <div class="mb-4">
+            <h3 class="h5 mb-3" style="color: var(--copper); font-weight: 700;">
                 <i class="fas fa-shield-alt me-2"></i>Risk & Position Management
             </h3>
-            <div class="row g-4">
+            <div class="row g-3">
                 <div class="col-lg-4 col-md-6">
                     <a href="/contract-calculator" class="text-decoration-none">
                         <div class="coming-soon-card" style="opacity: 1; border-color: var(--green-glow);">
-                            <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="d-flex align-items-center gap-2 mb-2">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                     style="width: 50px; height: 50px; background: rgba(0,255,136,0.15); border: 1px solid var(--green-glow);">
-                                    <i class="fas fa-chart-line" style="font-size: 1.4rem; color: var(--green-glow);"></i>
+                                     style="width: 40px; height: 40px; background: rgba(0,255,136,0.15); border: 1px solid var(--green-glow);">
+                                    <i class="fas fa-chart-line" style="font-size: 1rem; color: var(--green-glow);"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Contract Calculator</h5>
+                                    <h5 class="mb-1" style="color: var(--text-white); font-weight: 600; font-size: 0.95rem;">Contract Calculator</h5>
                                     <span class="eta-badge" style="background: var(--green-glow); color: #000; border-color: var(--green-glow);">LIVE NOW</span>
                                 </div>
                             </div>
-                            <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;">
+                            <p class="mb-0" style="color: var(--text-muted); font-size: 0.8rem;">
                                 Monte Carlo simulations, Kelly Criterion, risk metrics, and account projections
                             </p>
                         </div>
@@ -838,13 +843,13 @@
                 <div class="col-lg-4 col-md-6">
                     <a href="/position-sizer" class="text-decoration-none">
                         <div class="coming-soon-card" style="opacity: 1; border-color: var(--green-glow);">
-                            <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="d-flex align-items-center gap-2 mb-2">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                     style="width: 50px; height: 50px; background: rgba(0,255,136,0.15); border: 1px solid var(--green-glow);">
-                                    <i class="fas fa-bullseye" style="font-size: 1.4rem; color: var(--green-glow);"></i>
+                                     style="width: 40px; height: 40px; background: rgba(0,255,136,0.15); border: 1px solid var(--green-glow);">
+                                    <i class="fas fa-bullseye" style="font-size: 1rem; color: var(--green-glow);"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="mb-1" style="color: var(--text-white); font-weight: 600;">Position Sizer</h5>
+                                    <h5 class="mb-1" style="color: var(--text-white); font-weight: 600; font-size: 0.95rem;">Position Sizer</h5>
                                     <span class="eta-badge" style="background: var(--green-glow); color: #000; border-color: var(--green-glow);">LIVE NOW</span>
                                 </div>
                             </div>
@@ -922,7 +927,7 @@
             <h3 class="h4 mb-4" style="color: var(--cyan-glow); font-weight: 700;">
                 <i class="fas fa-chart-bar me-2"></i>Performance & Expectancy
             </h3>
-            <div class="row g-4">
+            <div class="row g-5">
                 <div class="col-lg-4 col-md-6">
                     <a href="/trade-expectancy" class="text-decoration-none">
                         <div class="coming-soon-card" style="opacity: 1; border-color: var(--green-glow);">
@@ -1010,7 +1015,7 @@
             <h3 class="h4 mb-4" style="color: var(--amber-glow); font-weight: 700;">
                 <i class="fas fa-rocket me-2"></i>Growth & Recovery
             </h3>
-            <div class="row g-4">
+            <div class="row g-5">
                 <div class="col-lg-4 col-md-6">
                     <a href="/drawdown-recovery" class="text-decoration-none">
                         <div class="coming-soon-card" style="opacity: 1; border-color: var(--green-glow);">
@@ -1086,8 +1091,8 @@
             
             <div class="footer-content">
                 <div class="row g-5">
-                    <!-- Brand Section -->
-                    <div class="col-lg-3">
+                    <!-- Brand - 1/3 -->
+                    <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
                         <div class="footer-logo mb-4">
                             <div class="footer-candle-icon">
                                 <svg width="40" height="56" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
@@ -1108,74 +1113,75 @@
                             </div>
                         </div>
                         <p class="footer-description">
-                            Professional trading calculators for serious traders. All calculations run privately in your browser.
+                            Professional trading calculators built by traders. Free forever. No BS.
                         </p>
                     </div>
 
-                    <!-- Risk & Position Tools -->
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <h5 class="footer-heading">
-                            <i class="fas fa-shield-alt me-1"></i> Risk & Position
-                        </h5>
-                        <ul class="footer-links">
-                            <li><a href="/contract-calculator">Contract Calculator</a></li>
-                            <li><a href="/position-sizer">Position Sizer</a></li>
-                            <li><a href="/portfolio-heat">Portfolio Heat</a></li>
-                            <li><a href="/risk-reward">Risk/Reward</a></li>
-                            <li><a href="/leverage-calculator">Leverage Calc</a></li>
-                        </ul>
-                    </div>
+                    <!-- Calculator Links - 2/3 -->
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <!-- Risk & Position Tools -->
+                            <div class="col-lg-4 col-md-4 col-6">
+                                <h5 class="footer-heading">
+                                    <i class="fas fa-shield-alt me-1"></i> Risk & Position
+                                </h5>
+                                <ul class="footer-links">
+                                    <li><a href="/contract-calculator">Contract Calculator</a></li>
+                                    <li><a href="/position-sizer">Position Sizer</a></li>
+                                    <li><a href="/portfolio-heat">Portfolio Heat</a></li>
+                                    <li><a href="/risk-reward">Risk/Reward</a></li>
+                                    <li><a href="/leverage-calculator">Leverage Calc</a></li>
+                                </ul>
+                            </div>
 
-                    <!-- Performance Tools -->
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <h5 class="footer-heading">
-                            <i class="fas fa-chart-bar me-1"></i> Performance
-                        </h5>
-                        <ul class="footer-links">
-                            <li><a href="/trade-expectancy">Trade Expectancy</a></li>
-                            <li><a href="/breakeven-calculator">Breakeven Calc</a></li>
-                            <li><a href="/win-rate-impact">Win Rate Impact</a></li>
-                            <li><a href="/sharpe-ratio">Sharpe Ratio</a></li>
-                        </ul>
-                    </div>
+                            <!-- Performance Tools -->
+                            <div class="col-lg-4 col-md-4 col-6">
+                                <h5 class="footer-heading">
+                                    <i class="fas fa-chart-bar me-1"></i> Performance
+                                </h5>
+                                <ul class="footer-links">
+                                    <li><a href="/trade-expectancy">Trade Expectancy</a></li>
+                                    <li><a href="/breakeven-calculator">Breakeven Calc</a></li>
+                                    <li><a href="/win-rate-impact">Win Rate Impact</a></li>
+                                    <li><a href="/sharpe-ratio">Sharpe Ratio</a></li>
+                                </ul>
+                            </div>
 
-                    <!-- Growth Tools -->
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <h5 class="footer-heading">
-                            <i class="fas fa-rocket me-1"></i> Growth
-                        </h5>
-                        <ul class="footer-links">
-                            <li><a href="/compound-growth">Compound Growth</a></li>
-                            <li><a href="/drawdown-recovery">Drawdown Recovery</a></li>
-                            <li><a href="/time-to-goal">Time to Goal</a></li>
-                        </ul>
+                            <!-- Growth Tools -->
+                            <div class="col-lg-4 col-md-4 col-6">
+                                <h5 class="footer-heading">
+                                    <i class="fas fa-rocket me-1"></i> Growth
+                                </h5>
+                                <ul class="footer-links">
+                                    <li><a href="/compound-growth">Compound Growth</a></li>
+                                    <li><a href="/drawdown-recovery">Drawdown Recovery</a></li>
+                                    <li><a href="/time-to-goal">Time to Goal</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Info & Privacy -->
-                    <div class="col-lg-3 col-md-4">
-                        <h5 class="footer-heading">
-                            <i class="fas fa-info-circle me-1"></i> Info
-                        </h5>
-                        <ul class="footer-links">
-                            <li><a href="/about">About</a></li>
-                            <li><a href="/methodology">Methodology</a></li>
-                        </ul>
-                        
-                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05);">
-                            <h6 style="color: #00ff88; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;">
-                                <i class="fas fa-lock me-1"></i> Privacy First
-                            </h6>
-                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.8rem;">
-                                <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
-                                    <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>No Registration
-                                </li>
-                                <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
-                                    <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>100% Client-Side
-                                </li>
-                                <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
-                                    <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>No Tracking
-                                </li>
-                            </ul>
+                </div>
+
+                <!-- Privacy Section - Horizontal -->
+                <div class="row mt-5" style="padding: 0 2rem;">
+                    <div class="col-12">
+                        <div class="d-flex align-items-center justify-content-center flex-wrap gap-4" style="padding: 1.5rem; background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.15); border-radius: 8px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-lock" style="color: #00ff88; font-size: 1.2rem;"></i>
+                                <span style="color: #00ff88; font-weight: 600; font-size: 0.95rem;">100% Private</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2" style="color: #9ba1a6; font-size: 0.9rem;">
+                                <i class="fas fa-check-circle" style="color: #00ff88;"></i>
+                                <span>No sign-up required</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2" style="color: #9ba1a6; font-size: 0.9rem;">
+                                <i class="fas fa-check-circle" style="color: #00ff88;"></i>
+                                <span>Runs in your browser</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2" style="color: #9ba1a6; font-size: 0.9rem;">
+                                <i class="fas fa-check-circle" style="color: #00ff88;"></i>
+                                <span>No tracking ever</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1183,15 +1189,20 @@
 
             <!-- Footer Bottom -->
             <div class="footer-bottom">
-                <div class="row align-items-center">
-                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                        <p class="footer-copyright mb-0">
-                            © 2025 Copper Candle. All calculations run locally in your browser.
+                <div class="row align-items-center" style="padding: 0 2rem;">
+                    <div class="col-md-8 text-center text-md-start mb-3 mb-md-0">
+                        <p class="footer-copyright mb-1">
+                            © 2025 Copper Candle • All calculations run locally in your browser
                         </p>
+                        <div style="font-size: 0.85rem;">
+                            <a href="/about" style="color: #9ba1a6; text-decoration: none; margin-right: 1rem;">About</a>
+                            <a href="/methodology" style="color: #9ba1a6; text-decoration: none; margin-right: 1rem;">Methodology</a>
+                            <a href="/terms" style="color: #9ba1a6; text-decoration: none;">Terms & Disclaimer</a>
+                        </div>
                     </div>
-                    <div class="col-md-6 text-center text-md-end">
+                    <div class="col-md-4 text-center text-md-end">
                         <div class="footer-social">
-                            <a href="#" class="social-link" title="Discord Community" aria-label="Discord">
+                            <a href="#" class="social-link" title="Join our Discord community" aria-label="Discord">
                                 <i class="fab fa-discord"></i>
                             </a>
                         </div>

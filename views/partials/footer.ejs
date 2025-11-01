@@ -1,169 +1,146 @@
     <!-- Footer -->
-    <footer style="background: linear-gradient(180deg, transparent 0%, #0a0f1a 100%); border-top: 1px solid rgba(0, 176, 255, 0.1); margin-top: 5rem; padding: 4rem 0 2rem;">
-        <div class="container-fluid px-4">
-            <div class="row g-4 mb-4">
-                <!-- Brand Column -->
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <svg width="40" height="56" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <linearGradient id="copper-grad-footer" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#ffb86c;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#d68b45;stop-opacity:1" />
-                                </linearGradient>
-                            </defs>
-                            <rect x="35" y="50" width="30" height="80" rx="2" fill="url(#copper-grad-footer)"/>
-                            <ellipse cx="50" cy="50" rx="15" ry="5" fill="#ffb86c"/>
-                            <path d="M 50 30 Q 45 40 50 50 Q 55 40 50 30 Z" fill="#fca311" opacity="0.9"/>
-                        </svg>
-                        <div>
-                            <div style="font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, #00b0ff 0%, #d68b45 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Copper Candle</div>
-                            <div style="color: #9ba1a6; font-size: 0.9rem;">Light your edge</div>
+    <footer style="background: linear-gradient(180deg, transparent 0%, rgba(10, 15, 26, 0.6) 50%, rgba(10, 15, 26, 0.9) 100%); border-top: 0; margin-top: 6rem; padding: 4rem 0 2.5rem;">
+        <div class="container">
+            <!-- Divider -->
+            <div style="width: 80%; max-width: 600px; height: 1px; background: linear-gradient(90deg, transparent, #d68b45, transparent); margin: 0 auto 3rem;"></div>
+            
+            <div style="margin-bottom: 2.5rem; padding: 0 2rem;">
+                <div class="row g-5">
+                    <!-- Brand - 1/3 -->
+                    <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <svg width="40" height="56" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="copper-grad-footer" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#ffb86c;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#d68b45;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <rect x="35" y="50" width="30" height="80" rx="2" fill="url(#copper-grad-footer)"/>
+                                <ellipse cx="50" cy="50" rx="15" ry="5" fill="#ffb86c"/>
+                                <path d="M 50 30 Q 45 40 50 50 Q 55 40 50 30 Z" fill="#fca311" opacity="0.9"/>
+                            </svg>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #eaeaea; letter-spacing: 0.3px; line-height: 1.2; white-space: nowrap;">Copper Candle</div>
+                                <div style="font-size: 0.9rem; color: #d68b45; font-style: italic; letter-spacing: 0.5px;">Light your edge</div>
+                            </div>
+                        </div>
+                        <p style="color: #9ba1a6; line-height: 1.7; font-size: 0.95rem; margin-top: 1rem;">
+                            Professional trading calculators built by traders. Free forever. No BS.
+                        </p>
+                    </div>
+
+                    <!-- Calculator Links - 2/3 -->
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <!-- Risk & Position Tools -->
+                            <div class="col-lg-4 col-md-4 col-6">
+                                <h5 style="color: #eaeaea; font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; letter-spacing: 0.5px;">
+                                    <i class="fas fa-shield-alt me-1"></i> Risk & Position
+                                </h5>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/contract-calculator" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Contract Calculator</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/position-sizer" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Position Sizer</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/portfolio-heat" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Portfolio Heat</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/risk-reward" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Risk/Reward</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/leverage-calculator" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Leverage Calc</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Performance Tools -->
+                            <div class="col-lg-4 col-md-4 col-6">
+                                <h5 style="color: #eaeaea; font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; letter-spacing: 0.5px;">
+                                    <i class="fas fa-chart-bar me-1"></i> Performance
+                                </h5>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/trade-expectancy" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Trade Expectancy</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/breakeven-calculator" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Breakeven Calc</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/win-rate-impact" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Win Rate Impact</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/sharpe-ratio" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Sharpe Ratio</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Growth Tools -->
+                            <div class="col-lg-4 col-md-4 col-6">
+                                <h5 style="color: #eaeaea; font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; letter-spacing: 0.5px;">
+                                    <i class="fas fa-rocket me-1"></i> Growth
+                                </h5>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/compound-growth" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Compound Growth</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/drawdown-recovery" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Drawdown Recovery</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                        <a href="/time-to-goal" style="color: #9ba1a6; text-decoration: none; transition: color 0.3s ease;">Time to Goal</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                    <p style="color: #9ba1a6; font-size: 0.9rem; line-height: 1.6;">
-                        Professional trading calculators for serious traders. All calculations run privately in your browser.
-                    </p>
                 </div>
 
-                <!-- Risk & Position Tools -->
-                <div class="col-lg-2 col-md-6 col-6">
-                    <h5 style="color: #d68b45; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
-                        <i class="fas fa-shield-alt me-1" style="font-size: 0.8rem;"></i> Risk & Position
-                    </h5>
-                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/contract-calculator" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-chart-line me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Contract Calculator
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/position-sizer" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-bullseye me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Position Sizer
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/portfolio-heat" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-fire me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Portfolio Heat
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/risk-reward" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-balance-scale me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Risk/Reward
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/leverage-calculator" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-layer-group me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Leverage Calc
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Performance Tools -->
-                <div class="col-lg-2 col-md-6 col-6">
-                    <h5 style="color: #00d4ff; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
-                        <i class="fas fa-chart-bar me-1" style="font-size: 0.8rem;"></i> Performance
-                    </h5>
-                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/trade-expectancy" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-calculator me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Trade Expectancy
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/breakeven-calculator" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-equals me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Breakeven Calc
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/win-rate-impact" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-chart-pie me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Win Rate Impact
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/sharpe-ratio" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-tachometer-alt me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Sharpe Ratio
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Growth Tools -->
-                <div class="col-lg-2 col-md-6 col-6">
-                    <h5 style="color: #fca311; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
-                        <i class="fas fa-rocket me-1" style="font-size: 0.8rem;"></i> Growth
-                    </h5>
-                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/compound-growth" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-seedling me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Compound Growth
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/drawdown-recovery" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-heartbeat me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Drawdown Recovery
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/time-to-goal" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-crosshairs me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Time to Goal
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Info & Privacy -->
-                <div class="col-lg-3 col-md-6">
-                    <h5 style="color: #00b0ff; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
-                        <i class="fas fa-info-circle me-1" style="font-size: 0.8rem;"></i> Info
-                    </h5>
-                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/about" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-info-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>About
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 0.5rem;">
-                            <a href="/methodology" style="color: #eaeaea; text-decoration: none; transition: color 0.2s;">
-                                <i class="fas fa-book me-2" style="color: #00ff88; font-size: 0.7rem;"></i>Methodology
-                            </a>
-                        </li>
-                    </ul>
-                    
-                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05);">
-                        <h6 style="color: #00ff88; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;">
-                            <i class="fas fa-lock me-1"></i> Privacy First
-                        </h6>
-                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.8rem;">
-                            <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
-                                <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>No Registration
-                            </li>
-                            <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
-                                <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>100% Client-Side
-                            </li>
-                            <li style="margin-bottom: 0.3rem; color: #9ba1a6;">
-                                <i class="fas fa-check-circle me-2" style="color: #00ff88; font-size: 0.7rem;"></i>No Tracking
-                            </li>
-                        </ul>
+                <!-- Privacy Section - Horizontal -->
+                <div class="row mt-5" style="padding: 0 2rem;">
+                    <div class="col-12">
+                        <div class="d-flex align-items-center justify-content-center flex-wrap gap-4" style="padding: 1.5rem; background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.15); border-radius: 8px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-lock" style="color: #00ff88; font-size: 1.2rem;"></i>
+                                <span style="color: #00ff88; font-weight: 600; font-size: 0.95rem;">100% Private</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2" style="color: #9ba1a6; font-size: 0.9rem;">
+                                <i class="fas fa-check-circle" style="color: #00ff88;"></i>
+                                <span>No sign-up required</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2" style="color: #9ba1a6; font-size: 0.9rem;">
+                                <i class="fas fa-check-circle" style="color: #00ff88;"></i>
+                                <span>Runs in your browser</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2" style="color: #9ba1a6; font-size: 0.9rem;">
+                                <i class="fas fa-check-circle" style="color: #00ff88;"></i>
+                                <span>No tracking ever</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Footer Bottom -->
-            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; margin-top: 2rem;">
-                <div class="container">
-                    <div class="row align-items-center">
-                        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                            <p style="color: #6c757d; font-size: 0.85rem; margin: 0;">
-                                © 2025 Copper Candle. All calculations run locally in your browser.
-                            </p>
+            <div style="padding-top: 2.5rem; border-top: 1px solid rgba(155, 161, 166, 0.1);">
+                <div class="row align-items-center" style="padding: 0 2rem;">
+                    <div class="col-md-8 text-center text-md-start mb-3 mb-md-0">
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                            © 2025 Copper Candle • All calculations run locally in your browser
+                        </p>
+                        <div style="font-size: 0.85rem;">
+                            <a href="/about" style="color: #9ba1a6; text-decoration: none; margin-right: 1rem;">About</a>
+                            <a href="/methodology" style="color: #9ba1a6; text-decoration: none; margin-right: 1rem;">Methodology</a>
+                            <a href="/terms" style="color: #9ba1a6; text-decoration: none;">Terms & Disclaimer</a>
                         </div>
-                        <div class="col-md-6 text-center text-md-end">
-                            <a href="/" style="color: #00b0ff; text-decoration: none; font-size: 0.85rem; font-weight: 500;">
-                                <i class="fas fa-home me-2"></i>Back to Home
-                            </a>
-                        </div>
+                    </div>
+                    <div class="col-md-4 text-center text-md-end">
+                        <a href="/" style="width: 38px; height: 38px; border-radius: 50%; background: rgba(0, 176, 255, 0.1); border: 1px solid rgba(0, 176, 255, 0.2); display: inline-flex; align-items: center; justify-content: center; color: #00b0ff; text-decoration: none; transition: all 0.3s ease; font-size: 1rem;" title="Back to Home">
+                            <i class="fas fa-home"></i>
+                        </a>
                     </div>
                 </div>
             </div>

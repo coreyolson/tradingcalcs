@@ -100,8 +100,9 @@
                 <div class="col-xl-8 col-lg-7">
                     <!-- Heat Gauge -->
                     <div class="card mb-3">
-                        <div class="card-header">
-                            <i class="fas fa-temperature-high"></i> Portfolio Heat
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-temperature-high"></i> Portfolio Heat</span>
+                            <div id="heatStatusBadge" style="font-size: 0.85rem;"></div>
                         </div>
                         <div class="card-body text-center">
                             <div class="heat-gauge-container mb-4">
@@ -110,6 +111,15 @@
                                 </div>
                                 <div class="heat-percentage" id="heatPercentage">0%</div>
                             </div>
+                            
+                            <!-- Heat Warning -->
+                            <div id="heatWarning" style="display: none; margin-bottom: 1rem; padding: 1rem; background: rgba(252, 163, 17, 0.1); border-left: 4px solid #fca311; text-align: left;">
+                                <div style="font-size: 0.9rem; color: #fca311;">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong id="heatWarningText"></strong>
+                                </div>
+                            </div>
+                            
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <div class="heat-stat">
@@ -321,15 +331,40 @@
         heatFill.style.width = gaugePercent + '%';
         heatPercentage.textContent = heatPercent.toFixed(2) + '%';
         
+        // Update heat status badge and warnings
+        const heatStatusBadge = document.getElementById('heatStatusBadge');
+        const heatWarning = document.getElementById('heatWarning');
+        const heatWarningText = document.getElementById('heatWarningText');
+        
+        const heatRatio = heatPercent / (maxHeatPercent * 100);
+        
         if (heatPercent > maxHeatPercent * 100) {
             heatPercentage.style.color = '#ff4444';
-        } else if (heatPercent > maxHeatPercent * 80) {
+            heatFill.style.background = '#ff4444';
+            heatStatusBadge.innerHTML = '<span class="badge bg-danger">⚠️ Over Limit</span>';
+            heatWarning.style.display = 'block';
+            heatWarning.style.borderColor = '#ff4444';
+            heatWarningText.style.color = '#ff4444';
+            heatWarningText.innerHTML = `You're over max heat by $${(totalRisk - maxHeatDollar).toFixed(0)}. Close positions or reduce size.`;
+        } else if (heatRatio > 0.9) {
             heatPercentage.style.color = '#fca311';
+            heatFill.style.background = '#fca311';
+            heatStatusBadge.innerHTML = '<span class="badge bg-warning">🔥 Near Limit</span>';
+            heatWarning.style.display = 'block';
+            heatWarningText.innerHTML = `You're at ${heatPercent.toFixed(1)}% of ${(maxHeatPercent * 100).toFixed(0)}% max. Room for ~$${available.toFixed(0)} more risk.`;
+        } else if (heatRatio > 0.75) {
+            heatPercentage.style.color = '#00b0ff';
+            heatFill.style.background = 'linear-gradient(90deg, #00ff88, #00b0ff)';
+            heatStatusBadge.innerHTML = '<span class="badge bg-info">Elevated</span>';
+            heatWarning.style.display = 'none';
         } else {
             heatPercentage.style.background = 'linear-gradient(135deg, #00b0ff 0%, #d68b45 100%)';
             heatPercentage.style.webkitBackgroundClip = 'text';
             heatPercentage.style.webkitTextFillColor = 'transparent';
             heatPercentage.style.backgroundClip = 'text';
+            heatFill.style.background = 'linear-gradient(90deg, #00ff88, #00b0ff)';
+            heatStatusBadge.innerHTML = '<span class="badge bg-success">✓ Healthy</span>';
+            heatWarning.style.display = 'none';
         }
         
         // Update stats

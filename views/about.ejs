@@ -4,241 +4,128 @@
     includeChartJs: false
 }) %>
 
-        <!-- Page Header -->
-        <div class="container-fluid px-4 mb-4">
-            <h1 class="page-title">
-                <i class="fas fa-info-circle"></i>
-                About Copper Candle
-            </h1>
-            <p class="page-subtitle">Professional Trading Tools • Built by Traders, for Traders</p>
-        </div>
+<div class="container-fluid px-4" style="max-width: 900px; margin: 0 auto;">
+    <!-- Page Header -->
+    <div class="text-center my-5">
+        <h1 style="color: #d68b45; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">
+            About Copper Candle
+        </h1>
+        <p style="color: #9ba1a6; font-size: 1rem;">
+            Professional Trading Tools • Built by Traders, for Traders
+        </p>
+    </div>
 
-        <div class="container-fluid px-4">
-            <div class="row g-4">
-                <div class="col-lg-8">
-                    <!-- Mission -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-bullseye"></i> Our Mission
-                        </div>
-                        <div class="card-body">
-                            <h5 class="text-primary mb-3">Measure Your Edge. Master Your Risk.</h5>
-                            <p class="lead mb-3">
-                                Copper Candle provides professional-grade trading calculators that help you make data-driven decisions with confidence.
-                            </p>
-                            <p>
-                                We believe every trader deserves access to sophisticated risk management tools without paywalls, sign-ups, or hidden agendas. 
-                                Whether you're trading 0DTE options, swing trading equities, or managing a futures portfolio, our calculators give you 
-                                the mathematical edge you need to trade with discipline.
-                            </p>
-                            <p class="mb-0">
-                                <strong>No courses to buy. No Discord to join. No email list to spam you.</strong> Just powerful tools that work.
-                            </p>
-                        </div>
-                    </div>
+    <!-- Mission -->
+    <section class="mb-5">
+        <h2 style="color: #00b0ff; font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">
+            What This Is
+        </h2>
+        <p style="color: #eaeaea; line-height: 1.8; margin-bottom: 1rem;">
+            Trading calculators that actually work. No sign-up walls. No credit card prompts. No upsells to a $2,997 course.
+        </p>
+        <p style="color: #eaeaea; line-height: 1.8; margin-bottom: 1rem;">
+            Calculate position sizes using Kelly Criterion. Run Monte Carlo simulations on your strategy. 
+            See if your "edge" is real or just variance. All calculations happen in your browser—we never see your data.
+        </p>
+        <p style="color: #eaeaea; line-height: 1.8;">
+            Built for options traders, futures scalpers, and anyone tired of risking 10% on a single trade because "it feels right."
+        </p>
+    </section>
 
-                    <!-- Why Free -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-heart"></i> Why Is This Free?
-                        </div>
-                        <div class="card-body">
-                            <p>
-                                We've all been there—blown up an account, revenge traded, over-leveraged on a "sure thing." The turning point came 
-                                when we started treating trading like a business: tracking metrics, sizing positions mathematically, and managing risk systematically.
-                            </p>
-                            <p>
-                                The tools we needed either didn't exist, cost hundreds per month, or required sharing our data. So we built our own. 
-                                And now we're sharing them because:
-                            </p>
-                            <ol>
-                                <li><strong>Better traders = better markets</strong> — Educated participants reduce volatility and improve liquidity</li>
-                                <li><strong>Open-source community</strong> — We believe in transparent formulas you can verify and improve</li>
-                                <li><strong>Giving back</strong> — Others helped us learn; now it's our turn</li>
-                            </ol>
-                            <p class="mb-0">
-                                If these tools help you avoid a single bad trade, we've succeeded. If they help you build lasting trading discipline, 
-                                we'll be thrilled.
-                            </p>
-                        </div>
-                    </div>
+    <!-- Why Free -->
+    <section class="mb-5">
+        <h2 style="color: #00b0ff; font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">
+            Why Free?
+        </h2>
+        <p style="color: #eaeaea; line-height: 1.8; margin-bottom: 1rem;">
+            We've all blown up an account. Revenge traded after a bad loss. Over-leveraged because "this one's different."
+        </p>
+        <p style="color: #eaeaea; line-height: 1.8; margin-bottom: 1rem;">
+            Everything changed when we started treating trading like a business: tracking metrics, sizing positions mathematically, 
+            managing risk systematically. The tools we needed either didn't exist, cost $200/month, or required handing over our trading data.
+        </p>
+        <p style="color: #eaeaea; line-height: 1.8; margin-bottom: 1rem;">
+            So we built our own. Now we're sharing them because:
+        </p>
+        <ol style="color: #eaeaea; line-height: 1.8; padding-left: 1.5rem;">
+            <li style="margin-bottom: 0.5rem;">Better traders make better markets</li>
+            <li style="margin-bottom: 0.5rem;">We believe in transparent formulas you can verify</li>
+            <li style="margin-bottom: 0.5rem;">Others helped us learn; paying it forward</li>
+        </ol>
+    </section>
 
-                    <!-- Privacy Commitment -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-shield-alt"></i> Privacy Commitment
-                        </div>
-                        <div class="card-body">
-                            <p class="lead mb-3">
-                                <strong class="text-success">100% client-side. Zero tracking. Zero data collection.</strong>
-                            </p>
-                            <p>
-                                All calculations happen in your browser. We don't see your account size, win rate, or trading strategy. 
-                                We don't use cookies for tracking. We don't sell your data because we never have it in the first place.
-                            </p>
-                            <div class="alert alert-info mb-3">
-                                <h6 class="mb-2"><i class="fas fa-code me-2"></i>Technical Details</h6>
-                                <ul class="mb-0">
-                                    <li>All calculations use client-side JavaScript</li>
-                                    <li>No server-side processing of your trading data</li>
-                                    <li>No cookies beyond essential session management</li>
-                                    <li>No third-party analytics or tracking pixels</li>
-                                    <li>localStorage used only for saving your preferences locally</li>
-                                </ul>
-                            </div>
-                            <p class="mb-0">
-                                You can use this site completely offline once loaded. Your trading data is yours alone.
-                            </p>
-                        </div>
-                    </div>
+    <!-- Privacy -->
+    <section class="mb-5">
+        <h2 style="color: #00ff88; font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">
+            Your Data Never Leaves Your Browser
+        </h2>
+        <p style="color: #eaeaea; line-height: 1.8; margin-bottom: 1rem;">
+            Everything runs client-side. We literally cannot see your account size, win rate, or strategy. 
+            No cookies. No tracking pixels. No "analytics." Your data stays on your computer.
+        </p>
+        <ul style="color: #9ba1a6; line-height: 1.8; padding-left: 1.5rem; font-size: 0.9rem;">
+            <li>100% JavaScript in your browser</li>
+            <li>Zero server-side data processing</li>
+            <li>localStorage only (saved on your device)</li>
+            <li>Works offline after first load</li>
+        </ul>
+    </section>
 
-                    <!-- Open Source -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-code"></i> Open Source & Transparency
-                        </div>
-                        <div class="card-body">
-                            <p>
-                                Trust in trading tools comes from transparency. That's why we're committed to open-sourcing our calculators:
-                            </p>
-                            <ul>
-                                <li><strong>View the math</strong> — All formulas are visible in the <a href="/methodology">Methodology</a> page</li>
-                                <li><strong>Verify calculations</strong> — Cross-check our results against academic papers and your own testing</li>
-                                <li><strong>Suggest improvements</strong> — Find a bug or have a feature idea? Join our Discord community</li>
-                                <li><strong>Inspect the code</strong> — All JavaScript source files are accessible and readable</li>
-                            </ul>
-                            <div class="alert alert-warning">
-                                <h6 class="mb-2"><i class="fas fa-exclamation-triangle me-2"></i>Important Disclaimer</h6>
-                                <p class="mb-0">
-                                    These calculators are educational tools based on mathematical models. They cannot predict the future or guarantee profits. 
-                                    Past performance does not indicate future results. Trading involves substantial risk of loss. Only trade with capital you can afford to lose. 
-                                    We are not financial advisors—these tools help you run your own analysis, but trading decisions are yours alone.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sidebar -->
-                <div class="col-lg-4">
-                    <!-- Quick Stats -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-chart-bar"></i> Project Stats
-                        </div>
-                        <div class="card-body">
-                            <div class="stat-row mb-3">
-                                <div class="stat-label">Calculators</div>
-                                <div class="stat-value text-primary">12</div>
-                            </div>
-                            <div class="stat-row mb-3">
-                                <div class="stat-label">Monte Carlo Simulations</div>
-                                <div class="stat-value text-success">10,000</div>
-                            </div>
-                            <div class="stat-row mb-3">
-                                <div class="stat-label">Calculation Speed</div>
-                                <div class="stat-value text-info">~100ms</div>
-                            </div>
-                            <div class="stat-row mb-3">
-                                <div class="stat-label">Privacy Level</div>
-                                <div class="stat-value text-warning">100%</div>
-                            </div>
-                            <div class="stat-row">
-                                <div class="stat-label">Cost to Use</div>
-                                <div class="stat-value text-success">$0</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tech Stack -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-laptop-code"></i> Technology
-                        </div>
-                        <div class="card-body">
-                            <p class="small text-muted mb-2">Built with:</p>
-                            <ul class="list-unstyled small">
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Node.js & Express</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Bootstrap 5</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Chart.js for visualizations</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Pure JavaScript (no frameworks)</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Responsive design</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Contact -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-envelope"></i> Feedback & Support
-                        </div>
-                        <div class="card-body">
-                            <p class="small">
-                                Found a bug? Have a feature request? Want to contribute?
-                            </p>
-                            <p class="small mb-3">
-                                We're building this for the trading community. Your feedback helps us improve.
-                            </p>
-                            <div class="d-grid gap-2">
-                                <a href="#" class="btn btn-sm btn-outline-primary">
-                                    <i class="fab fa-discord me-2"></i>Join Discord Community
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Resources -->
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-book"></i> Resources
-                        </div>
-                        <div class="card-body">
-                            <ul class="list-unstyled small">
-                                <li class="mb-2">
-                                    <a href="/methodology" class="text-decoration-none">
-                                        <i class="fas fa-calculator me-2"></i>Methodology & Formulas
-                                    </a>
-                                </li>
-                                <li class="mb-2">
-                                    <a href="/" class="text-decoration-none">
-                                        <i class="fas fa-home me-2"></i>All Calculators
-                                    </a>
-                                </li>
-                                <li class="mb-2">
-                                    <a href="#" class="text-decoration-none text-muted">
-                                        <i class="fas fa-video me-2"></i>Video Tutorials (Coming Soon)
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+    <!-- Stats -->
+    <section class="mb-5">
+        <div class="row g-4 text-center">
+            <div class="col-6 col-md-3">
+                <div style="color: #00b0ff; font-size: 2.5rem; font-weight: 700;">12</div>
+                <div style="color: #9ba1a6; font-size: 0.85rem;">Calculators</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="color: #00ff88; font-size: 2.5rem; font-weight: 700;">10K</div>
+                <div style="color: #9ba1a6; font-size: 0.85rem;">Monte Carlo Runs</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="color: #fca311; font-size: 2.5rem; font-weight: 700;">100%</div>
+                <div style="color: #9ba1a6; font-size: 0.85rem;">Privacy Level</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="color: #00ff88; font-size: 2.5rem; font-weight: 700;">$0</div>
+                <div style="color: #9ba1a6; font-size: 0.85rem;">Cost to Use</div>
             </div>
         </div>
+    </section>
 
-        <style>
-            .stat-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding-bottom: 0.75rem;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
-            
-            .stat-row:last-child {
-                border-bottom: none;
-                padding-bottom: 0;
-            }
-            
-            .stat-label {
-                font-size: 0.85rem;
-                color: #9ba1a6;
-            }
-            
-            .stat-value {
-                font-size: 1.25rem;
-                font-weight: 700;
-            }
-        </style>
+    <!-- Disclaimer -->
+    <section class="mb-5">
+        <div style="background: rgba(255, 184, 108, 0.1); border-left: 3px solid #ffb86c; padding: 1rem 1.5rem; border-radius: 4px;">
+            <h3 style="color: #ffb86c; font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">
+                <i class="fas fa-exclamation-triangle me-2"></i>Real Talk
+            </h3>
+            <p style="color: #eaeaea; font-size: 0.9rem; line-height: 1.7; margin-bottom: 0;">
+                These are math tools, not crystal balls. They can't predict the future. Trading is risky—you can lose money, 
+                possibly all of it. We're not financial advisors. Use these calculators to understand the math, 
+                but your trading decisions are 100% on you. See our <a href="/terms" style="color: #ffb86c;">Terms & Disclaimer</a> for the full legal version.
+            </p>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="mb-5">
+        <h2 style="color: #9ba1a6; font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">
+            Technology
+        </h2>
+        <div style="color: #9ba1a6; font-size: 0.9rem; line-height: 1.8;">
+            Built with Node.js, Express, Bootstrap 5, Chart.js, and pure JavaScript. No frameworks. No bloat. Just fast, reliable calculations.
+        </div>
+    </section>
+
+    <!-- Links -->
+    <section class="mb-5 text-center">
+        <a href="/methodology" class="btn btn-outline-primary me-2" style="font-size: 0.9rem;">
+            <i class="fas fa-calculator me-2"></i>View Methodology
+        </a>
+        <a href="/" class="btn btn-outline-secondary" style="font-size: 0.9rem;">
+            <i class="fas fa-home me-2"></i>Back to Calculators
+        </a>
+    </section>
+</div>
 
 <%- include('partials/footer') %>
