@@ -44,28 +44,16 @@
 - **Commit:** 1b76b8c
 - **Completed:** October 31, 2025
 
+### ✅ 5. **Enhanced Profile Loaded Notification**
+- **Status:** COMPLETED
+- **Implemented in:** Position Sizer, Trade Expectancy, Portfolio Heat, Compound Growth, Time to Goal, Leverage
+- **Features:** Larger toast (420px), green border pulse (2s), field count display, dismissible, 4.5s duration
+- **Commit:** cfced27
+- **Completed:** October 31, 2025
+
 ---
 
 ## 🎯 PROFILE ENHANCEMENTS (High Value)
-- **Problem:** Recommendations hidden in dropdown, users miss critical warnings
-- **Solution:**
-  - Add recommendation banner at top of each calculator page
-  - Show only CRITICAL and HIGH priority recommendations
-  - Make it collapsible with localStorage to remember state
-  - Example: "⚠️ Negative Edge Detected - Your strategy has negative expectancy"
-- **Implementation:**
-
-### 5. **Enhanced Profile Loaded Notification**
-- **Problem:** Toast notification is subtle, users might not notice auto-fill happened
-- **Solution:**
-  - Add subtle green border pulse to auto-filled fields
-  - Increase toast size and duration
-  - Add sound notification (optional, user preference)
-  - Show "Loaded from profile" icon next to field labels
-- **Files to modify:**
-  - Position Sizer, Portfolio Heat, Trade Expectancy (already have notifications)
-  - Add to remaining calculators with auto-fill
-- **Priority:** 🟡 MEDIUM
 
 ### 6. **Profile Import from CSV/JSON**
 - **Problem:** Users can export but not import
