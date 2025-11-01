@@ -275,12 +275,30 @@
         const avgLoss = parseFloat(document.getElementById('avgLoss').value);
         const totalTrades = parseInt(document.getElementById('totalTrades').value);
         
-        if (isNaN(winRate) || isNaN(avgWin) || isNaN(avgLoss) || isNaN(totalTrades)) return;
+        // Validation
+        const errors = [];
+        if (isNaN(winRate) || winRate < 0 || winRate > 1) errors.push('Win rate must be between 0% and 100%');
+        if (!avgWin || avgWin <= 0) errors.push('Average win must be greater than $0');
+        if (!avgLoss || avgLoss <= 0) errors.push('Average loss must be greater than $0');
+        if (!totalTrades || totalTrades <= 0) errors.push('Total trades must be greater than 0');
+        
+        if (errors.length > 0) {
+            showError(errors);
+            return;
+        }
+        
+        clearError();
         
         const lossRate = 1 - winRate;
         
         // Calculate expectancy
         const expectancy = (winRate * avgWin) - (lossRate * avgLoss);
+        
+        // Validate calculation
+        if (!isFinite(expectancy) || isNaN(expectancy)) {
+            showError(['Invalid calculation result']);
+            return;
+        }
         
         // Update expectancy display
         const expectancyEl = document.getElementById('expectancy');
@@ -395,6 +413,35 @@
             // Track calculator usage
             PersonalizationEngine.trackCalculatorUsage('Trade Expectancy');
         }
+    }
+    
+    // Error handling functions
+    function showError(errors) {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid Input</strong>
+                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+    }
+    
+    function clearError() {
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer) errorContainer.style.display = 'none';
+    }
+    
+    function createErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'errorContainer';
+        container.style.display = 'none';
+        const form = document.getElementById('expectancyForm');
+        form.parentElement.insertBefore(container, form.nextSibling);
+        return container;
     }
     
     // Listen for profile updates

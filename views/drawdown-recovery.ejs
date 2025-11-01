@@ -197,12 +197,35 @@
     
     // Real-time calculation function
     function calculate() {
-        const peakBalance = parseFloat(document.getElementById('peakBalance').value) || 0;
-        const currentBalance = parseFloat(document.getElementById('currentBalance').value) || 0;
-        const winRate = parseFloat(document.getElementById('winRate').value) / 100 || 0;
-        const avgWin = parseFloat(document.getElementById('avgWin').value) / 100 || 0;
-        const avgLoss = parseFloat(document.getElementById('avgLoss').value) / 100 || 0;
-        const tradesPerDay = parseInt(document.getElementById('tradesPerDay').value) || 1;
+        const peakBalance = parseFloat(document.getElementById('peakBalance').value);
+        const currentBalance = parseFloat(document.getElementById('currentBalance').value);
+        const winRate = parseFloat(document.getElementById('winRate').value) / 100;
+        const avgWin = parseFloat(document.getElementById('avgWin').value) / 100;
+        const avgLoss = parseFloat(document.getElementById('avgLoss').value) / 100;
+        const tradesPerDay = parseInt(document.getElementById('tradesPerDay').value);
+        
+        // Validation
+        const errors = [];
+        if (!peakBalance || peakBalance <= 0) errors.push('Peak balance must be greater than $0');
+        if (!currentBalance || currentBalance < 0) errors.push('Current balance cannot be negative');
+        if (currentBalance > peakBalance) errors.push('Current balance cannot exceed peak balance');
+        if (isNaN(winRate) || winRate < 0 || winRate > 1) errors.push('Win rate must be between 0% and 100%');
+        if (!avgWin || avgWin <= 0 || avgWin > 1) errors.push('Average win must be between 0% and 100%');
+        if (!avgLoss || avgLoss <= 0 || avgLoss > 1) errors.push('Average loss must be between 0% and 100%');
+        if (!tradesPerDay || tradesPerDay <= 0) errors.push('Trades per day must be greater than 0');
+        
+        if (errors.length > 0) {
+            showError(errors);
+            return;
+        }
+        
+        // Special case: 100% drawdown (account at $0)
+        if (currentBalance === 0) {
+            showUnrecoverableDrawdown();
+            return;
+        }
+        
+        clearError();
         
         if (!peakBalance || !currentBalance) return;
         
@@ -212,6 +235,26 @@
         
         // Calculate recovery needed (key insight: need more gain % than loss %)
         const recoveryNeeded = (drawdownDollar / currentBalance) * 100;
+        
+        // Validate calculations
+        if (!isFinite(drawdownPercent) || isNaN(drawdownPercent)) {
+            showError(['Invalid drawdown calculation']);
+            return;
+        }
+        
+        if (!isFinite(recoveryNeeded) || isNaN(recoveryNeeded)) {
+            showError(['Invalid recovery calculation']);
+            return;
+        }
+        
+        // Warning for severe drawdowns
+        if (drawdownPercent > 99) {
+            showWarning('99%+ drawdown is practically unrecoverable. Requires ' + recoveryNeeded.toFixed(0) + '% gain.');
+        } else if (drawdownPercent > 75) {
+            showWarning('75%+ drawdown requires ' + recoveryNeeded.toFixed(0) + '% gain - extremely difficult.');
+        } else if (drawdownPercent > 50) {
+            showWarning('50%+ drawdown requires ' + recoveryNeeded.toFixed(0) + '% gain - very challenging.');
+        }
         
         // Update drawdown displays
         document.getElementById('drawdownPercent').textContent = drawdownPercent.toFixed(1) + '%';
@@ -435,6 +478,83 @@
         });
         
         tbody.innerHTML = rows;
+    }
+    
+    // Error handling functions
+    function showError(errors) {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid Input</strong>
+                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+        clearResults();
+    }
+    
+    function showUnrecoverableDrawdown() {
+        const errorContainer = document.getElementById('errorContainer') || createErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-skull-crossbones"></i>
+                <strong>100% Drawdown - Unrecoverable</strong>
+                <p style="margin: 0.5rem 0 0 0;">Account is at $0. Cannot recover without adding new capital.</p>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+        clearResults();
+    }
+    
+    function showWarning(message) {
+        const warningContainer = document.getElementById('warningContainer') || createWarningContainer();
+        warningContainer.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>Warning:</strong> ${message}
+            </div>
+        `;
+        warningContainer.style.display = 'block';
+    }
+    
+    function clearError() {
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer) errorContainer.style.display = 'none';
+        const warningContainer = document.getElementById('warningContainer');
+        if (warningContainer) warningContainer.style.display = 'none';
+    }
+    
+    function clearResults() {
+        document.getElementById('drawdownPercent').textContent = '--';
+        document.getElementById('drawdownDollar').textContent = '--';
+        document.getElementById('drawdownDisplay').textContent = '--';
+        document.getElementById('gainNeeded').textContent = '--';
+        document.getElementById('recoveryNeeded').textContent = '--';
+        document.getElementById('expectedReturn').textContent = '--';
+        document.getElementById('wlRatio').textContent = '--';
+        document.getElementById('tradesNeeded').textContent = '--';
+        document.getElementById('timeNeeded').textContent = '--';
+    }
+    
+    function createErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'errorContainer';
+        container.style.display = 'none';
+        const form = document.querySelector('.compact-form');
+        form.parentElement.insertBefore(container, form.nextSibling);
+        return container;
+    }
+    
+    function createWarningContainer() {
+        const container = document.createElement('div');
+        container.id = 'warningContainer';
+        container.style.display = 'none';
+        const results = document.querySelector('.row.g-3');
+        results.parentElement.insertBefore(container, results);
+        return container;
     }
     
     // Add real-time updates to all inputs
