@@ -281,12 +281,34 @@
     addPositionForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const symbol = document.getElementById('symbol').value.toUpperCase();
+        const symbol = document.getElementById('symbol').value.toUpperCase().trim();
         const entryPrice = parseFloat(document.getElementById('entryPrice').value);
         const stopLoss = parseFloat(document.getElementById('stopLoss').value);
         const positionSize = parseInt(document.getElementById('positionSize').value);
         
+        // Validation
+        const errors = [];
+        if (!symbol) errors.push('Symbol is required');
+        if (!entryPrice || entryPrice <= 0) errors.push('Entry price must be greater than $0');
+        if (!stopLoss || stopLoss <= 0) errors.push('Stop loss must be greater than $0');
+        if (stopLoss === entryPrice) errors.push('Stop loss cannot equal entry price');
+        if (!positionSize || positionSize <= 0) errors.push('Position size must be greater than 0');
+        
+        if (errors.length > 0) {
+            showFormError(errors);
+            return;
+        }
+        
+        clearFormError();
+        
         const risk = Math.abs(entryPrice - stopLoss) * positionSize;
+        
+        // Sanity check: risk shouldn't exceed account balance
+        const accountBalance = parseFloat(accountBalanceInput.value);
+        if (risk > accountBalance) {
+            showFormError(['Position risk ($' + risk.toFixed(2) + ') exceeds account balance ($' + accountBalance.toFixed(2) + ')']);
+            return;
+        }
         
         positions.push({
             id: Date.now(),
@@ -320,11 +342,29 @@
     function updateDisplay() {
         const accountBalance = parseFloat(accountBalanceInput.value);
         const maxHeatPercent = parseFloat(maxHeatInput.value) / 100;
-        const maxHeatDollar = accountBalance * maxHeatPercent;
         
+        // Validation
+        if (!accountBalance || accountBalance <= 0) {
+            showDisplayError('Account balance must be greater than $0');
+            return;
+        }
+        if (!maxHeatPercent || maxHeatPercent <= 0 || maxHeatPercent > 1) {
+            showDisplayError('Max portfolio heat must be between 1% and 100%');
+            return;
+        }
+        
+        clearDisplayError();
+        
+        const maxHeatDollar = accountBalance * maxHeatPercent;
         const totalRisk = positions.reduce((sum, p) => sum + p.risk, 0);
         const heatPercent = (totalRisk / accountBalance) * 100;
         const available = maxHeatDollar - totalRisk;
+        
+        // Validate calculations
+        if (!isFinite(heatPercent) || isNaN(heatPercent)) {
+            showDisplayError('Invalid calculation result');
+            return;
+        }
         
         // Update heat gauge
         const gaugePercent = Math.min((totalRisk / maxHeatDollar) * 100, 100);
@@ -430,6 +470,13 @@
             return;
         }
         
+        // Validate chart data
+        const hasInvalidData = positions.some(p => !isFinite(p.risk) || isNaN(p.risk) || p.risk < 0);
+        if (hasInvalidData) {
+            console.error('Invalid data in positions, skipping chart render');
+            return;
+        }
+        
         riskChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -474,6 +521,71 @@
                 }
             }
         });
+    }
+
+    // Error handling functions
+    function showFormError(errors) {
+        const errorContainer = document.getElementById('formErrorContainer') || createFormErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger" style="margin-top: 1rem;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid Input</strong>
+                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+    }
+    
+    function clearFormError() {
+        const errorContainer = document.getElementById('formErrorContainer');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+        }
+    }
+    
+    function showDisplayError(message) {
+        const errorContainer = document.getElementById('displayErrorContainer') || createDisplayErrorContainer();
+        errorContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Error:</strong> ${message}
+            </div>
+        `;
+        errorContainer.style.display = 'block';
+        
+        // Reset displays
+        heatFill.style.width = '0%';
+        heatPercentage.textContent = '--';
+        currentHeat.textContent = '--';
+        availableHeat.textContent = '--';
+        maxHeatDisplay.textContent = '--';
+    }
+    
+    function clearDisplayError() {
+        const errorContainer = document.getElementById('displayErrorContainer');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+        }
+    }
+    
+    function createFormErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'formErrorContainer';
+        container.style.display = 'none';
+        const form = document.getElementById('addPositionForm');
+        form.parentElement.appendChild(container);
+        return container;
+    }
+    
+    function createDisplayErrorContainer() {
+        const container = document.createElement('div');
+        container.id = 'displayErrorContainer';
+        container.style.display = 'none';
+        const heatCard = document.querySelector('.heat-gauge-container').parentElement;
+        heatCard.insertBefore(container, heatCard.firstChild);
+        return container;
     }
 
     // Update on account changes
