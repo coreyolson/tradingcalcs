@@ -165,5 +165,125 @@
             </div>
         </header>
         
+        <!-- Backup Reminder Banner -->
+        <div id="backupReminderBanner" style="display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 1060; background: linear-gradient(135deg, rgba(255, 183, 0, 0.95), rgba(252, 163, 17, 0.95)); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(252, 163, 17, 0.4); animation: slideDown 0.4s ease;">
+            <div class="container-fluid px-4 py-3">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                        <div style="width: 48px; height: 48px; background: rgba(0, 0, 0, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; color: #000;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; color: #000; font-size: 1rem; margin-bottom: 0.25rem;">
+                                <i class="fas fa-shield-alt me-1"></i>Backup Your Trading Profile
+                            </div>
+                            <div style="color: rgba(0, 0, 0, 0.8); font-size: 0.9rem;" id="backupReminderText">
+                                Your profile hasn't been backed up in over 30 days. Protect your data from browser issues.
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <button onclick="backupNow()" class="btn" style="background: #000; color: #fff; border: none; font-weight: 600; padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.9rem; transition: all 0.2s ease;">
+                            <i class="fas fa-download me-2"></i>Backup Now
+                        </button>
+                        <button onclick="dismissBackupBanner(7)" class="btn" style="background: rgba(0, 0, 0, 0.1); color: #000; border: 1px solid rgba(0, 0, 0, 0.2); font-weight: 600; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.9rem; transition: all 0.2s ease;">
+                            Remind Me Later
+                        </button>
+                        <button onclick="dismissBackupBanner(30)" style="background: transparent; border: none; color: rgba(0, 0, 0, 0.6); font-size: 1.25rem; cursor: pointer; padding: 0.25rem 0.5rem; transition: color 0.2s ease;" title="Dismiss for 30 days">
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <style>
+            @keyframes slideDown {
+                0% {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideUp {
+                0% {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+            }
+            
+            #backupReminderBanner button:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+        </style>
+        
+        <script>
+            // Check and show backup reminder on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof PersonalizationEngine !== 'undefined') {
+                    if (PersonalizationEngine.shouldShowBackupReminder()) {
+                        showBackupReminder();
+                    }
+                }
+            });
+            
+            function showBackupReminder() {
+                const banner = document.getElementById('backupReminderBanner');
+                const days = PersonalizationEngine.getDaysSinceLastBackup();
+                const textEl = document.getElementById('backupReminderText');
+                
+                if (days === null) {
+                    textEl.textContent = 'Your profile has never been backed up. Protect your data from browser issues.';
+                } else {
+                    textEl.textContent = `Your profile hasn't been backed up in ${days} days. Protect your data from browser issues.`;
+                }
+                
+                banner.style.display = 'block';
+            }
+            
+            function backupNow() {
+                PersonalizationEngine.exportProfile();
+                dismissBackupBanner(30);
+                
+                // Show success toast
+                const toast = document.createElement('div');
+                toast.className = 'alert alert-success';
+                toast.style.cssText = 'position: fixed; top: 90px; right: 20px; z-index: 1070; max-width: 400px; animation: slideInRight 0.3s ease;';
+                toast.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-check-circle" style="font-size: 1.5rem; color: var(--success-color);"></i>
+                        <div>
+                            <strong style="color: var(--success-color);">Profile Backed Up!</strong><br>
+                            <small style="color: var(--text-secondary);">Your trading profile has been downloaded safely.</small>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+            
+            function dismissBackupBanner(days) {
+                PersonalizationEngine.dismissBackupReminder(days);
+                const banner = document.getElementById('backupReminderBanner');
+                banner.style.animation = 'slideUp 0.4s ease';
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 400);
+            }
+        </script>
+        
         <!-- Include Profile Modal & Widget -->
         <%- include('profile-modal') %>

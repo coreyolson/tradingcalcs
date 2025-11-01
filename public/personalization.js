@@ -296,6 +296,11 @@ const PersonalizationEngine = (() => {
      */
     function exportProfile() {
         const profile = loadProfile();
+        
+        // Track backup date
+        profile.lastBackupDate = new Date().toISOString();
+        saveProfile(profile);
+        
         const dataStr = JSON.stringify(profile, null, 2);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(dataBlob);
@@ -320,6 +325,56 @@ const PersonalizationEngine = (() => {
             console.error('Error importing profile:', error);
             return false;
         }
+    }
+    
+    /**
+     * Check if backup reminder should be shown
+     */
+    function shouldShowBackupReminder() {
+        const profile = loadProfile();
+        
+        // Don't show if profile is empty
+        if (!isProfileComplete()) {
+            return false;
+        }
+        
+        // Check if reminder was dismissed recently
+        const dismissedUntil = localStorage.getItem('backupReminderDismissedUntil');
+        if (dismissedUntil && new Date(dismissedUntil) > new Date()) {
+            return false;
+        }
+        
+        // Check last backup date
+        if (!profile.lastBackupDate) {
+            // No backup yet - show reminder if profile is older than 30 days
+            const profileCreated = profile.createdAt || new Date().toISOString();
+            const daysSinceCreation = (new Date() - new Date(profileCreated)) / (1000 * 60 * 60 * 24);
+            return daysSinceCreation > 30;
+        }
+        
+        // Check if last backup was more than 30 days ago
+        const daysSinceBackup = (new Date() - new Date(profile.lastBackupDate)) / (1000 * 60 * 60 * 24);
+        return daysSinceBackup > 30;
+    }
+    
+    /**
+     * Dismiss backup reminder for specified days
+     */
+    function dismissBackupReminder(days = 7) {
+        const dismissUntil = new Date();
+        dismissUntil.setDate(dismissUntil.getDate() + days);
+        localStorage.setItem('backupReminderDismissedUntil', dismissUntil.toISOString());
+    }
+    
+    /**
+     * Get days since last backup
+     */
+    function getDaysSinceLastBackup() {
+        const profile = loadProfile();
+        if (!profile.lastBackupDate) {
+            return null;
+        }
+        return Math.floor((new Date() - new Date(profile.lastBackupDate)) / (1000 * 60 * 60 * 24));
     }
     
     /**
@@ -463,6 +518,9 @@ const PersonalizationEngine = (() => {
         resetProfile,
         exportProfile,
         importProfile,
+        shouldShowBackupReminder,
+        dismissBackupReminder,
+        getDaysSinceLastBackup,
         getRiskProfileDescription,
         getTradingStyleDescription,
         showCalculatorRecommendations,
