@@ -480,6 +480,11 @@
     window.addEventListener('profileLoaded', autoFillFromProfile);
     window.addEventListener('profileUpdated', autoFillFromProfile);
     
+    // Show calculator-specific recommendations
+    if (typeof PersonalizationEngine !== 'undefined') {
+        PersonalizationEngine.showCalculatorRecommendations('Trade Expectancy');
+    }
+    
     // Auto-fill on page load
     autoFillFromProfile();
 </script>

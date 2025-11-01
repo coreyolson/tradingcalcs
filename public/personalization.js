@@ -384,6 +384,71 @@ const PersonalizationEngine = (() => {
         return descriptions[style] || null;
     }
     
+    /**
+     * Show calculator-specific recommendations
+     * Filters and displays only CRITICAL and HIGH priority recommendations
+     * relevant to the current calculator
+     */
+    function showCalculatorRecommendations(calculatorName) {
+        const recommendations = getRecommendations();
+        
+        // Filter for critical and high priority only
+        const importantRecs = recommendations.filter(rec => 
+            rec.priority === 'critical' || rec.priority === 'high'
+        );
+        
+        if (importantRecs.length === 0) {
+            return; // No important recommendations to show
+        }
+        
+        // Check if user has dismissed recommendations
+        const dismissedKey = 'calc_rec_dismissed_' + calculatorName;
+        const dismissed = localStorage.getItem(dismissedKey);
+        const dismissedTime = dismissed ? parseInt(dismissed) : 0;
+        const hoursSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60);
+        
+        // Re-show after 24 hours
+        if (hoursSinceDismissed < 24) {
+            return;
+        }
+        
+        // Create recommendation banner
+        const container = document.getElementById('calcRecommendations') || createRecommendationContainer();
+        
+        let html = '';
+        importantRecs.forEach(rec => {
+            const alertType = rec.priority === 'critical' ? 'danger' : 'warning';
+            const icon = rec.icon || 'fa-info-circle';
+            
+            html += `
+                <div class="alert alert-${alertType} alert-dismissible fade show mb-3" role="alert">
+                    <i class="fas ${icon} me-2"></i>
+                    <strong>${rec.title}:</strong> ${rec.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" 
+                        onclick="PersonalizationEngine.dismissRecommendation('${calculatorName}')"></button>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        container.style.display = 'block';
+    }
+    
+    function createRecommendationContainer() {
+        const container = document.createElement('div');
+        container.id = 'calcRecommendations';
+        container.style.display = 'none';
+        const mainContainer = document.querySelector('.container');
+        const firstCard = mainContainer.querySelector('.row');
+        mainContainer.insertBefore(container, firstCard);
+        return container;
+    }
+    
+    function dismissRecommendation(calculatorName) {
+        const dismissedKey = 'calc_rec_dismissed_' + calculatorName;
+        localStorage.setItem(dismissedKey, Date.now().toString());
+    }
+    
     // Public API
     return {
         loadProfile,
@@ -400,6 +465,8 @@ const PersonalizationEngine = (() => {
         importProfile,
         getRiskProfileDescription,
         getTradingStyleDescription,
+        showCalculatorRecommendations,
+        dismissRecommendation,
         DEFAULT_PROFILE
     };
 })();

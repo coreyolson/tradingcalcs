@@ -576,6 +576,11 @@
     window.addEventListener('profileLoaded', autoFillFromProfile);
     window.addEventListener('profileUpdated', autoFillFromProfile);
     
+    // Show calculator-specific recommendations
+    if (typeof PersonalizationEngine !== 'undefined') {
+        PersonalizationEngine.showCalculatorRecommendations('Position Sizer');
+    }
+    
     // Initial auto-fill and calculation
     autoFillFromProfile();
     calculate();

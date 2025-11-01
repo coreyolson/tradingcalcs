@@ -621,6 +621,11 @@
     window.addEventListener('profileLoaded', autoFillFromProfile);
     window.addEventListener('profileUpdated', autoFillFromProfile);
     
+    // Show calculator-specific recommendations
+    if (typeof PersonalizationEngine !== 'undefined') {
+        PersonalizationEngine.showCalculatorRecommendations('Portfolio Heat');
+    }
+    
     // Initial auto-fill and display
     autoFillFromProfile();
     updateDisplay();
