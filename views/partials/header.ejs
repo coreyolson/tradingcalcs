@@ -289,6 +289,143 @@
                     banner.style.display = 'none';
                 }, 400);
             }
+            
+            // Global Keyboard Shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+P or Cmd+P: Open Profile Modal
+                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                    e.preventDefault();
+                    const profileBtn = document.getElementById('profileModalBtn');
+                    if (profileBtn) profileBtn.click();
+                }
+                
+                // Ctrl+K or Cmd+K: Focus calculator search (if exists)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    const searchInput = document.querySelector('input[type="search"]');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.select();
+                    } else {
+                        // If no search, go to homepage
+                        window.location.href = '/';
+                    }
+                }
+                
+                // ? key: Show keyboard shortcuts help
+                if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                    // Don't trigger if user is typing in an input
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                    e.preventDefault();
+                    showKeyboardShortcuts();
+                }
+                
+                // Escape: Close modals or shortcuts overlay
+                if (e.key === 'Escape') {
+                    const shortcutsModal = document.getElementById('keyboardShortcutsOverlay');
+                    if (shortcutsModal && shortcutsModal.style.display === 'flex') {
+                        hideKeyboardShortcuts();
+                    }
+                }
+            });
+            
+            function showKeyboardShortcuts() {
+                let overlay = document.getElementById('keyboardShortcutsOverlay');
+                
+                if (!overlay) {
+                    // Create shortcuts overlay
+                    overlay = document.createElement('div');
+                    overlay.id = 'keyboardShortcutsOverlay';
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(5, 8, 22, 0.95);
+                        backdrop-filter: blur(8px);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 9999;
+                        animation: fadeIn 0.2s ease;
+                    `;
+                    
+                    overlay.innerHTML = `
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: 12px; padding: 2rem; max-width: 600px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h3 style="margin: 0; color: var(--primary-color); font-size: 1.5rem;">
+                                    <i class="fas fa-keyboard"></i> Keyboard Shortcuts
+                                </h3>
+                                <button onclick="hideKeyboardShortcuts()" style="background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; padding: 0.25rem 0.5rem; transition: color 0.2s;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0, 212, 255, 0.05); border-radius: 6px;">
+                                    <span style="color: var(--text-primary);">
+                                        <i class="fas fa-user-circle" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                                        Open Profile
+                                    </span>
+                                    <kbd style="background: var(--bg-secondary); padding: 0.25rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); font-family: monospace; font-size: 0.85rem;">Ctrl+P</kbd>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0, 212, 255, 0.05); border-radius: 6px;">
+                                    <span style="color: var(--text-primary);">
+                                        <i class="fas fa-search" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                                        Calculator Search / Home
+                                    </span>
+                                    <kbd style="background: var(--bg-secondary); padding: 0.25rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); font-family: monospace; font-size: 0.85rem;">Ctrl+K</kbd>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0, 212, 255, 0.05); border-radius: 6px;">
+                                    <span style="color: var(--text-primary);">
+                                        <i class="fas fa-question-circle" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                                        Show This Help
+                                    </span>
+                                    <kbd style="background: var(--bg-secondary); padding: 0.25rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); font-family: monospace; font-size: 0.85rem;">?</kbd>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0, 212, 255, 0.05); border-radius: 6px;">
+                                    <span style="color: var(--text-primary);">
+                                        <i class="fas fa-times-circle" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                                        Close Overlay
+                                    </span>
+                                    <kbd style="background: var(--bg-secondary); padding: 0.25rem 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); font-family: monospace; font-size: 0.85rem;">Esc</kbd>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+                                <i class="fas fa-lightbulb" style="color: var(--warning-color); margin-right: 0.25rem;"></i>
+                                Pro tip: Use <kbd style="background: var(--bg-secondary); padding: 0.15rem 0.4rem; border-radius: 3px; border: 1px solid var(--border-color); font-family: monospace; font-size: 0.75rem;">Ctrl+P</kbd> to quickly save your profile settings
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Close on background click
+                    overlay.addEventListener('click', function(e) {
+                        if (e.target === overlay) {
+                            hideKeyboardShortcuts();
+                        }
+                    });
+                    
+                    document.body.appendChild(overlay);
+                } else {
+                    overlay.style.display = 'flex';
+                }
+            }
+            
+            function hideKeyboardShortcuts() {
+                const overlay = document.getElementById('keyboardShortcutsOverlay');
+                if (overlay) {
+                    overlay.style.animation = 'fadeOut 0.2s ease';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        overlay.style.animation = 'fadeIn 0.2s ease';
+                    }, 200);
+                }
+            }
         </script>
         
         <!-- Include Profile Modal & Widget -->

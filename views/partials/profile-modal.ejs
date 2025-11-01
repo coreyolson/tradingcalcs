@@ -251,12 +251,13 @@
     
     function createSetupButton() {
         profileWidgetContainer.innerHTML = `
-            <button class="btn btn-sm" type="button" id="setupProfileBtn"
+            <button class="btn btn-sm" type="button" id="profileModalBtn"
                     style="background: rgba(214, 139, 69, 0.1); border: 1px solid rgba(214, 139, 69, 0.3); color: #d68b45;">
                 <i class="fas fa-user-plus me-2"></i>Set Up Profile
+                <kbd style="background: rgba(0,0,0,0.3); padding: 0.1rem 0.3rem; margin-left: 0.5rem; border-radius: 3px; font-size: 0.7rem; opacity: 0.7;">Ctrl+P</kbd>
             </button>
         `;
-        document.getElementById('setupProfileBtn').addEventListener('click', function() {
+        document.getElementById('profileModalBtn').addEventListener('click', function() {
             modal.show();
         });
     }
@@ -264,13 +265,14 @@
     function createProfileWidget() {
         profileWidgetContainer.innerHTML = `
             <div class="dropdown">
-                <button class="btn btn-sm dropdown-toggle" type="button" id="profileDropdown" 
+                <button class="btn btn-sm dropdown-toggle" type="button" id="profileModalBtn" 
                         data-bs-toggle="dropdown" aria-expanded="false"
                         style="background: rgba(214, 139, 69, 0.1); border: 1px solid rgba(214, 139, 69, 0.3); color: #d68b45;">
                     <i class="fas fa-user-circle me-2"></i>
                     <span id="profileUsername">My Profile</span>
+                    <kbd style="background: rgba(0,0,0,0.3); padding: 0.1rem 0.3rem; margin-left: 0.5rem; border-radius: 3px; font-size: 0.65rem; opacity: 0.6;">Ctrl+P</kbd>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown" 
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileModalBtn" 
                     style="background: linear-gradient(135deg, #1a1f25 0%, #24292e 100%); border: 1px solid rgba(214, 139, 69, 0.3); min-width: 280px;">
                     
                     <!-- Profile Quick Stats -->
